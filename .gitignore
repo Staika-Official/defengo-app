@@ -1,4 +1,4 @@
-# ========== 기본 Unity 설정 ==========
+# ========== Unity 기본 캐시 및 임시 파일 ==========
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -6,26 +6,63 @@
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
-
-# 유니티 빌드 타겟 관련
+[Uu]ser[Ss]ettings/
 sysinfo.txt
+*.log
 
-# ========== VS/JetBrains 관련 ==========
+# Unity Addressables 및 StreamingAssets 관련
+**/Assets/AddressableAssetsData/*/*.bin*
+**/assets/addressableassetsdata/*/*.bin*
+**/Assets/StreamingAssets/aa.meta
+**/assets/streamingassets/*/aa/*
+
+# Unity Collaborate 및 Plastic SCM
+.collabignore
+**/Assets/Plugins/PlasticSCM/
+**/assets/plugins/PlasticSCM*
+*.private
+*.private.meta
+^*.private.[0-9]+$
+^*.private.[0-9]+.meta$
+
+# Unity Cache Server
+UnityCache/
+
+# Asset Store Tools
+**/Assets/AssetStoreTools/
+**/assets/assetstoretools/
+
+# ========== 개발 도구 (IDE/에디터) 관련 ==========
 .vs/
 .vscode/
-.cursor/
 .idea/
+.cursor/
+.consulo/
+
+# VS / Rider / 기타 IDE 생성 파일
 *.sln
 *.csproj
-*.user
 *.unityproj
+*.user
+*.userprefs
+*.suo
 *.pidb
 *.booproj
-
-# Rider
 *.sln.iml
+*.svd
+*.VC.db
+*.opendb
+*.pidb.meta
+*.pdb
+*.pdb.meta
+*.mdb
+*.mdb.meta
 
-# ========== OS 별 캐시 및 설정 ==========
+# Gradle / Android Studio / Crashlytics
+.gradle/
+crashlytics-build.properties
+
+# ========== OS별 임시 파일 ==========
 # macOS
 .DS_Store
 ._*
@@ -37,23 +74,19 @@ Desktop.ini
 # Linux
 *~
 
-# ========== 사용자 설정 ==========
+# ========== 임시/백업 파일 ==========
 *.swp
 *.tmp
 *.bak
 *.old
 *.orig
+~UnityDirMonSyncFile~*
 
-# Unity Collaborate 및 Plastic SCM
-.collabignore
-**/Assets/Plugins/PlasticSCM/
-
-# Unity Cache Server
-UnityCache/
-
-# ========== 빌드 출력 제외 ==========
+# ========== 빌드 결과물 제외 ==========
 *.apk
 *.aab
+*.app
+*.unitypackage
 *.xcodeproj/
 *.xcworkspace/
 *.xcuserstate
@@ -62,19 +95,13 @@ UnityCache/
 *.mode2v3
 *.perspectivev3
 
-# ========== 기타 제외 ==========
-/ExportedObj/
-/*.apk
-/*.unitypackage
-*.apk
-*.unitypackage
-*.log
+# ========== 테스트 / 커버리지 ==========
+TestResults/
+CoverageResults/
 
-# ========== 사용자에 따라 추가할 수 있는 항목 ==========
-# 환경 변수, secret 등
+# ========== 환경변수 / Secret ==========
 .env
 .env.*
 
-# 테스트 결과
-TestResults/
-CoverageResults/
+# ========== Exported 오브젝트 ==========
+ExportedObj/
