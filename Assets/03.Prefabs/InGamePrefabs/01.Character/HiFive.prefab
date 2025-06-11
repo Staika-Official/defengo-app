@@ -1,0 +1,509 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2618945105408075912
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2618945105408075911}
+  - component: {fileID: 2618945105408075910}
+  - component: {fileID: 2618945105408075913}
+  - component: {fileID: 2278748678415472041}
+  m_Layer: 0
+  m_Name: SpineAnim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2618945105408075911
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945105408075912}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.15, y: 0.15, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2618945106766730984}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2618945105408075910
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945105408075912}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 28ff27969f66e314096d6868ceef389b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &2618945105408075913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945105408075912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d247ba06193faa74d9335f5481b2b56c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skeletonDataAsset: {fileID: 11400000, guid: c694cf9dae4c62d4e952ff3bdd12bd73, type: 2}
+  initialSkinName: 
+  fixPrefabOverrideViaMeshFilter: 2
+  initialFlipX: 0
+  initialFlipY: 0
+  updateWhenInvisible: 3
+  separatorSlotNames: []
+  zSpacing: 0
+  useClipping: 1
+  immutableTriangles: 0
+  pmaVertexColors: 1
+  clearStateOnDisable: 0
+  tintBlack: 0
+  singleSubmesh: 0
+  fixDrawOrder: 0
+  addNormals: 0
+  calculateTangents: 0
+  maskInteraction: 0
+  maskMaterials:
+    materialsMaskDisabled: []
+    materialsInsideMask: []
+    materialsOutsideMask: []
+  disableRenderingOnOverride: 1
+  updateTiming: 1
+  unscaledTime: 0
+  _animationName: Appear
+  loop: 0
+  timeScale: 1
+--- !u!33 &2278748678415472041
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945105408075912}
+  m_Mesh: {fileID: 0}
+--- !u!1 &2618945106766730986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2618945106766730984}
+  - component: {fileID: 6690882264182555718}
+  - component: {fileID: 5735511720878701370}
+  - component: {fileID: 6690882264182555717}
+  m_Layer: 0
+  m_Name: HiFive
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2618945106766730984
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945106766730986}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2618945105408075911}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &6690882264182555718
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945106766730986}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.4}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!50 &5735511720878701370
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945106766730986}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &6690882264182555717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2618945106766730986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2b12d493a3ce4cce8ae58319ad22e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 2618945105408075913}
+  characterName: 
+  range:
+    migratedVersion: 
+    currentCryptoKey: 1422787833
+    hiddenValue: 1409601273
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isTouched: 0
+  constructibleIdx:
+    currentCryptoKey: 1438414849
+    hiddenValue: 1438414849
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  glacierIdx:
+    currentCryptoKey: 1350134219
+    hiddenValue: 1350134219
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isTutorial: 0
+  totalDamage:
+    migratedVersion: 
+    currentCryptoKey: 1034157792
+    hiddenValue: 1040098272
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  characterIndex: 307
+  starGradeIndex:
+    currentCryptoKey: 2088115964
+    hiddenValue: 2088115964
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  upgradeIndex:
+    currentCryptoKey: 1526137114
+    hiddenValue: 1526137114
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  characterData: {fileID: 11400000, guid: 444f5a5ca243243d4a7d0c7925be9cf6, type: 2}
+  upgradeFactor:
+    migratedVersion: 
+    currentCryptoKey: 1581272051
+    hiddenValue: 1581990131
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  basicAttackDamage:
+    migratedVersion: 
+    currentCryptoKey: 1903753552
+    hiddenValue: 1912174672
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  classDamage:
+    migratedVersion: 
+    currentCryptoKey: 1852762643
+    hiddenValue: 1860857363
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  attackSpeed:
+    migratedVersion: 
+    currentCryptoKey: 2130235526
+    hiddenValue: 2127624326
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalRange:
+    migratedVersion: 
+    currentCryptoKey: 2108205020
+    hiddenValue: 2108139740
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  targetCount:
+    currentCryptoKey: 2075487837
+    hiddenValue: 2075487839
+    fakeValue: 2
+    fakeValueActive: 1
+    inited: 1
+  attackRange:
+    migratedVersion: 
+    currentCryptoKey: 1467855070
+    hiddenValue: 1471184350
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  projectileSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1971642267
+    hiddenValue: 1977582747
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  strikeRange:
+    migratedVersion: 
+    currentCryptoKey: 1381268893
+    hiddenValue: 1383945373
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffValue:
+    migratedVersion: 
+    currentCryptoKey: 1636514978
+    hiddenValue: 1631357858
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffRange:
+    migratedVersion: 
+    currentCryptoKey: 1011000447
+    hiddenValue: 1017397887
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffCycle:
+    migratedVersion: 
+    currentCryptoKey: 1277921255
+    hiddenValue: 1283927015
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffDuration:
+    migratedVersion: 
+    currentCryptoKey: 1533455365
+    hiddenValue: 1538024965
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  totalBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1897119417
+    hiddenValue: 1908282297
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  getAttackBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1831562257
+    hiddenValue: 1835805457
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalDamageRate:
+    migratedVersion: 
+    currentCryptoKey: 1134446070
+    hiddenValue: 1128636150
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isThrow: 0
+  isDrag: 0
+  isAttackType: 0
+  isDraggable: 0
+  isLeft: 0
+  maxStarGradeValue: 0
+  sellPriceRatio:
+    migratedVersion: 
+    currentCryptoKey: 1224882859
+    hiddenValue: 1228538539
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  collisions: []
+  characterState: 0
+  pivotPosition: {x: 0, y: 0}
+  currentGridPos: {x: 0, y: 0}
+  animTransform: {fileID: 0}
+  isSummoned: 0
+  meshRenderer: {fileID: 0}
+  speedBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1285315181
+    hiddenValue: 1281006701
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  connectionCharacters: []
+  connectionCount: 0
+  projectileName: BeeStingProjectile
+  particleName: ' YellowHit'
+  characterInterface: {fileID: 0}
+  targetedMonster: []
+  buffParticle: []
+  isDestroyed: 0
+  isChange: 0
+  addtiveAttack: 0
+  addtiveDetectRange: 0
+  hifives: []

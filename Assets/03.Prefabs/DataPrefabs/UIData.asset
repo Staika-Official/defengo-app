@@ -1,0 +1,1246 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e68580abe8c744ffaa7356b902f2ad6c, type: 3}
+  m_Name: UIData
+  m_EditorClassIdentifier: 
+  dic_RankingBoxProperties:
+    array:
+    - Key: 1
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: cfd83e8ece7a2804aad67aea06a2df95, type: 3}
+        color_Layer:
+        - {r: 0.101960786, g: 0.32941177, b: 0.5019608, a: 1}
+        - {r: 0.8666667, g: 0.7137255, b: 0.44705883, a: 1}
+        - {r: 0.98039216, g: 1, b: 0.68235296, a: 1}
+        gradientColorKeys:
+        - {r: 0.9843137, g: 0.9137255, b: 0.627451, a: 1}
+        - {r: 1, g: 0.8901961, b: 0.5686275, a: 1}
+    - Key: 2
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 524c75c439a0fc943a6bf196116b8412, type: 3}
+        color_Layer:
+        - {r: 0.101960786, g: 0.32941177, b: 0.5019608, a: 1}
+        - {r: 0.5568628, g: 0.654902, b: 0.6117647, a: 1}
+        - {r: 0.9019608, g: 0.99215686, b: 1, a: 1}
+        gradientColorKeys:
+        - {r: 0.827451, g: 0.91764706, b: 0.92941177, a: 1}
+        - {r: 0.91764706, g: 0.92156863, b: 0.78039217, a: 1}
+    - Key: 3
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: dde341b9885e73147bef7ed74772ad2b, type: 3}
+        color_Layer:
+        - {r: 0.101960786, g: 0.32941177, b: 0.5019608, a: 1}
+        - {r: 0.74509805, g: 0.5411765, b: 0.32156864, a: 1}
+        - {r: 0.9019608, g: 0.78431374, b: 0.65882355, a: 1}
+        gradientColorKeys:
+        - {r: 0.87058824, g: 0.75686276, b: 0.6313726, a: 1}
+        - {r: 0.81960785, g: 0.7137255, b: 0.6, a: 1}
+    - Key: 4
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_Layer:
+        - {r: 0.47058824, g: 0.6901961, b: 0.8980392, a: 1}
+        - {r: 0.5882353, g: 0.8392157, b: 0.972549, a: 1}
+        - {r: 0.6745098, g: 0.8862745, b: 1, a: 1}
+        gradientColorKeys: []
+    - Key: 5
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_Layer:
+        - {r: 0.43529412, g: 0.7137255, b: 0.85882354, a: 1}
+        - {r: 0.73333335, g: 0.90588236, b: 1, a: 1}
+        - {r: 0.8509804, g: 0.9490196, b: 1, a: 1}
+        gradientColorKeys: []
+  dic_CharacterCardInfo:
+    array:
+    - Key: 0
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 8f545b7bfa68e6e46b6c6b6d12ab04f6, type: 3}
+        color_BackGround: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+        color_Shadow: {r: 0.29411766, g: 0.6509804, b: 0.78431374, a: 1}
+        color_decGradeText: {r: 0.7058824, g: 0.90588236, b: 1, a: 1}
+        disableShadowColor: {r: 0.36078432, g: 0.54509807, b: 0.6117647, a: 1}
+        particleColorLifeTime_NFT_Gradient_color:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        light_NFT_color: {r: 0, g: 0, b: 0, a: 0}
+        color_LevelText: {r: 1, g: 1, b: 1, a: 1}
+    - Key: 2
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: af99182e32612d44fa61d8ef9aadda64, type: 3}
+        color_BackGround: {r: 0.77254903, g: 1, b: 0.7372549, a: 1}
+        color_Shadow: {r: 0.007843138, g: 0.54901963, b: 0.42745098, a: 1}
+        color_decGradeText: {r: 0.48235294, g: 0.9529412, b: 0.23921569, a: 1}
+        disableShadowColor: {r: 0.011764706, g: 0.48235294, b: 0.2627451, a: 1}
+        particleColorLifeTime_NFT_Gradient_color:
+          serializedVersion: 2
+          key0: {r: 0.6, g: 1, b: 0.69803923, a: 0}
+          key1: {r: 0.6, g: 1, b: 0.69803923, a: 1}
+          key2: {r: 0.6, g: 1, b: 0.69610244, a: 1}
+          key3: {r: 0.6, g: 1, b: 0.69803923, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 4032
+          ctime2: 58751
+          ctime3: 65279
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 4224
+          atime2: 59135
+          atime3: 65535
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 4
+        light_NFT_color: {r: 0.05882353, g: 0.59607846, b: 0, a: 1}
+        color_LevelText: {r: 0.87058824, g: 1, b: 0.827451, a: 1}
+    - Key: 4
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 09ce62c62166b8c48ab079c2cb611b00, type: 3}
+        color_BackGround: {r: 0.7137255, g: 0.92156863, b: 1, a: 1}
+        color_Shadow: {r: 0.16078432, g: 0.40392157, b: 0.7019608, a: 1}
+        color_decGradeText: {r: 0.07058824, g: 0.7058824, b: 1, a: 1}
+        disableShadowColor: {r: 0, g: 0.40392157, b: 0.5568628, a: 1}
+        particleColorLifeTime_NFT_Gradient_color:
+          serializedVersion: 2
+          key0: {r: 0.3254902, g: 0.92156863, b: 1, a: 0}
+          key1: {r: 0.3254902, g: 0.92156863, b: 1, a: 1}
+          key2: {r: 0.32704395, g: 0.922414, b: 1, a: 1}
+          key3: {r: 0.3254902, g: 0.92156863, b: 1, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 4032
+          ctime2: 58751
+          ctime3: 65535
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 4224
+          atime2: 59135
+          atime3: 65535
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 4
+        light_NFT_color: {r: 0, g: 0.56078434, b: 1, a: 1}
+        color_LevelText: {r: 0.76862746, g: 0.9529412, b: 1, a: 1}
+    - Key: 6
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 67ce1447b8b1773488eccdd6c7753c9f, type: 3}
+        color_BackGround: {r: 0.99607843, g: 0.827451, b: 0.9529412, a: 1}
+        color_Shadow: {r: 0.6039216, g: 0.14509805, b: 0.6431373, a: 1}
+        color_decGradeText: {r: 0.99215686, g: 0.5254902, b: 1, a: 1}
+        disableShadowColor: {r: 0.5647059, g: 0.18039216, b: 0.35686275, a: 1}
+        particleColorLifeTime_NFT_Gradient_color:
+          serializedVersion: 2
+          key0: {r: 1, g: 0.6, b: 0.90588236, a: 0}
+          key1: {r: 1, g: 0.6, b: 0.90588236, a: 1}
+          key2: {r: 1, g: 0.60062885, b: 0.9048884, a: 1}
+          key3: {r: 1, g: 0.6, b: 0.90588236, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 4032
+          ctime2: 58751
+          ctime3: 65535
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 4224
+          atime2: 59135
+          atime3: 65535
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 4
+        light_NFT_color: {r: 0.6509804, g: 0.07058824, b: 0.5372549, a: 1}
+        color_LevelText: {r: 1, g: 0.88235295, b: 0.8901961, a: 1}
+    - Key: 9
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: d70325fba95c83248956b519c64719f7, type: 3}
+        color_BackGround: {r: 1, g: 0.9764706, b: 0.65882355, a: 1}
+        color_Shadow: {r: 0.72156864, g: 0.54509807, b: 0, a: 1}
+        color_decGradeText: {r: 1, g: 0.972549, b: 0.21568628, a: 1}
+        disableShadowColor: {r: 0.50980395, g: 0.41568628, b: 0.0627451, a: 1}
+        particleColorLifeTime_NFT_Gradient_color:
+          serializedVersion: 2
+          key0: {r: 0.95686275, g: 1, b: 0.5529412, a: 0}
+          key1: {r: 0.95686275, g: 1, b: 0.5529412, a: 1}
+          key2: {r: 0.9581684, g: 1, b: 0.55345905, a: 1}
+          key3: {r: 0.95686275, g: 1, b: 0.5529412, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 4032
+          ctime2: 58751
+          ctime3: 65535
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 4224
+          atime2: 59135
+          atime3: 65535
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 4
+        light_NFT_color: {r: 0.6431373, g: 0.5921569, b: 0.19215687, a: 1}
+        color_LevelText: {r: 1, g: 0.98039216, b: 0.7058824, a: 1}
+  dic_HatchingCardInfo:
+    array:
+    - Key: HATCHING_ORB_COMMON
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 8f545b7bfa68e6e46b6c6b6d12ab04f6, type: 3}
+        color_BackGround: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+        color_Shadow: {r: 0.29411766, g: 0.6509804, b: 0.78431374, a: 1}
+        color_GradeText: {r: 0.7058824, g: 0.90588236, b: 1, a: 1}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: af99182e32612d44fa61d8ef9aadda64, type: 3}
+        color_BackGround: {r: 0.77254903, g: 1, b: 0.7372549, a: 1}
+        color_Shadow: {r: 0.007843138, g: 0.54901963, b: 0.42745098, a: 1}
+        color_GradeText: {r: 0.48235294, g: 0.9529412, b: 0.23921569, a: 1}
+    - Key: HATCHING_ORB_RARE
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 09ce62c62166b8c48ab079c2cb611b00, type: 3}
+        color_BackGround: {r: 0.7137255, g: 0.92156863, b: 1, a: 1}
+        color_Shadow: {r: 0.16078432, g: 0.40392157, b: 0.7019608, a: 1}
+        color_GradeText: {r: 0.07058824, g: 0.7058824, b: 1, a: 1}
+    - Key: HATCHING_ORB_EPIC
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: 67ce1447b8b1773488eccdd6c7753c9f, type: 3}
+        color_BackGround: {r: 0.99607843, g: 0.827451, b: 0.9529412, a: 1}
+        color_Shadow: {r: 0.6039216, g: 0.14509805, b: 0.6431373, a: 1}
+        color_GradeText: {r: 0.99215686, g: 0.5254902, b: 1, a: 1}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value:
+        sprite_Frame: {fileID: 21300000, guid: d70325fba95c83248956b519c64719f7, type: 3}
+        color_BackGround: {r: 1, g: 0.9764706, b: 0.65882355, a: 1}
+        color_Shadow: {r: 0.72156864, g: 0.54509807, b: 0, a: 1}
+        color_GradeText: {r: 1, g: 0.972549, b: 0.21568628, a: 1}
+  TxtColor:
+    array:
+    - Key: level_5_color
+      Value: {r: 0.59607846, g: 0.95686275, b: 1, a: 1}
+    - Key: level_10_color
+      Value: {r: 1, g: 0.94509804, b: 0.5058824, a: 1}
+    - Key: Energy_low_color
+      Value: {r: 1, g: 0.5921569, b: 0.5529412, a: 1}
+    - Key: Inventory_CardCapacity_color
+      Value: {r: 0.7019608, g: 0.91764706, b: 1, a: 1}
+    - Key: DisableDec_Image - BackgroundShadow
+      Value: {r: 0.33333334, g: 0.41568628, b: 0.47058824, a: 1}
+    - Key: DisableDec_Image - CharacterPortrait
+      Value: {r: 0.6156863, g: 0.68235296, b: 0.7254902, a: 0.627451}
+    - Key: DisableDec_Image - Frame
+      Value: {r: 0.83137256, g: 0.83137256, b: 0.83137256, a: 1}
+    - Key: Ingame - SummonBtn_Disable - Amount Frame
+      Value: {r: 0.4156863, g: 0.5529412, b: 0.6666667, a: 1}
+    - Key: Ingame - SellDim
+      Value: {r: 0.07450981, g: 0.21568628, b: 0.29411766, a: 0.87058824}
+    - Key: InventoryItem_LevelColor_Unique
+      Value: {r: 0.7704402, g: 0.95189226, b: 1, a: 1}
+    - Key: InventoryItem_LevelColor_Epic
+      Value: {r: 1, g: 0.8836478, b: 0.8906313, a: 1}
+    - Key: InventoryItem_LevelColor_Uncommon
+      Value: {r: 0.870892, g: 1, b: 0.827044, a: 1}
+    - Key: InventoryItem_LevelColor_Legendary
+      Value: {r: 1, g: 0.9818204, b: 0.70440245, a: 1}
+    - Key: InventoryItem_LevelColor_Normal
+      Value: {r: 1, g: 1, b: 1, a: 1}
+    - Key: InventoryItem_Frame_Color_Owned
+      Value: {r: 0.53459114, g: 0.88619393, b: 1, a: 1}
+    - Key: InventoryItem_Frame_Color_NotOwned
+      Value: {r: 0.36712345, g: 0.75240296, b: 0.9339623, a: 1}
+    - Key: InventoryItem_Frame_Color_MaxLevel
+      Value: {r: 1, g: 1, b: 1, a: 1}
+    - Key: RandomBoxFX_Color_Epic_gradient
+      Value: {r: 0.92941177, g: 0.23137255, b: 1, a: 1}
+    - Key: RandomBoxFX_Color_Epic_radial
+      Value: {r: 0.98039216, g: 0.41960785, b: 1, a: 1}
+    - Key: RandomBoxFX_Color_Epic_particle
+      Value: {r: 1, g: 0.57254905, b: 0.84313726, a: 1}
+    - Key: RandomBoxFX_Color_Legendary_gradient
+      Value: {r: 1, g: 0.85490197, b: 0.2901961, a: 1}
+    - Key: RandomBoxFX_Color_Legendary_radial
+      Value: {r: 1, g: 0.9843137, b: 0.2901961, a: 1}
+    - Key: RandomBoxFX_Color_Legendary_particle
+      Value: {r: 1, g: 0.98039216, b: 0.5058824, a: 1}
+    - Key: LimitedProfile_Disable_Color
+      Value: {r: 0.6117647, g: 0.7490196, b: 0.8, a: 0.9254902}
+    - Key: maskingFrame_Profile_Disable_Color
+      Value: {r: 0.44313726, g: 0.59607846, b: 0.7254902, a: 1}
+    - Key: ImgFrame_Profile_Disable_Color
+      Value: {r: 0.043137256, g: 0.0627451, b: 0.09803922, a: 0.84313726}
+    - Key: Img_Profile_Disable_Color
+      Value: {r: 0.64705884, g: 0.7764706, b: 0.8, a: 0.7019608}
+  dic_ShopPackageInfo:
+    array:
+    - Key: 2
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_BackGround: {r: 0.24705882, g: 0.7411765, b: 0.45490196, a: 1}
+        color_Button: {r: 0.654902, g: 1, b: 0.48235294, a: 1}
+        color_Line: {r: 0.88235295, g: 1, b: 0.7647059, a: 1}
+    - Key: 1
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_BackGround: {r: 0.7411765, g: 0.4509804, b: 0.3137255, a: 1}
+        color_Button: {r: 0.99607843, g: 0.8745098, b: 0.45490196, a: 1}
+        color_Line: {r: 1, g: 0.96862745, b: 0.6392157, a: 1}
+    - Key: 0
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_BackGround: {r: 0.14901961, g: 0.6431373, b: 0.9411765, a: 1}
+        color_Button: {r: 0.29411766, g: 0.7882353, b: 0.99215686, a: 1}
+        color_Line: {r: 0.46666667, g: 0.85490197, b: 1, a: 1}
+    - Key: 3
+      Value:
+        sprite_Icon: {fileID: 0}
+        color_BackGround: {r: 0.14901961, g: 0.6431373, b: 0.9411765, a: 1}
+        color_Button: {r: 0.29411766, g: 0.7882353, b: 0.99215686, a: 1}
+        color_Line: {r: 0.46666667, g: 0.85490197, b: 1, a: 1}
+  dic_ShopInnerFrameColor:
+    array:
+    - Key: GEM_150000
+      Value:
+        color_InnerFrame: {r: 0.4745098, g: 0.85882354, b: 0.47843137, a: 1}
+        color_HighLight: {r: 1, g: 1, b: 1, a: 1}
+        color_Base: {r: 1, g: 1, b: 1, a: 1}
+        color_Quantity: {r: 0.93333334, g: 0.85490197, b: 0.48235294, a: 1}
+        color_Grdient:
+          serializedVersion: 2
+          key0: {r: 0.8459119, g: 1, b: 0.85966974, a: 1}
+          key1: {r: 1, g: 0.9816259, b: 0.7798742, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        grdientOffset: -1
+        grdientZoom: 0.1
+    - Key: BOX_LEGEND
+      Value:
+        color_InnerFrame: {r: 0.98039216, g: 0.58431375, b: 0.3647059, a: 1}
+        color_HighLight: {r: 1, g: 1, b: 1, a: 1}
+        color_Base: {r: 1, g: 1, b: 1, a: 1}
+        color_Quantity: {r: 0.94509804, g: 0.8156863, b: 0.70980394, a: 1}
+        color_Grdient:
+          serializedVersion: 2
+          key0: {r: 1, g: 0.88235295, b: 0.7372549, a: 1}
+          key1: {r: 1, g: 0.88235295, b: 0.7372549, a: 1}
+          key2: {r: 1, g: 0.9816259, b: 0.7798742, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 20928
+          ctime2: 65535
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 3
+          m_NumAlphaKeys: 2
+        grdientOffset: -0.24
+        grdientZoom: 0.55
+    - Key: Defalut
+      Value:
+        color_InnerFrame: {r: 0.7176471, g: 0.85882354, b: 0.94509804, a: 1}
+        color_HighLight: {r: 0.9137255, g: 0.98039216, b: 1, a: 1}
+        color_Base: {r: 0.90588236, g: 0.9647059, b: 0.99215686, a: 1}
+        color_Quantity: {r: 0.6862745, g: 0.83137256, b: 0.9254902, a: 1}
+        color_Grdient:
+          serializedVersion: 2
+          key0: {r: 0.9779874, g: 0.9933962, b: 1, a: 1}
+          key1: {r: 0.90588236, g: 0.9647059, b: 0.99215686, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        grdientOffset: 0
+        grdientZoom: 1
+  dic_WalletTextColor:
+    array:
+    - Key: OUT
+      Value: {r: 1, g: 0.6509804, b: 0.6509804, a: 1}
+    - Key: IN
+      Value: {r: 0.8, g: 0.99607843, b: 0.627451, a: 1}
+  dic_StatusInfo:
+    array:
+    - Key: 0
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 66c492a5c72dc11479a4a563ca4d8889, type: 3}
+    - Key: 1
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: ae3075a287a2ba24d8c386d0175fb795, type: 3}
+    - Key: 2
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: ae3075a287a2ba24d8c386d0175fb795, type: 3}
+    - Key: 3
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: a11ecaae81601fe4b989fa4f24c990fb, type: 3}
+    - Key: 4
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: a6aebd6f19f186747bcf72272f141e0e, type: 3}
+    - Key: 5
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: c98ef7c9b4f0f414b8f8b439e11b4b3a, type: 3}
+    - Key: 6
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 7d4d7e2e19343f345866f5c116e241f9, type: 3}
+    - Key: 7
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 0869c418831f41d4aa28f782acc20acc, type: 3}
+    - Key: 8
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: c577a5df2dadd6848919fc1b038b418e, type: 3}
+    - Key: 9
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 2d6930dcd1492014f9e534f3b91b03a1, type: 3}
+    - Key: 10
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 5f337675d6b4c2c47aae4595f5aff5a0, type: 3}
+    - Key: 11
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 979d34c019cef0643af4dd462e7c4df8, type: 3}
+    - Key: 12
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 3f6aaf62bc30fd44497749b42534a26a, type: 3}
+    - Key: 13
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 2d6930dcd1492014f9e534f3b91b03a1, type: 3}
+    - Key: 14
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 09528303c04e74a4cbbe20773db268c7, type: 3}
+    - Key: 15
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 5b58db12483993b4e95a1694f4deba54, type: 3}
+    - Key: 16
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 071c4f6f17551a84fa6541540fb05637, type: 3}
+    - Key: 17
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 1a3dec6dc63c53d4a810b261dae95cbf, type: 3}
+    - Key: 18
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 01959531a85028f47a867c83f491bd7c, type: 3}
+    - Key: 19
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: f5d113d8f39c41444b36795baf972829, type: 3}
+    - Key: 20
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 26e06fca37e3caf479033474baf5e2c0, type: 3}
+    - Key: 21
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6c2b5914bb9767245bd096495e780fcb, type: 3}
+    - Key: 22
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: d5d9dcbaf6b1d2444b2cf03d7fbe10ed, type: 3}
+    - Key: 23
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 8d5780a2761d34845b7095430dfb5cd5, type: 3}
+    - Key: 24
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: fc7053de9d79d1f45aff1be31de3a838, type: 3}
+    - Key: 25
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6b5a12a1de82f254ab9704a7d7080da4, type: 3}
+    - Key: 26
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 710ad75672753cc48a63c9aba086217c, type: 3}
+    - Key: 27
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 919c92e26b3c2904a9666d60e569a6df, type: 3}
+    - Key: 28
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 9eff8bdb110cd634293b01d67af72ff8, type: 3}
+    - Key: 29
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 5ad41e6780bcfca4781594ff91bd7a94, type: 3}
+    - Key: 30
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 4e020af97cba23b4cb74030b35534ce8, type: 3}
+    - Key: 31
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: ede01408a413be64d8da9c1460077692, type: 3}
+    - Key: 32
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 2d6930dcd1492014f9e534f3b91b03a1, type: 3}
+    - Key: 33
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 19996fff8d115f74faae7b3a2dba5b26, type: 3}
+    - Key: 34
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 7967c18a7dd0bd843a72c3b0531e2298, type: 3}
+    - Key: 35
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 2d6930dcd1492014f9e534f3b91b03a1, type: 3}
+    - Key: 36
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 0869c418831f41d4aa28f782acc20acc, type: 3}
+    - Key: 37
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 269c0fc51a7b0cf45b0316dd72befe63, type: 3}
+    - Key: 38
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 8baddb54e582e1642a5351cf81651c83, type: 3}
+    - Key: 39
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 0491af2f37fb54649bd5c2d5d4b2b980, type: 3}
+    - Key: 40
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: e07b89425a245da4c8b4c96502d1a080, type: 3}
+    - Key: 41
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: e5d5bf10f66caa04c9ec6cfe88002f8f, type: 3}
+    - Key: 42
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: f647807029dbd834cb8bfa8b15f096de, type: 3}
+    - Key: 43
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 0491af2f37fb54649bd5c2d5d4b2b980, type: 3}
+    - Key: 44
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 3b280596015b2f64bb4c14a843367bd5, type: 3}
+    - Key: 45
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 676e1a59784e5414f8cc653c93909a3a, type: 3}
+    - Key: 46
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6219bb85c43031346bad6d1de26a10ef, type: 3}
+    - Key: 48
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 7be9be89420ad104f926376ce3662bcf, type: 3}
+    - Key: 49
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6b5a12a1de82f254ab9704a7d7080da4, type: 3}
+    - Key: 50
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 1ca021df263171f489f46f027fa45369, type: 3}
+    - Key: 51
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: e41910f41e3349a47ae5eb1de7f597c0, type: 3}
+    - Key: 52
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 746927b532fdd654a8986bd2e4b928aa, type: 3}
+    - Key: 53
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 8d0a9654b40e2a44cbd4b8a0376cbe67, type: 3}
+    - Key: 54
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 738a843296508d649870e6428654bee1, type: 3}
+    - Key: 55
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 352bb87c67bbcbe47a6af68a6eedf476, type: 3}
+    - Key: 56
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6e61dea40b4a841458105363c59ddaff, type: 3}
+    - Key: 57
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 8db72735ef0a49149a3d1b4d7d5b8c76, type: 3}
+    - Key: 58
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 6f8d190ea0385c54ebf7a87432b23b89, type: 3}
+    - Key: 59
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 48d3c8f00c011e948b815b3a698efb28, type: 3}
+    - Key: 60
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 3f6f06bb9b8893e4191f030f4de75c8d, type: 3}
+    - Key: 61
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 72c79d8bf1059e549bad0cbef071d10e, type: 3}
+    - Key: 62
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 4e6c2cebc9e892643b3a312933fe21a0, type: 3}
+    - Key: 63
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 5dbd255c3f2b56c4b8a9f05d5e9db6d2, type: 3}
+    - Key: 64
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 73abd596c31c8f04c897358b31baca15, type: 3}
+    - Key: 65
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 546615322a1476746a1447ae1f2812cf, type: 3}
+    - Key: 66
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 322f37650655e1b479ec10cfb4eb29ea, type: 3}
+    - Key: 67
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: c2ce7bfcde00c244889e8a58ac4a211b, type: 3}
+    - Key: 68
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: ecc9ef5e3bd547042b1616417e5ea40d, type: 3}
+    - Key: 69
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: b89861cdc2f75af4582661dac544411e, type: 3}
+    - Key: 70
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: f28d155f5c673dc499ff89d6875efa7e, type: 3}
+    - Key: 71
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 43cf21a01e34c894f858e870e8ab38c5, type: 3}
+  dic_RandomBoxSprite:
+    array:
+    - Key: BOX_NORMAL
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: de980ec0b01f1894eb994e56141d47fb, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 2b9beb8eb8d5f444c85a84f1239776a1, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 77a1c4f4c4466e94bb6ac7c483a69a4e, type: 3}
+        sprite_Top: {fileID: 21300000, guid: 9d69776789a5de748916816caee2ab4e, type: 3}
+    - Key: BOX_SILVER
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 67730e02c5018ac47a47c13230715767, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 483eb50fd0475d74e93258f84f48e634, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 926eb6c5120c6e6478e8ca5488222d20, type: 3}
+        sprite_Top: {fileID: 21300000, guid: ce43ebbc16a7e8646a26c6dcc6a8c2b2, type: 3}
+    - Key: BOX_GOLD
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 377f6a90e8c253a40afbeeed84ea388f, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 1fac24201a2cfdd47bdc7f405288315f, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: da080e31662b5a84f9a5e93596c4e1f6, type: 3}
+        sprite_Top: {fileID: 21300000, guid: 74eb8f2f32d34dd489a705fbe4b9616a, type: 3}
+    - Key: BOX_EVENT
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: c7f34924a5a5ea24e84ea6066c5e974c, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: bb409121f2c75f047b54c484a5748a07, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 90ad704bfa42ebc47a180f60b660a1fd, type: 3}
+        sprite_Top: {fileID: 21300000, guid: 50cac304600078242a46bafb0790c95f, type: 3}
+    - Key: BOX_LIMITED
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 9f5863965dc3a8a4aa3388ca13ae26bd, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 8e7c3b20dfda9864aad47e61d2e5b4de, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 77601c62786cbf64da3456bbba580148, type: 3}
+        sprite_Top: {fileID: 21300000, guid: 3eb73fb52b4ad1743872bbae2c9afccf, type: 3}
+    - Key: BOX_WOOD
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 783046361b3ad414fa3a5140ccd02a9a, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 3c6ee42c554408343a3631846d25121f, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 0ca2d6d4bfb8be641bb59f9f5fcef541, type: 3}
+        sprite_Top: {fileID: 21300000, guid: d4767cb39cc3f92479b6a1e138550997, type: 3}
+    - Key: BOX_LEGEND
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 9d462c1686baab7499179821abe8e650, type: 3}
+        sprite_Bottom: {fileID: 21300000, guid: 395c4842f311a734a857d36525d01128, type: 3}
+        sprite_Top_Open: {fileID: 21300000, guid: 9da99cd614222654ab1c0722e13c04d9, type: 3}
+        sprite_Top: {fileID: 21300000, guid: d17c2513bd14641439bd3a9c0379def9, type: 3}
+  dic_HatchingStoneSprite:
+    array:
+    - Key: HATCHING_ORB_COMMON
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+        sprite_Icon_Light: {fileID: 21300000, guid: 4a8f6a5c09703c64f9f4b0df7175e7f0, type: 3}
+        sprite_Pieces3: {fileID: 21300000, guid: 79c31129257c9054ab808cf38c552d79, type: 3}
+        sprite_Pieces2: {fileID: 21300000, guid: 09c134f790b5cda4f93a77861b68eec6, type: 3}
+        sprite_Pieces1: {fileID: 21300000, guid: 274aa98d55d7bda47a8db5e84b76f9c1, type: 3}
+        texture_Attactor: {fileID: 2800000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+        sprite_Icon_Light: {fileID: 21300000, guid: 0b8c9938d56d43349b57a9bc6c45b378, type: 3}
+        sprite_Pieces3: {fileID: 21300000, guid: 3670d70c639569c4da0d8479466239e6, type: 3}
+        sprite_Pieces2: {fileID: 21300000, guid: 149a9e139e4fff0459725ad07a7ab30d, type: 3}
+        sprite_Pieces1: {fileID: 21300000, guid: 20105145fdbdaad44861388f9fe68b9a, type: 3}
+        texture_Attactor: {fileID: 2800000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+    - Key: HATCHING_ORB_RARE
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+        sprite_Icon_Light: {fileID: 21300000, guid: 9123e2325b95b8a46811cf7314a8c0fe, type: 3}
+        sprite_Pieces3: {fileID: 21300000, guid: 27f18225f49e1d64b8145987e0d4b290, type: 3}
+        sprite_Pieces2: {fileID: 21300000, guid: ec1774987efa0fd459841c74c88ac1d8, type: 3}
+        sprite_Pieces1: {fileID: 21300000, guid: 5fbad7189b29aa847ad9608a4c76846b, type: 3}
+        texture_Attactor: {fileID: 2800000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+    - Key: HATCHING_ORB_EPIC
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+        sprite_Icon_Light: {fileID: 21300000, guid: b070e0bb802b32147b43e9100448adf8, type: 3}
+        sprite_Pieces3: {fileID: 21300000, guid: 2ec1205bc0a9bde4692a136645bd1472, type: 3}
+        sprite_Pieces2: {fileID: 21300000, guid: ecf5fef9d3b588546a9b62f79c81e90a, type: 3}
+        sprite_Pieces1: {fileID: 21300000, guid: 4d6a31adcae03964fadadb4075f5c599, type: 3}
+        texture_Attactor: {fileID: 2800000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value:
+        sprite_Icon: {fileID: 21300000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+        sprite_Icon_Light: {fileID: 21300000, guid: b6494209e9e75864796c527c25526d23, type: 3}
+        sprite_Pieces3: {fileID: 21300000, guid: 97dc9e012ad8afe40aca192efcb37613, type: 3}
+        sprite_Pieces2: {fileID: 21300000, guid: 82d112f1d9542a04c9fc33db04fd4b56, type: 3}
+        sprite_Pieces1: {fileID: 21300000, guid: 0cc0bc9585f540741b37f0d16b9aca55, type: 3}
+        texture_Attactor: {fileID: 2800000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+  sprite_Energy: {fileID: 21300000, guid: bbdd6f797f086814eb7f4bf654d052c2, type: 3}
+  dic_EnergySprite:
+    array:
+    - Key: ENERGY_1
+      Value: {fileID: 21300000, guid: 54b546c9a6119a24f9958768b2043e54, type: 3}
+    - Key: ENERGY_AD
+      Value: {fileID: 21300000, guid: 54b546c9a6119a24f9958768b2043e54, type: 3}
+  dic_WalletHistoryIcons:
+    array:
+    - Key: SIGN_UP_GIFT
+      Value: {fileID: 21300000, guid: 41692ea386b155441946d36bf43fa9f5, type: 3}
+    - Key: INAPP_TIK
+      Value: {fileID: 21300000, guid: 41692ea386b155441946d36bf43fa9f5, type: 3}
+    - Key: CLASSUP_TIK
+      Value: {fileID: 21300000, guid: df65faa0221bdde4c92d0e90c1fd5004, type: 3}
+    - Key: ENERGY
+      Value: {fileID: 21300000, guid: 7a3a8670046a8dd46aab2e6d3954b659, type: 3}
+    - Key: BOX_NORMAL
+      Value: {fileID: 21300000, guid: 062f22c93a6abc543b1906c4c4f4fe3a, type: 3}
+    - Key: BOX_SILVER
+      Value: {fileID: 21300000, guid: de1efcc2d8d1b204c8df843625ff641e, type: 3}
+    - Key: BOX_GOLD
+      Value: {fileID: 21300000, guid: e041f88507153f6498adad43fed6af7d, type: 3}
+    - Key: DAILY_REWARD
+      Value: {fileID: 21300000, guid: a1dd26a2f0f582849bcd7b4afd58ddad, type: 3}
+    - Key: EVENT_REWARD
+      Value: {fileID: 21300000, guid: 1535aad115c7c2849922f0e423c64239, type: 3}
+    - Key: INBOX_REWARD_TIK
+      Value: {fileID: 21300000, guid: 41692ea386b155441946d36bf43fa9f5, type: 3}
+    - Key: INBOX_REWARD_STIK
+      Value: {fileID: 21300000, guid: 8377cc120e576e944b75feebe81e20c3, type: 3}
+    - Key: CHANGE_NICKNAME
+      Value: {fileID: 21300000, guid: 41692ea386b155441946d36bf43fa9f5, type: 3}
+    - Key: ENERGY_1
+      Value: {fileID: 21300000, guid: 7a3a8670046a8dd46aab2e6d3954b659, type: 3}
+    - Key: WELCOME
+      Value: {fileID: 21300000, guid: 41692ea386b155441946d36bf43fa9f5, type: 3}
+    - Key: TIK_TO_PTIK
+      Value: {fileID: 21300000, guid: f35c20c969921004fbf1444b2c73a23b, type: 3}
+    - Key: STIK_TO_TIK
+      Value: {fileID: 21300000, guid: e81d3f87303d2474b9bf81f0656a5f76, type: 3}
+    - Key: TIK_TO_STIK
+      Value: {fileID: 21300000, guid: 4ff00c7eede609c478824a0901a40e1e, type: 3}
+    - Key: EXCHANGE_DEPOSIT
+      Value: {fileID: 21300000, guid: b48381d40de6a934ca8b696c155e9b3b, type: 3}
+    - Key: PENDING
+      Value: {fileID: 21300000, guid: b48381d40de6a934ca8b696c155e9b3b, type: 3}
+    - Key: EXCHANGE_WITHDRAWAL
+      Value: {fileID: 21300000, guid: 5bb9d1b4152cc79438c233955388a1fa, type: 3}
+  dic_InboxItemIcon:
+    array:
+    - Key: BOX_NORMAL
+      Value: {fileID: 21300000, guid: 062f22c93a6abc543b1906c4c4f4fe3a, type: 3}
+    - Key: BOX_SILVER
+      Value: {fileID: 21300000, guid: de1efcc2d8d1b204c8df843625ff641e, type: 3}
+    - Key: BOX_GOLD
+      Value: {fileID: 21300000, guid: e041f88507153f6498adad43fed6af7d, type: 3}
+    - Key: BOX_WOOD
+      Value: {fileID: 21300000, guid: f3cd0153ade130a47befd97990820a0a, type: 3}
+    - Key: BOX_LEGEND
+      Value: {fileID: 21300000, guid: 9d462c1686baab7499179821abe8e650, type: 3}
+    - Key: Energy
+      Value: {fileID: 21300000, guid: 54b546c9a6119a24f9958768b2043e54, type: 3}
+    - Key: Tik
+      Value: {fileID: 21300000, guid: 8736cd2dec8931c4d85b736f5c13f0fb, type: 3}
+    - Key: Stik
+      Value: {fileID: 21300000, guid: 8377cc120e576e944b75feebe81e20c3, type: 3}
+    - Key: Go
+      Value: {fileID: 21300000, guid: 2844dbe395c6e0049978e3fd7aa72944, type: 3}
+    - Key: BOX_EVENT
+      Value: {fileID: 21300000, guid: 8377cc120e576e944b75feebe81e20c3, type: 3}
+    - Key: EventChest
+      Value: {fileID: 21300000, guid: c7f34924a5a5ea24e84ea6066c5e974c, type: 3}
+    - Key: SubtractiveTik
+      Value: {fileID: 21300000, guid: c7f34924a5a5ea24e84ea6066c5e974c, type: 3}
+    - Key: Gem
+      Value: {fileID: 21300000, guid: d5403a3a07d29e745ac97ba57ac56066, type: 3}
+    - Key: HATCHING_ORB_COMMON
+      Value: {fileID: 21300000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value: {fileID: 21300000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+    - Key: HATCHING_ORB_RARE
+      Value: {fileID: 21300000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+    - Key: HATCHING_ORB_EPIC
+      Value: {fileID: 21300000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value: {fileID: 21300000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+  dic_CoinSymbol:
+    array:
+    - Key: 0
+      Value: {fileID: 21300000, guid: 8736cd2dec8931c4d85b736f5c13f0fb, type: 3}
+    - Key: 1
+      Value: {fileID: 21300000, guid: 8377cc120e576e944b75feebe81e20c3, type: 3}
+  dic_RandomBoxItemTextColor:
+    array:
+    - Key: Character
+      Value:
+        colorName:
+        - {r: 0.78039217, g: 0.90588236, b: 1, a: 1}
+    - Key: Staika
+      Value:
+        colorName:
+        - {r: 1, g: 0.98039216, b: 0.8352941, a: 1}
+        - {r: 1, g: 0.6, b: 0.18431373, a: 1}
+  dic_RandomBoxEffetColor:
+    array:
+    - Key: 6
+      Value:
+        colorName:
+        - {r: 0.92941177, g: 0.23137255, b: 1, a: 1}
+        - {r: 0.98039216, g: 0.41960785, b: 1, a: 1}
+        - {r: 1, g: 0.57254905, b: 0.84313726, a: 1}
+    - Key: 9
+      Value:
+        colorName:
+        - {r: 1, g: 0.85490197, b: 0.2901961, a: 1}
+        - {r: 1, g: 0.9843137, b: 0.2901961, a: 1}
+        - {r: 1, g: 0.98039216, b: 0.5058824, a: 1}
+  dic_gemIcon:
+    array:
+    - Key: GEM_100
+      Value: {fileID: 21300000, guid: 629f43a55536d504db82a5c1af1fc46d, type: 3}
+    - Key: GEM_1000
+      Value: {fileID: 21300000, guid: 8b0d9da16ed9daa4daebeb871ae34162, type: 3}
+    - Key: GEM_10000
+      Value: {fileID: 21300000, guid: c4954bbff7fae954c8eb46d537d3a7b5, type: 3}
+    - Key: GEM_50000
+      Value: {fileID: 21300000, guid: df62eb7b04a856647a68f0e3d710edb1, type: 3}
+    - Key: GEM_100000
+      Value: {fileID: 21300000, guid: 4e0243c3f46c1464c89a61edc0f4cc12, type: 3}
+    - Key: GEM_150000
+      Value: {fileID: 21300000, guid: a72df75be43942b47b2347582d1b79a9, type: 3}
+  dic_weeklyRewardSymbol:
+    array:
+    - Key: PROFILE_10001
+      Value: {fileID: 21300000, guid: bbc65d955359f89408a9952167550e0d, type: 3}
+    - Key: TIK
+      Value: {fileID: 21300000, guid: 81a4bfb86a3e5294ebe09263d4e36b21, type: 3}
+    - Key: STIK
+      Value: {fileID: 21300000, guid: 1f89ca71fea7f6441932c2251cb89813, type: 3}
+    - Key: BOX_GOLD
+      Value: {fileID: 21300000, guid: 377f6a90e8c253a40afbeeed84ea388f, type: 3}
+    - Key: PROFILE_10002
+      Value: {fileID: 21300000, guid: 773535177fdb19c4e9857dbf3419d670, type: 3}
+    - Key: PROFILE_10003
+      Value: {fileID: 21300000, guid: 79c403f94ddbbaa46a7864141a0a5f67, type: 3}
+    - Key: GEM
+      Value: {fileID: 21300000, guid: c4954bbff7fae954c8eb46d537d3a7b5, type: 3}
+    - Key: BOX_SILVER
+      Value: {fileID: 21300000, guid: 67730e02c5018ac47a47c13230715767, type: 3}
+    - Key: BOX_WOOD
+      Value: {fileID: 21300000, guid: 783046361b3ad414fa3a5140ccd02a9a, type: 3}
+  dic_walletPropertyColor:
+    array:
+    - Key: text_staika
+      Value: {r: 1, g: 0.74509805, b: 0.5254902, a: 1}
+    - Key: text_taika
+      Value: {r: 0.9137255, g: 0.77254903, b: 0.84313726, a: 1}
+    - Key: background_staika
+      Value: {r: 0.8392157, g: 0.39607844, b: 0.1882353, a: 1}
+    - Key: background_taika
+      Value: {r: 0.74509805, g: 0.38431373, b: 0.5686275, a: 1}
+  dic_BattlePassItemIcon:
+    array:
+    - Key: BOX_NORMAL
+      Value: {fileID: 21300000, guid: de980ec0b01f1894eb994e56141d47fb, type: 3}
+    - Key: BOX_SILVER
+      Value: {fileID: 21300000, guid: 67730e02c5018ac47a47c13230715767, type: 3}
+    - Key: BOX_GOLD
+      Value: {fileID: 21300000, guid: 377f6a90e8c253a40afbeeed84ea388f, type: 3}
+    - Key: BOX_WOOD
+      Value: {fileID: 21300000, guid: 783046361b3ad414fa3a5140ccd02a9a, type: 3}
+    - Key: BOX_LEGEND
+      Value: {fileID: 21300000, guid: 9d462c1686baab7499179821abe8e650, type: 3}
+    - Key: GEM_SMALL
+      Value: {fileID: 21300000, guid: 5bcf4b8229fbea24683ff7f12c4eea87, type: 3}
+    - Key: GEM_LOW
+      Value: {fileID: 21300000, guid: 31221f0a92dba4044bff567ebf08b9bd, type: 3}
+    - Key: ENERGY
+      Value: {fileID: 21300000, guid: 54b546c9a6119a24f9958768b2043e54, type: 3}
+    - Key: HATCHING_ORB_COMMON
+      Value: {fileID: 21300000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value: {fileID: 21300000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+    - Key: HATCHING_ORB_RARE
+      Value: {fileID: 21300000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+    - Key: HATCHING_ORB_EPIC
+      Value: {fileID: 21300000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value: {fileID: 21300000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+  dic_BattlePassLevelColor:
+    array:
+    - Key: 0
+      Value:
+        color_Shadow: {r: 0.11764706, g: 0.13333334, b: 0.3764706, a: 0.7137255}
+        color_EndOutBottomFrame: {r: 0.10980392, g: 0.5294118, b: 0.28627452, a: 1}
+        color_EndOutUpFrame: {r: 0.10980392, g: 0.5294118, b: 0.28627452, a: 1}
+        color_MiddleOutBottom: {r: 0.2509804, g: 0.74509805, b: 0.4627451, a: 1}
+        color_FirstFrame: {r: 0.8156863, g: 1, b: 0.60784316, a: 1}
+        color_MainFrame: {r: 0.654902, g: 1, b: 0.4862745, a: 1}
+        color_Text: {r: 0.9882353, g: 0.99215686, b: 0.8, a: 1}
+        mat_Text: {fileID: -901028585359562673, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
+    - Key: 1
+      Value:
+        color_Shadow: {r: 0.11764706, g: 0.13333334, b: 0.3764706, a: 0.7137255}
+        color_EndOutBottomFrame: {r: 0.7647059, g: 0.46666667, b: 0.32941177, a: 1}
+        color_EndOutUpFrame: {r: 0.7647059, g: 0.46666667, b: 0.33333334, a: 1}
+        color_MiddleOutBottom: {r: 0.70980394, g: 0.49411765, b: 0.45490196, a: 1}
+        color_FirstFrame: {r: 1, g: 0.98039216, b: 0.50980395, a: 1}
+        color_MainFrame: {r: 0.99607843, g: 0.9019608, b: 0.5019608, a: 1}
+        color_Text: {r: 0.9882353, g: 0.99215686, b: 0.8, a: 1}
+        mat_Text: {fileID: 2100000, guid: ef7739c29f3724dac9c194f46f593943, type: 2}
+    - Key: 2
+      Value:
+        color_Shadow: {r: 0.11764706, g: 0.13333334, b: 0.3764706, a: 0.7137255}
+        color_EndOutBottomFrame: {r: 0.08235294, g: 0.14901961, b: 0.24313726, a: 1}
+        color_EndOutUpFrame: {r: 0.13725491, g: 0.20784314, b: 0.28627452, a: 1}
+        color_MiddleOutBottom: {r: 0.08627451, g: 0.15686275, b: 0.24705882, a: 1}
+        color_FirstFrame: {r: 0.3254902, g: 0.47058824, b: 0.6745098, a: 1}
+        color_MainFrame: {r: 0.18039216, g: 0.3019608, b: 0.47843137, a: 1}
+        color_Text: {r: 1, g: 1, b: 1, a: 1}
+        mat_Text: {fileID: -901028585359562673, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
+  dic_BattlePassCrystal:
+    array:
+    - Key: 5
+      Value: {fileID: 21300000, guid: 9c0c9927be019e84f8535978614e9507, type: 3}
+    - Key: 30
+      Value: {fileID: 21300000, guid: e96df96ac2fe98e4c93e798ccd316991, type: 3}
+    - Key: 70
+      Value: {fileID: 21300000, guid: 8e008dbb559261c4ea99034a3fb70cdf, type: 3}
+  dic_MonthlyPackageSprite:
+    array:
+    - Key: 0
+      Value: {fileID: 21300000, guid: 1b66f30ae2e2af6498ad371f10cdee0c, type: 3}
+  dic_QuestItemColor:
+    array:
+    - Key: 0
+      Value:
+        color_BackGround: {r: 0.42352942, g: 0.7137255, b: 0.81960785, a: 1}
+        color_MainFrame: {r: 0.8666667, g: 0.9607843, b: 1, a: 1}
+        color_Line: {r: 0.6, g: 0.84705883, b: 0.9607843, a: 1}
+        color_Reward: {r: 0.654902, g: 0.8352941, b: 0.9019608, a: 1}
+    - Key: 1
+      Value:
+        color_BackGround: {r: 0.9098039, g: 0.6, b: 0.34509805, a: 1}
+        color_MainFrame: {r: 1, g: 0.9098039, b: 0.54509807, a: 1}
+        color_Line: {r: 0.96862745, g: 0.69803923, b: 0.47843137, a: 1}
+        color_Reward: {r: 1, g: 0.9607843, b: 0.8039216, a: 1}
+    - Key: 2
+      Value:
+        color_BackGround: {r: 0.42352942, g: 0.7137255, b: 0.81960785, a: 1}
+        color_MainFrame: {r: 0.8666667, g: 0.9607843, b: 1, a: 1}
+        color_Line: {r: 0.6, g: 0.84705883, b: 0.9607843, a: 1}
+        color_Reward: {r: 0.654902, g: 0.8352941, b: 0.9019608, a: 1}
+  dic_RewardItemIcon:
+    array:
+    - Key: BOX_NORMAL
+      Value: {fileID: 21300000, guid: de980ec0b01f1894eb994e56141d47fb, type: 3}
+    - Key: BOX_SILVER
+      Value: {fileID: 21300000, guid: 67730e02c5018ac47a47c13230715767, type: 3}
+    - Key: BOX_GOLD
+      Value: {fileID: 21300000, guid: 377f6a90e8c253a40afbeeed84ea388f, type: 3}
+    - Key: BOX_WOOD
+      Value: {fileID: 21300000, guid: 783046361b3ad414fa3a5140ccd02a9a, type: 3}
+    - Key: BOX_LEGEND
+      Value: {fileID: 21300000, guid: 9d462c1686baab7499179821abe8e650, type: 3}
+    - Key: GEM
+      Value: {fileID: 21300000, guid: 610beabd179079942a1ce1758639cd92, type: 3}
+    - Key: ENERGY
+      Value: {fileID: 21300000, guid: 18df832407e08cc498c59934bba6c8d1, type: 3}
+    - Key: HATCHING_ORB_COMMON
+      Value: {fileID: 21300000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value: {fileID: 21300000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+    - Key: HATCHING_ORB_RARE
+      Value: {fileID: 21300000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+    - Key: HATCHING_ORB_EPIC
+      Value: {fileID: 21300000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value: {fileID: 21300000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+    - Key: STIK
+      Value: {fileID: 21300000, guid: 8377cc120e576e944b75feebe81e20c3, type: 3}
+    - Key: TIK
+      Value: {fileID: 21300000, guid: 8736cd2dec8931c4d85b736f5c13f0fb, type: 3}
+    - Key: DAILYEXP
+      Value: {fileID: 21300000, guid: 85fc6e89683517c4ab0d5d8001a860d8, type: 3}
+    - Key: BOX_LIMITED_POLARIS
+      Value: {fileID: 21300000, guid: 9f5863965dc3a8a4aa3388ca13ae26bd, type: 3}
+  dic_RandomRewardIcon:
+    array:
+    - Key: GEM
+      Value: {fileID: 21300000, guid: 5bcf4b8229fbea24683ff7f12c4eea87, type: 3}
+    - Key: ENERGY
+      Value: {fileID: 21300000, guid: bbdd6f797f086814eb7f4bf654d052c2, type: 3}
+    - Key: HATCHING_ORB_COMMON
+      Value: {fileID: 21300000, guid: 23490dc8a1d27a64a8f88d432c0fbcfc, type: 3}
+    - Key: HATCHING_ORB_UNCOMMON
+      Value: {fileID: 21300000, guid: a4a3fb711a7caac438de5f0e22011266, type: 3}
+    - Key: HATCHING_ORB_RARE
+      Value: {fileID: 21300000, guid: af8e98aac06b77345b54c27c38197b72, type: 3}
+    - Key: HATCHING_ORB_EPIC
+      Value: {fileID: 21300000, guid: 60874fd5a88e1eb47ae429dc5ece3f54, type: 3}
+    - Key: HATCHING_ORB_LEGENDARY
+      Value: {fileID: 21300000, guid: f4550bf1a627e59439c6f558c2a6dcb8, type: 3}
+    - Key: STIK
+      Value: {fileID: 21300000, guid: 419f6e473570df34da89bfea4a41a1ed, type: 3}
+    - Key: TIK
+      Value: {fileID: 21300000, guid: 74fdae6c385b4fd45a9101ba704ca0b0, type: 3}
+  dic_CharacterSkinColor:
+    array:
+    - Key: 0
+      Value:
+        color_Background: {r: 0.29803923, g: 0.6431373, b: 0.9372549, a: 1}
+        color_Frame: {r: 0.54509807, g: 0.84705883, b: 0.9764706, a: 1}
+        color_Inner: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+        is_Active_Grdient: 0
+        color_Inner_Grdient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        color_Profile: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+    - Key: 1
+      Value:
+        color_Background: {r: 0.29803923, g: 0.6431373, b: 0.9372549, a: 1}
+        color_Frame: {r: 0.54509807, g: 0.84705883, b: 0.9764706, a: 1}
+        color_Inner: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+        is_Active_Grdient: 0
+        color_Inner_Grdient:
+          serializedVersion: 2
+          key0: {r: 1, g: 1, b: 1, a: 1}
+          key1: {r: 1, g: 1, b: 1, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        color_Profile: {r: 0.58431375, g: 0.9098039, b: 1, a: 1}
+    - Key: 2
+      Value:
+        color_Background: {r: 0.7490196, g: 0.45490196, b: 0.33333334, a: 1}
+        color_Frame: {r: 0.9764706, g: 0.9490196, b: 0.7529412, a: 1}
+        color_Inner: {r: 1, g: 1, b: 1, a: 1}
+        is_Active_Grdient: 1
+        color_Inner_Grdient:
+          serializedVersion: 2
+          key0: {r: 0.9764706, g: 0.9490196, b: 0.7529412, a: 1}
+          key1: {r: 1, g: 0.84705883, b: 0.49411765, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        color_Profile: {r: 1, g: 0.9764706, b: 0.65882355, a: 1}
+    - Key: 3
+      Value:
+        color_Background: {r: 0.7490196, g: 0.45490196, b: 0.33333334, a: 1}
+        color_Frame: {r: 0.9764706, g: 0.9490196, b: 0.7529412, a: 1}
+        color_Inner: {r: 1, g: 1, b: 1, a: 1}
+        is_Active_Grdient: 1
+        color_Inner_Grdient:
+          serializedVersion: 2
+          key0: {r: 0.9764706, g: 0.9490196, b: 0.7529412, a: 1}
+          key1: {r: 1, g: 0.84705883, b: 0.49411765, a: 1}
+          key2: {r: 0, g: 0, b: 0, a: 0}
+          key3: {r: 0, g: 0, b: 0, a: 0}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 65535
+          ctime2: 0
+          ctime3: 0
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 0
+          atime1: 65535
+          atime2: 0
+          atime3: 0
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_NumColorKeys: 2
+          m_NumAlphaKeys: 2
+        color_Profile: {r: 1, g: 0.9764706, b: 0.65882355, a: 1}
+  dic_userItemIcon:
+    array:
+    - Key: ROULETTE_TICKET
+      Value: {fileID: 21300000, guid: ee2c381bc6b63be408d6ff4211470c76, type: 3}

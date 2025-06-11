@@ -1,0 +1,289 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a6d88fce5d1a47198b81d20ed6260cb, type: 3}
+  m_Name: Polaris
+  m_EditorClassIdentifier: 
+  isNew: 0
+  isNewInventory: 0
+  isUsed: 0
+  isPossibleUpgrade: 1
+  isUniqueChange: 0
+  isUniqueUpgrade: 0
+  characterName: Polaris
+  characterType: 0
+  attackType: 0
+  characterIndex: 404
+  characterGrade: 9
+  characterPowerLevel:
+    currentCryptoKey: 1137650884
+    hiddenValue: 1137650884
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  characterClassLevel:
+    currentCryptoKey: 1667544411
+    hiddenValue: 1667544401
+    fakeValue: 10
+    fakeValueActive: 1
+    inited: 1
+  characterQuantity:
+    currentCryptoKey: 1106736045
+    hiddenValue: 1106736037
+    fakeValue: 8
+    fakeValueActive: 1
+    inited: 1
+  attackId:
+    currentCryptoKey: 1308407877
+    hiddenValue: 1308407877
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  targetCount:
+    migratedVersion: 
+    currentCryptoKey: 1506852702
+    hiddenValue: 1723813982
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 1
+    fakeValueActive: 1
+    inited: 1
+  attackDamage:
+    migratedVersion: 
+    currentCryptoKey: 1982941814
+    hiddenValue: 910881142
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 6
+    fakeValueActive: 1
+    inited: 1
+  attackSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1898925776
+    hiddenValue: 1313876584
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.52
+    fakeValueActive: 1
+    inited: 1
+  detectRange:
+    migratedVersion: 
+    currentCryptoKey: 1403687855
+    hiddenValue: 329259420
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 5.6
+    fakeValueActive: 1
+    inited: 1
+  strikeRange:
+    migratedVersion: 
+    currentCryptoKey: 1098404396
+    hiddenValue: 20250186
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 4.2
+    fakeValueActive: 1
+    inited: 1
+  criticalRange:
+    migratedVersion: 
+    currentCryptoKey: 1173371043
+    hiddenValue: 2029684012
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.06
+    fakeValueActive: 1
+    inited: 1
+  criticalDamageRate:
+    migratedVersion: 
+    currentCryptoKey: 1515542352
+    hiddenValue: 1700238672
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 1.5
+    fakeValueActive: 1
+    inited: 1
+  projectileSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1128077324
+    hiddenValue: 1125661964
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isThrow: 0
+  buffValue:
+    migratedVersion: 
+    currentCryptoKey: 1717552809
+    hiddenValue: 1724276649
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffRange:
+    migratedVersion: 
+    currentCryptoKey: 1964670177
+    hiddenValue: 1971067617
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffCycle:
+    migratedVersion: 
+    currentCryptoKey: 1317807533
+    hiddenValue: 1311083693
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffDuration:
+    migratedVersion: 
+    currentCryptoKey: 1915672368
+    hiddenValue: 1926704688
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  maxStarGradeValue:
+    currentCryptoKey: 1481623733
+    hiddenValue: 1481623729
+    fakeValue: 4
+    fakeValueActive: 1
+    inited: 1
+  characterNameTextKey: UI_Character_404
+  characterDescTextKey: UI_CharacterInfo_404
+  characterAttackDescTextKey: UI_CharacterAttack_404
+  isNFT: 0
+  statusTypes: 0000000002000000030000001f00000020000000
+  fieldBuffType: 0
+  classUpFactor:
+  - migratedVersion: 
+    currentCryptoKey: 2138378761
+    hiddenValue: 1058206985
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 4
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 2138378761
+    hiddenValue: 1041399049
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 8.5
+    fakeValueActive: 1
+    inited: 1
+  starFactor:
+  - migratedVersion: 
+    currentCryptoKey: 1192157542
+    hiddenValue: 2033009323
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.2
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1192157542
+    hiddenValue: 115412582
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 8
+    fakeValueActive: 1
+    inited: 1
+  powerFactor:
+  - migratedVersion: 
+    currentCryptoKey: 1564519216
+    hiddenValue: 430655280
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 540
+    fakeValueActive: 1
+    inited: 1
+  characterUniqueValue:
+  - migratedVersion: 
+    currentCryptoKey: 1696395444
+    hiddenValue: 636525748
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 4
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1696395444
+    hiddenValue: 653279412
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 220
+    fakeValueActive: 1
+    inited: 1
+  isHiddenMission: 0
+  relationChracterIndexes: 0500000067000000cb0000009101000093010000

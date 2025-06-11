@@ -1,0 +1,300 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a6d88fce5d1a47198b81d20ed6260cb, type: 3}
+  m_Name: Guardian
+  m_EditorClassIdentifier: 
+  isNew: 0
+  isNewInventory: 0
+  isUsed: 0
+  isPossibleUpgrade: 0
+  isUniqueChange: 0
+  characterName: Guardian
+  anim: {fileID: 11400000, guid: 3781da9e553d0c546b34a470a623781a, type: 2}
+  sprite_ChracterPortrait: {fileID: 21300000, guid: aee3414562c939e4bac16a7aeab05a30, type: 3}
+  characterType: 0
+  attackType: 2
+  characterIndex: 406
+  characterGrade: 9
+  characterPowerLevel:
+    currentCryptoKey: 1802597030
+    hiddenValue: 1802597030
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  characterClassLevel:
+    currentCryptoKey: 1107950545
+    hiddenValue: 1107950557
+    fakeValue: 12
+    fakeValueActive: 1
+    inited: 1
+  characterQuantity:
+    currentCryptoKey: 1946818708
+    hiddenValue: 1946818735
+    fakeValue: 59
+    fakeValueActive: 1
+    inited: 1
+  attackId:
+    currentCryptoKey: 1025115966
+    hiddenValue: 1025115966
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  targetCount:
+    migratedVersion: 
+    currentCryptoKey: 2019390553
+    hiddenValue: 2020891993
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  attackDamage:
+    migratedVersion: 
+    currentCryptoKey: 1860112041
+    hiddenValue: 1846468521
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  attackSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1639651066
+    hiddenValue: 1628879866
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  detectRange:
+    migratedVersion: 
+    currentCryptoKey: 1905882657
+    hiddenValue: 1903597857
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  strikeRange:
+    migratedVersion: 
+    currentCryptoKey: 1814164944
+    hiddenValue: 1828004304
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalRange:
+    migratedVersion: 
+    currentCryptoKey: 1852184242
+    hiddenValue: 1846961842
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalDamageRate:
+    migratedVersion: 
+    currentCryptoKey: 1957364813
+    hiddenValue: 1946463053
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  projectileSpeed:
+    migratedVersion: 
+    currentCryptoKey: 2142233551
+    hiddenValue: 2145628111
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isThrow: 1
+  projectileName: EffectBarrier
+  buffValue:
+    migratedVersion: 
+    currentCryptoKey: 1609675004
+    hiddenValue: 1605431804
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffRange:
+    migratedVersion: 
+    currentCryptoKey: 1010828384
+    hiddenValue: 1006911584
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffCycle:
+    migratedVersion: 
+    currentCryptoKey: 1421293431
+    hiddenValue: 1412937591
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffDuration:
+    migratedVersion: 
+    currentCryptoKey: 1742449165
+    hiddenValue: 1739250445
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  maxStarGradeValue:
+    currentCryptoKey: 1760827960
+    hiddenValue: 1760827964
+    fakeValue: 4
+    fakeValueActive: 1
+    inited: 1
+  characterNameTextKey: UI_Character_406
+  characterDescTextKey: UI_CharacterInfo_406
+  characterAttackDescTextKey: UI_CharacterAttack_406
+  displayType: 1
+  isNFT: 0
+  statusTypes: 300000003c00000031000000
+  fieldBuffType: 0
+  classUpFactor:
+  - migratedVersion: 
+    currentCryptoKey: 1271736900
+    hiddenValue: 1974686942
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.3
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1271736900
+    hiddenValue: 1964605047
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.35
+    fakeValueActive: 1
+    inited: 1
+  starFactor:
+  - migratedVersion: 
+    currentCryptoKey: 1070015041
+    hiddenValue: 32377740
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.4
+    fakeValueActive: 1
+    inited: 1
+  powerFactor: []
+  characterUniqueValue:
+  - migratedVersion: 
+    currentCryptoKey: 1034865735
+    hiddenValue: 2093788743
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 8
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1034865735
+    hiddenValue: 44697633
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 1.3
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1034865735
+    hiddenValue: 46968391
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0.5
+    fakeValueActive: 1
+    inited: 1
+  - migratedVersion: 
+    currentCryptoKey: 1034865735
+    hiddenValue: 2093809223
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 13
+    fakeValueActive: 1
+    inited: 1
+  skinName:
+    currentCryptoKey: 
+    hiddenValue: 
+    cryptoKey: 28006400f200df002100d200db00
+    hiddenChars: 4c0001009400be005400be00af00
+    fakeValue: default
+    fakeValueActive: 1
+    inited: 1
+  isHiddenMission: 1
+  relationChracterIndexes: 020000006a000000320100001505000092010000
