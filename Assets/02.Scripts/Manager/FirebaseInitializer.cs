@@ -176,7 +176,7 @@ public class FirebaseInitializer : MonoBehaviour
         return true;
     }
 
-    private bool CheckWhiteListIP()
+    public bool CheckWhiteListIP()
     {
         string externalip = new WebClient().DownloadString("https://api.ipify.org");
         

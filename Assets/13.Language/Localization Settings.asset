@@ -36,6 +36,7 @@ MonoBehaviour:
         m_CommandLineArgument: -language=
     - rid: 56846975518900254
       type: {class: SystemLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900255
       type: {class: SpecificLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
@@ -43,6 +44,7 @@ MonoBehaviour:
           m_Code: en-US
     - rid: 56846975518900256
       type: {class: LocalesProvider, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900257
       type: {class: LocalizedAssetDatabase, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
@@ -56,7 +58,7 @@ MonoBehaviour:
           m_TableCollectionName: UI_Text
         m_UseFallback: 0
         m_MissingTranslationState: 1
-        m_NoTranslationFoundMessage: No translation found for '{key}' in {table.TableCollectionName}
+        m_NoTranslationFoundMessage: '{key}'
         m_SmartFormat:
           rid: 56846975518900259
     - rid: 56846975518900259
@@ -118,14 +120,19 @@ MonoBehaviour:
         m_Groups: []
     - rid: 56846975518900264
       type: {class: DictionarySource, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900265
       type: {class: ValueTupleSource, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900266
       type: {class: XmlSource, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900267
       type: {class: ReflectionSource, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900268
       type: {class: DefaultSource, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
+      data: 
     - rid: 56846975518900269
       type: {class: PluralLocalizationFormatter, ns: UnityEngine.Localization.SmartFormat.Extensions, asm: Unity.Localization}
       data:

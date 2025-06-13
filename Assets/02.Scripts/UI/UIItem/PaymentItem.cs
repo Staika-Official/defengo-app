@@ -31,7 +31,7 @@ namespace Framework.UI
 
             try
             {
-                image_Icon.sprite = DataManager.Instance.uiPropertyData.dic_WalletHistoryIcons[data.content];
+                image_Icon.sprite = DataManager.Instance.uiPropertyData.dic_WalletHistoryIcons[data.content ?? ""];
             }
             catch (KeyNotFoundException e)
             {

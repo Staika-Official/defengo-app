@@ -211,18 +211,10 @@ namespace Framework.GameData.Defense
         {
             this.userState = userState;
             userProfileImageIds = userState.userProfileIds;
-            
+
             // Block Region Check
-            isBlockRegion = !GetIp() && Array.IndexOf(blockRegincode, userState.region) != -1 && NetworkManager.Instance.applicationState == ApplicationState.PRODUCTION;
-        }
-
-        private bool GetIp()
-        {
-            string externalip = new WebClient().DownloadString("https://api.ipify.org");
-            Debug.Log(externalip);
-
-            bool isSameIp = externalip == "1.232.94.157";
-            return isSameIp;
+            bool whiteList = FirebaseInitializer.Instance.CheckWhiteListIP();
+            isBlockRegion = !whiteList && Array.IndexOf(blockRegincode, userState.region) != -1 && NetworkManager.Instance.applicationState == ApplicationState.PRODUCTION;
         }
 
         public string GetUserStikAmount()

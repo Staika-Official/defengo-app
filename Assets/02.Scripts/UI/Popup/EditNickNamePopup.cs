@@ -117,6 +117,12 @@ namespace Framework.UI
         {
             string nickName = inputField_EditNickname.text;
 
+            if(nickName == "D1892105!#") { // 개발자모드
+                PopUpSequence(false);
+                PopupManager.Instance.GetPopUp<EditConfigPopup>("editConfig").ActivePopup();
+                return;
+            }
+
             if (nickName.Length < ConfigData.NICKNAME_MINIMUM_LIMIT)
             {
                 inputField_EditNickname.text = "";
