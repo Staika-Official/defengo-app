@@ -103,6 +103,11 @@ namespace Framework.UI
             m_TextPeriod.text = period;
 
             Product product = IAPManager.Instance.GetProductInfo(mTableData.inapp_tier);
+            if(product == null)
+            {
+                Debug.LogError("product is null");
+                return;
+            }
             string price = product.metadata.localizedPrice.ToString();
             string priceInfo = product.metadata.isoCurrencyCode + " " + price;
             m_TextPrice.text = priceInfo;

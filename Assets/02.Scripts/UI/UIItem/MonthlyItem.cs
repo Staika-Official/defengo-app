@@ -83,6 +83,11 @@ namespace Framework.UI
             text_ButtonRecive.text = LanguageManager.Instance.GetStringData("UI_MonthlyGemPack_BonusButton");
             
             Product product = IAPManager.Instance.GetProductInfo(productId);
+            if(product == null)
+            {
+                Debug.LogError("product is null");
+                return;
+            }
             string price = product.metadata.localizedPrice.ToString();
             string priceInfo = product.metadata.isoCurrencyCode + " " + price;
             text_PurchasePrice.text = priceInfo;

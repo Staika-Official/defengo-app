@@ -222,7 +222,7 @@ namespace Framework.Network
                 Instance = this;
 #if __PRODUCTION__
                 applicationState = ApplicationState.PRODUCTION;
-                Debug.unityLogger.logEnabled = false;
+                //Debug.unityLogger.logEnabled = false;
 #elif __STAGE__
                 applicationState = ApplicationState.STAGE;
 #endif
@@ -253,7 +253,7 @@ namespace Framework.Network
                 case ApplicationState.PRODUCTION:
                     Domain.baseUrl = "https://api.staika.io/services";
 #if !UNITY_EDITOR
-                    Debug.unityLogger.logEnabled = false; // Debug.Log 출력 여부
+                    //Debug.unityLogger.logEnabled = false; // Debug.Log 출력 여부
 #endif
                     break;
             }

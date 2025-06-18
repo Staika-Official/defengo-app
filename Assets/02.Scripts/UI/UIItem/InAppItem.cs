@@ -21,6 +21,11 @@ namespace Framework.UI
             this.productId = productId;
 
             Product product = IAPManager.Instance.GetProductInfo(productId);
+            if(product == null)
+            {
+                Debug.LogError("product is null");
+                return;
+            }
             // Debug.Log("Localized Title  : " + product.metadata.localizedTitle);
             // Debug.Log("isoCurrencyCode : " + product.metadata.isoCurrencyCode);
             CultureInfo culture = GetCultureInfoFromISOCurrencyCode(product.metadata.isoCurrencyCode);

@@ -85,6 +85,11 @@ namespace Framework.UI
             //인앱 가격을 셋해주고 결제 할때 본인의 key값을 이용해서 인앱상품을 결제하기위함
             productId = IAPManager.Instance.iapPassCrystalKey;
             Product product = IAPManager.Instance.GetProductInfo(productId);
+            if(product == null)
+            {
+                Debug.LogError("product is null");
+                return;
+            }
             string price = product.metadata.localizedPrice.ToString();
             string priceInfo = product.metadata.isoCurrencyCode + " " + price;
             text_InApp.text = priceInfo;

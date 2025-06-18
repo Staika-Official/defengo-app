@@ -99,19 +99,19 @@ public class BuildScript
                 switch (i)
                 {
                     case ArgType.SERVER:
-                        dicArgValues.Add(i, SERVER.LIVE.ToString());
+                        dicArgValues.Add(i, SERVER.STAGE.ToString());
                         break;
                     case ArgType.EXTENSION:
                         dicArgValues.Add(i, EXTENSION.APK.ToString());
                         break;
                     case ArgType.VERSIONNAME:
-                        dicArgValues.Add(i, "2.13.1");
+                        dicArgValues.Add(i, "2.14.0");
                         break;
                     case ArgType.BUILDNUMBER:
-                        dicArgValues.Add(i, "164");
+                        dicArgValues.Add(i, "165");
                         break;
                     case ArgType.PLATFORM:
-                        dicArgValues.Add(i, PLATFORM.iOS.ToString());
+                        dicArgValues.Add(i, PLATFORM.Android.ToString()); 
                         break;
                     default:
                         dicArgValues.Add(i, string.Empty);
@@ -217,7 +217,7 @@ public class BuildScript
     {
         if (report.summary.result == BuildResult.Succeeded)
         {
-            Debug.Log("Build succeeded: ");
+            Debug.Log($"Build succeeded: {report.summary.outputPath}");
         }
         else
         {

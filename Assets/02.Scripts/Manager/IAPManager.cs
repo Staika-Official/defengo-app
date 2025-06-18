@@ -39,6 +39,8 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
 
     public ProductCollection products => throw new NotImplementedException();
 
+    private bool initializing = false;
+
     //iap도큐먼트 지울 예정
     //https://docs.unity3d.com/Packages/com.unity.purchasing@4.12/api/UnityEngine.Purchasing.IStoreController.html
 
@@ -66,6 +68,8 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
 
     public void Initialize()
     {
+        if(initializing)
+            return;
         //ConfigurationBuilder.instance => 어떤 스토어로 구성을 할것인지 -> (1.스토어 구성 2.오버로딩 있음 도큐먼트 참고)
         //StandardPurchasingModule => Unity가 지원하는 표준 스토어를 위한 모듈 (앱스토어, 구글플레이)
         var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
@@ -88,6 +92,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
         //1.IDetailedStoreListener 향후 거래에 대한 콜백을 받으려면 리스너를 설정 해야함
         //2.ConfigurationBuilder에 바인딩 된 구매 목록 정의 
         UnityPurchasing.Initialize(this, builder);
+        initializing = true;
     }
 
     public void PurchaseProduct(string inapp_tier)
@@ -104,6 +109,12 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
     {
         //m_StoreController에 있는 products(제품 컬렉션)변수에 접근후
         //WithID 메서드를 사용해서 받아온 매개변수id와 일치하는 제품을 들고온다.
+        if(m_StoreController == null)
+        {
+            Debug.LogError("m_StoreController is null");
+            Initialize();
+            return null;
+        }
         Product product = m_StoreController.products.WithID(baseKey + inapp_tier);
         return product;
     }
@@ -115,6 +126,7 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
         //m_StoreController란 IStoreController 인터페이스이며
         //UnityPurchasing에 등록해준 상품을 제어하기 위한 컨트롤러이며
         //컨트롤러 내부 변수(products)에 접근해서 등록된 상품을 들고오거나 셋 할 수 있다.
+        initializing = false;
         m_StoreController = controller;
 
         for (int i = 0; i < m_StoreController.products.all.Length; i++)
@@ -170,11 +182,13 @@ public class IAPManager : MonoBehaviour, IDetailedStoreListener, IStoreControlle
     //Unity IAP가 초기화 실패할 경우 호출
     public void OnInitializeFailed(InitializationFailureReason error)
     {
+        
         OnInitializeFailed(error, null);
     }
 
     public void OnInitializeFailed(InitializationFailureReason error, string message)
     {
+        initializing = false;
         var errorMessage = $"Purchasing failed to initialize. Reason: {error}.";
 
         if (message != null)
