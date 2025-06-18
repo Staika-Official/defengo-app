@@ -132,7 +132,6 @@ namespace Framework.UI
         {
             button_free.button.onClick.AddListener(() =>
             {
-                button_exit.SetInterectible(false);
                 button_free.SetInterectible(false);
 
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
@@ -141,7 +140,6 @@ namespace Framework.UI
 
             button_ticket.button.onClick.AddListener(() =>
             {
-                button_exit.SetInterectible(false);
                 button_ticket.SetInterectible(false);
 
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
@@ -150,7 +148,6 @@ namespace Framework.UI
 
             button_stik.button.onClick.AddListener(() =>
             {
-                button_exit.SetInterectible(false);
                 button_stik.SetInterectible(false, false);
 
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
@@ -159,7 +156,6 @@ namespace Framework.UI
             
             button_ad.button.onClick.AddListener(() =>
             {
-                button_exit.SetInterectible(false);
                 button_ad.SetInterectible(false, false);
                 
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
@@ -283,6 +279,7 @@ namespace Framework.UI
                 Debug.Log("Roulette Reward Index Error!!!!!!!!!!!!!!!!!");
                 return;
             }
+            button_exit.SetInterectible(false);
 
             overGlow.SetActive(true);
             lightingGlow.SetActive(true);

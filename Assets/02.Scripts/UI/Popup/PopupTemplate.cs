@@ -33,7 +33,7 @@ namespace Framework.UI
                 uiSequences.ExcuteSeqeunce();
             }
 
-            if (SceneManager.GetActiveScene().buildIndex == 2)
+            if(PopupManager.Instance != null)
             {
                 transform.SetParent(PopupManager.GetPopupRect(isActive));
             }
