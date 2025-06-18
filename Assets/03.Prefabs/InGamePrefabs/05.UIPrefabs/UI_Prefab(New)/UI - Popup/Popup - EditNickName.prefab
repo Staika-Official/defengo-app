@@ -859,7 +859,7 @@ GameObject:
   - component: {fileID: 4705983198953101784}
   - component: {fileID: 4705983198953101791}
   m_Layer: 5
-  m_Name: Popup - EditNickname
+  m_Name: Popup - EditNickName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -940,7 +940,6 @@ MonoBehaviour:
   uiSequences: {fileID: 6243777076742818323}
   canvasGroup: {fileID: 4705983198953101791}
   button_Close: {fileID: 2793446074624701501}
-  isWalletPopup: 0
   editNickname: 
   inputField_EditNickname: {fileID: 7951494194147507886}
   text_Status: {fileID: 3452272039321131058}
@@ -1128,13 +1127,13 @@ MonoBehaviour:
   m_UpdateString:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 3452272039321131058}
         m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
         m_MethodName: set_text
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1429,7 +1428,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 11400000, guid: 021f7d34d563ec847b790eb6edd3c4f2, type: 2}
+  m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -2907,7 +2906,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Change
+  m_text: "\uBCC0\uACBD\uD558\uAE30"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: c9c83aa4a445ae44f9ac677551b18520, type: 2}
@@ -3253,7 +3252,19 @@ MonoBehaviour:
   m_FormatArguments: []
   m_UpdateString:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8913886812830728874}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   references:
     version: 2
     RefIds: []
@@ -3324,12 +3335,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '*You can use it for free once per account.
-
-    *Offensive words can be
-    subject to sanctions.
-
-    *Special characters and spaces are not allowed.'
+  m_text: "*\uACC4\uC815\uB2F9 1\uD68C \uBB34\uB8CC \uC0AC\uC6A9\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4.\r\n*\uBD88\uCF8C\uAC10\uC744
+    \uC8FC\uB294 \uB2E8\uC5B4\uB294 \uC81C\uC7AC\uC758 \uB300\uC0C1\uC774 \uB420
+    \uC218 \uC788\uC2B5\uB2C8\uB2E4.\r\n*\uD2B9\uC218\uBB38\uC790 \uBC0F \uACF5\uBC31\uC740
+    \uC0AC\uC6A9\uD560 \uC218 \uC5C6\uC2B5\uB2C8\uB2E4."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 032409fe5ee4d214ebaa914db9f79cff, type: 2}
@@ -4232,7 +4241,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC911\uBCF5\uD655\uC778"
+  m_text: "\uC911\uBCF5 \uD655\uC778"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 7281773a32ea73243b9c1e24f3bd8634, type: 2}

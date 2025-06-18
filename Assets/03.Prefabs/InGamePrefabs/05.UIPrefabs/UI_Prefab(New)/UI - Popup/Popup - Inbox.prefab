@@ -1630,7 +1630,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Delete Read Mail
+  m_text: "\uC77D\uC740 \uBA54\uC77C \uC0AD\uC81C"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: -901028585359562673, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
@@ -2094,7 +2094,7 @@ GameObject:
   - component: {fileID: 5187205689010557497}
   - component: {fileID: 2561601015904882730}
   - component: {fileID: 8346566509781315485}
-  - component: {fileID: 284190147664768571}
+  - component: {fileID: 5280046625623517000}
   m_Layer: 5
   m_Name: Text_Empty
   m_TagString: Untagged
@@ -2219,7 +2219,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &284190147664768571
+--- !u!114 &5280046625623517000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2243,7 +2243,19 @@ MonoBehaviour:
   m_FormatArguments: []
   m_UpdateString:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8346566509781315485}
+        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
+        m_MethodName: set_text
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 1
   references:
     version: 2
     RefIds: []
@@ -2284,7 +2296,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -14.100098, y: -14.620239}
-  m_SizeDelta: {x: 22, y: 0}
+  m_SizeDelta: {x: 22, y: 23.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &843216421573015904
 CanvasRenderer:
@@ -3247,7 +3259,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC815\uB9D0 \uC0AD\uC81C\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
+  m_text: "\uC815\uB9D0\uB85C \uC0AD\uC81C\uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 032409fe5ee4d214ebaa914db9f79cff, type: 2}
@@ -3465,7 +3477,6 @@ MonoBehaviour:
   uiSequences: {fileID: 6120207865219939217}
   canvasGroup: {fileID: 6165358797925971134}
   button_Close: {fileID: 2077866276295786897}
-  isWalletPopup: 0
   button_AllClaim: {fileID: 1695585795744050659}
   button_Delete: {fileID: 7235260540843505751}
   scrollRect: {fileID: 4571542383854280309}
@@ -4156,7 +4167,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Notice
+  m_text: "\uC548\uB0B4"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 32ee5194b1a22dc499a09b2308dc4662, type: 2}
@@ -4764,6 +4775,7 @@ MonoBehaviour:
   button: {fileID: 7235260540843505751}
   uISequences: {fileID: 6669783495928343814}
   isInterectible: 1
+  disableObject: {fileID: 0}
 --- !u!114 &6669783495928343814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6174,6 +6186,7 @@ MonoBehaviour:
   button: {fileID: 8728591852887376845}
   uISequences: {fileID: 7227561840349134066}
   isInterectible: 1
+  disableObject: {fileID: 0}
 --- !u!114 &7227561840349134066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6239,7 +6252,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -15.9, y: -14.620209}
-  m_SizeDelta: {x: 22, y: 0}
+  m_SizeDelta: {x: 22, y: 23.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7464266611437261920
 CanvasRenderer:
@@ -6574,6 +6587,7 @@ MonoBehaviour:
   button: {fileID: 8019051839508915866}
   uISequences: {fileID: 7150158693626761976}
   isInterectible: 1
+  disableObject: {fileID: 0}
 --- !u!114 &7150158693626761976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7468,6 +7482,7 @@ MonoBehaviour:
   button: {fileID: 1695585795744050659}
   uISequences: {fileID: 2708281183818736775}
   isInterectible: 1
+  disableObject: {fileID: 0}
 --- !u!114 &2708281183818736775
 MonoBehaviour:
   m_ObjectHideFlags: 0

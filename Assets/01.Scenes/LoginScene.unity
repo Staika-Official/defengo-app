@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.12729394, g: 0.1341429, b: 0.121147014, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -674,6 +673,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 605180695}
     m_Modifications:
+    - target: {fileID: 114106114, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_UpdateString.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1445294162}
+    - target: {fileID: 114106114, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_UpdateString.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: set_text
+      objectReference: {fileID: 0}
+    - target: {fileID: 114106114, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_UpdateString.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 634676645, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
       propertyPath: m_SizeDelta.y
       value: 72.54348
@@ -742,6 +753,10 @@ PrefabInstance:
       propertyPath: m_text
       value: copyright 2024. EzTechFin. all rights reserved
       objectReference: {fileID: 0}
+    - target: {fileID: 3388386721082205832, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4715393748434255938, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
       propertyPath: m_Name
       value: Button_GuestLogin
@@ -808,6 +823,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6704317540583718971, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
       propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6732277111721927959, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6732277111721927959, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6993692673551386490, guid: 433e15a115538194f95c6e18a54fea11, type: 3}
