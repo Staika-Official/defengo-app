@@ -50,13 +50,18 @@ namespace Framework.UI
 
             button_Confirm.onClick.AddListener(() => OnClick_Home());
         }
+        private bool goingHome = false;
 
         public void OnClick_Home()
         {
+            if (goingHome) return;
+            goingHome = true;
+
             SceneLoadManager.onCompleteLoadScene = () =>
             {
                 SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 SceneLoadManager.onCompleteLoadScene = null;
+                goingHome = false;
             };
             SceneLoadManager.Instance.SwitchingScene(2);
 
