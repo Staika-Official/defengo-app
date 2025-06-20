@@ -44,17 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4638d8ef112a847b5b0ec0bf48313aef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minimumVersionInfo:
-    aosVersion: 
-    iosVersion: 
-    isPatch: 0
-    isUpdate: 0
-  versionInfo: 
-  maintenanceKey: 
-  versionKey: 
-  maintenanceDetailKey: 
-  isGuestScreening: 0
-  isMaintenanceDetail: 0
 --- !u!1 &585376846
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,6 +729,22 @@ MonoBehaviour:
     storeItems: []
   specialStoreDTO:
     specialStore: []
+  limitedStoreItem:
+    code: 
+    nameKo: 
+    nameEn: 
+    fromDate: 
+    toDate: 
+    receivedItemAmount: 0
+    moneyType: 
+    price: 0
+    limitedQuantity: 0
+    purchasedQuantity: 0
+    saleRate: 0
+    userCeiling: 0
+    maxCeiling: 0
+    rewardCharacters: 
+    isAvailable: 0
   isFirst: 0
 --- !u!1 &3250274387114863576
 GameObject:
@@ -1043,11 +1048,6 @@ MonoBehaviour:
     rewardLeaderBoard: []
   weeklyRewardBoard:
     rewardLeaderBoard: []
-  limitedInfo:
-    activated: 0
-    fromDate: 
-    toDate: 
-    pityActivated: 0
   userPassInfo:
     isActivated: 0
     battlePassId: 0
@@ -1061,7 +1061,6 @@ MonoBehaviour:
   isTutorial: 0
   tutorial_State: 0
   isSkinPackageOpened: 0
-  isBlockRegion: 0
 --- !u!1 &3250274387937532411
 GameObject:
   m_ObjectHideFlags: 0
