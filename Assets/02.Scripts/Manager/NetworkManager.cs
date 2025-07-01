@@ -703,7 +703,10 @@ namespace Framework.Network
                         title = value["title"],
                         content = value["content"]
                     };
-                    UserInfoManager.Instance.dic_BoardList.Add(boardList.boardType, boardList);
+                    if(!UserInfoManager.Instance.dic_BoardList.ContainsKey(boardList.boardType))
+                    {
+                        UserInfoManager.Instance.dic_BoardList.Add(boardList.boardType, boardList);
+                    }
                 }
 
                 Success?.Invoke();

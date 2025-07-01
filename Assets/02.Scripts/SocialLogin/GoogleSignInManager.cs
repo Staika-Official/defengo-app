@@ -29,8 +29,10 @@ namespace Framework.Login
             {
                 Instance = this;
             }
-
-            //InitConfig();
+            
+            InitConfig();
+            
+            GoogleSignIn.Configuration = configuration;
         }
 
         public void InitConfig()
@@ -38,7 +40,9 @@ namespace Framework.Login
             configuration = new GoogleSignInConfiguration
             {
                 WebClientId = webClientId,
-                RequestIdToken = true
+                RequestIdToken = true,
+                RequestEmail = true,
+                UseGameSignIn = false
             };
         }
 
@@ -47,14 +51,6 @@ namespace Framework.Login
             if(isLogin) return;
 
             isLogin = true;
-            
-            InitConfig();
-            
-            GoogleSignIn.Configuration = configuration;
-            GoogleSignIn.Configuration.UseGameSignIn = false;
-            GoogleSignIn.Configuration.RequestIdToken = true;
-            GoogleSignIn.Configuration.RequestEmail = true;
-
             GoogleSignIn.DefaultInstance.SignIn().ContinueWith(
               OnAuthenticationFinished);
         }
