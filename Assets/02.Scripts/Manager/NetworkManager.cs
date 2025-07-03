@@ -483,7 +483,10 @@ namespace Framework.Network
                         LoginManager.Instance.SetLoginScreen(false);
                         break;
                     case AccountStatus.TERMINATION_REQUESTED:
-                        LoginManager.Instance.RestorePopup();
+                        _ = GetUserResourceByTokenModule(() =>
+                        {
+                            LoginManager.Instance.RestorePopup();
+                        });
                         break;
                     case AccountStatus.TERMINATION_COMPLETED:
                         break;
