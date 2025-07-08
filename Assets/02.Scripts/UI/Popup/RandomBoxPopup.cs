@@ -390,22 +390,7 @@ namespace Framework.UI
             //캐릭터 오픈 함수
             CharacterData data = DataManager.Instance.dic_CharacterData[(CharacterIndex)int.Parse(randomBoxProperty.value)];
 
-            if (data.characterClassLevel == 0)
-            {
-                inventoryCharacterItem.newCharacter.SetActive(true);
-                data.characterClassLevel = (int)data.characterGrade + 1;
-                data.isNewInventory = true;
-                isNewCharacter = true;
-
-            }
-            else
-            {
-                inventoryCharacterItem.newCharacter.SetActive(false);
-                data.characterQuantity++;
-                data.isNewInventory = false;
-                isNewCharacter = false;
-            }
-
+            inventoryCharacterItem.newCharacter.SetActive(data.isNew);
             //캐릭터 카드 초기화
             inventoryCharacterItem.Initialize(data, false);
             text_Grade.text = LanguageManager.Instance.GetStringData($"UI_Grade_{(int)data.characterGrade}");
@@ -611,11 +596,21 @@ namespace Framework.UI
             foreach (var data in randomBoxOpenData)
             {
                 CharacterData characterData = DataManager.Instance.dic_CharacterData[(CharacterIndex)int.Parse(data.value)];
-
                 if (characterData.characterClassLevel == 0)
+                {
                     characterData.isNew = true;
+                    characterData.characterClassLevel = (int)characterData.characterGrade + 1;
+                    characterData.isNewInventory = true;
+                    isNewCharacter = true;
+
+                }
                 else
+                {
                     characterData.isNew = false;
+                    characterData.characterQuantity++;
+                    characterData.isNewInventory = false;
+                    isNewCharacter = false;
+                }
             }
         }
     }
