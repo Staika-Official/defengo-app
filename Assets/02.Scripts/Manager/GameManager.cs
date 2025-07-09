@@ -515,6 +515,9 @@ namespace Framework.Game.Defense
                 _ = NetworkManager.Instance.GetRouletteGroup(playId, (ReqRouletteGroupData data) =>
                 {
                     UIManager.Instance.RoulettePopup(data);
+                }, ()=>
+                {
+                    GameFinishedSend();
                 });
             }
             else
