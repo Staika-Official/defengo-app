@@ -134,7 +134,7 @@ namespace Framework.Util
 #elif UNITY_ANDROID
                     style = GpmWebViewStyle.FULLSCREEN,
 #endif
-                    orientation = GpmOrientation.UNSPECIFIED,
+                    orientation = GpmOrientation.PORTRAIT,
                     isClearCookie = true,
                     isClearCache = true,
                     isNavigationBarVisible = false,

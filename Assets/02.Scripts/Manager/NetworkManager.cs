@@ -3658,10 +3658,28 @@ namespace Framework.Network
             DataManager.Instance.SetRoulettTableData(datas);
         }
 
-        public async UniTask GetRouletteGroup(int playId, UnityAction<ReqRouletteGroupData> onSuccess)
+        public async UniTask GetRouletteGroup(int playId, UnityAction<ReqRouletteGroupData> onSuccess, UnityAction onFailed)
         {
-            ReqRouletteGroupData datas = await SendToServerAsync<ReqRouletteGroupData>(string.Format(Url.getRouletteGroup, UserInfoManager.Instance.userId, playId), SendType.GET, TokenType.ACCESSTOKEN);
-            onSuccess?.Invoke(datas);
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getRouletteGroup, UserInfoManager.Instance.userId, playId), "GET");
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                ReqRouletteGroupData rouletteGroupData = JsonMapper.ToObject<ReqRouletteGroupData>(res.downloadHandler.text);
+                onSuccess?.Invoke(rouletteGroupData);
+            }
+            catch
+            {
+                Debug.Log(req.downloadHandler.text);
+                ErrorMessage(req.responseCode.ToString());
+                onFailed?.Invoke();
+            }
+            req.Dispose();
         }
 
         public async UniTask PostRouletteReward(int playId, RoulettePaidType type, UnityAction<ReqRouletteRewardData> onSuccess, UnityAction<string> onFailed)
