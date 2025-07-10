@@ -23,13 +23,14 @@ public class AdmobManager : MonoBehaviour
         //Key
         //adUnitId = "ca-app-pub-7166239305649170/4879003536";
         //미디에이션 Key
-        adUnitId = "ca-app-pub-7166239305649170/4411652176";
+        adUnitId = "ca-app-pub-3467340260114612/5880860486";
+        
 #elif UNITY_ANDROID
         //Key
         //adUnitId = "ca-app-pub-7166239305649170/8810509680";
 
         //미디에이션 Key
-        adUnitId = "ca-app-pub-7166239305649170/3588858818";
+        adUnitId = "ca-app-pub-3467340260114612/1520031381";
 #else
         adUnitId = "asd";
 #endif
