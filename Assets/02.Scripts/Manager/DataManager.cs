@@ -4,9 +4,6 @@ using Framework.Network;
 using Framework.Sound;
 using Framework.UI;
 using Framework.Util;
-using Google.MiniJSON;
-using UnityEditor.Localization.Plugins.XLIFF.V20;
-using Newtonsoft.Json;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 
