@@ -30,6 +30,7 @@ namespace Framework.Network
 
     public class Url
     {
+        public static readonly string getCharacters = "/game/api/character-info";
         public static readonly string socialLogin = "/uaa/api/sign-in/social";
         public static readonly string guestLogin = "/uaa/api/guest/login";
         public static readonly string userSocialLoginIntegration = "/uaa/api/guest/users/{0}/integration";
@@ -955,6 +956,30 @@ namespace Framework.Network
             }
 
             req.Dispose();
+        }
+
+        public async UniTask<string> GetCharacterFromServer()
+        {
+            UnityWebRequest req = new(Domain.baseUrl + Url.getCharacters, "GET");
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader(contentType, contentTypeValue);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(authorization, bearer + accessToken);
+            try
+            {
+                var res = await req.SendWebRequest();
+                string json = res.downloadHandler.text;
+                return json;
+            }
+            catch
+            {
+                Debug.Log(req.downloadHandler.text);
+                return null;
+            }
+            finally
+            {
+                req.Dispose();
+            }
         }
 
         // public async UniTask GetUserResourceByTokenModuleRestore()

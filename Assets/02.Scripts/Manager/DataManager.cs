@@ -4,7 +4,11 @@ using Framework.Network;
 using Framework.Sound;
 using Framework.UI;
 using Framework.Util;
+using Google.MiniJSON;
+using UnityEditor.Localization.Plugins.XLIFF.V20;
+using Newtonsoft.Json;
 using UnityEngine;
+using Newtonsoft.Json.Linq;
 
 namespace Framework.GameData.Defense
 {
@@ -149,6 +153,14 @@ namespace Framework.GameData.Defense
                     data.characterQuantity = 0;
 
                     //character skin
+                    
+                }
+
+                GetCharacterFromServer();
+
+                foreach (var key in dic_CharacterData.Keys)
+                {
+                    var data = dic_CharacterData[key];
                     List<SkinTableData> skin_list = SkinTableDataList.FindAll(a => a.character_id == (int)data.characterIndex).OrderBy(a => a.skin_grade_type).ToList();
                     foreach (SkinTableData skin in skin_list)
                     {
@@ -197,6 +209,26 @@ namespace Framework.GameData.Defense
             }
 
             return reward_tableList;
+        }
+
+        public async void GetCharacterFromServer()
+        {
+            var json = await NetworkManager.Instance.GetCharacterFromServer();
+            if (json != null)
+            {
+                JArray array = JArray.Parse(json);
+                foreach (JObject item in array)
+                {
+                    var characterData = dic_CharacterData[(CharacterIndex)item["characterIndex"].Value<int>()];
+                    characterData.OverrideFromJson(item);
+                }
+            }
+        }
+
+        [System.Serializable]
+        public class CharacterDataArray
+        {
+            public CharacterData[] characters;
         }
 
         public void SetRoulettTableData(Dictionary<string, List<int>> data)

@@ -6,6 +6,7 @@ using CodeStage.AntiCheat.ObscuredTypes;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Newtonsoft.Json.Linq;
 
 [CreateAssetMenu(menuName = "CharacterData")]
 public class CharacterData : ScriptableObject
@@ -96,120 +97,120 @@ public class CharacterData : ScriptableObject
     /// JSON 데이터를 가져와서 기존 값들만 덮어쓰는 함수
     /// </summary>
     /// <param name="jsonData">JSON 문자열 데이터</param>
-    public void OverrideFromJson(string jsonData)
+    public void OverrideFromJson(JObject jsonData)
     {
         try
         {
             // JSON을 Dictionary로 파싱
-            var jsonDict = JsonUtility.FromJson<Dictionary<string, object>>(jsonData);
-            if (jsonDict == null)
+            
+            if (jsonData == null)
             {
                 Debug.LogWarning("JSON 데이터 파싱 실패");
                 return;
             }
-
+    
             // 각 필드를 확인하고 값이 있으면 덮어쓰기
-            if (jsonDict.ContainsKey("isNew") && jsonDict["isNew"] != null)
-                isNew = Convert.ToBoolean(jsonDict["isNew"]);
+            if (jsonData.TryGetValue("isNew", out var isNewToken) && isNewToken != null)
+                isNew = isNewToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isNewInventory") && jsonDict["isNewInventory"] != null)
-                isNewInventory = Convert.ToBoolean(jsonDict["isNewInventory"]);
+            if (jsonData.TryGetValue("isNewInventory", out var isNewInventoryToken) && isNewInventoryToken != null)
+                isNewInventory = isNewInventoryToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isUsed") && jsonDict["isUsed"] != null)
-                isUsed = Convert.ToBoolean(jsonDict["isUsed"]);
+            if (jsonData.TryGetValue("isUsed", out var isUsedToken) && isUsedToken != null)
+                isUsed = isUsedToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isPossibleUpgrade") && jsonDict["isPossibleUpgrade"] != null)
-                isPossibleUpgrade = Convert.ToBoolean(jsonDict["isPossibleUpgrade"]);
+            if (jsonData.TryGetValue("isPossibleUpgrade", out var isPossibleUpgradeToken) && isPossibleUpgradeToken != null)
+                isPossibleUpgrade = isPossibleUpgradeToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isUniqueChange") && jsonDict["isUniqueChange"] != null)
-                isUniqueChange = Convert.ToBoolean(jsonDict["isUniqueChange"]);
+            if (jsonData.TryGetValue("isUniqueChange", out var isUniqueChangeToken) && isUniqueChangeToken != null)
+                isUniqueChange = isUniqueChangeToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isUniqueUpgrade") && jsonDict["isUniqueUpgrade"] != null)
-                isUniqueUpgrade = Convert.ToBoolean(jsonDict["isUniqueUpgrade"]);
+            if (jsonData.TryGetValue("isUniqueUpgrade", out var isUniqueUpgradeToken) && isUniqueUpgradeToken != null)
+                isUniqueUpgrade = isUniqueUpgradeToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("characterName") && jsonDict["characterName"] != null)
-                characterName = jsonDict["characterName"].ToString();
+            if (jsonData.TryGetValue("characterName", out var characterNameToken) && characterNameToken != null)
+                characterName = characterNameToken.Value<string>();
 
-            if (jsonDict.ContainsKey("characterType") && jsonDict["characterType"] != null)
-                characterType = (CharacterType)Convert.ToInt32(jsonDict["characterType"]);
+            if (jsonData.TryGetValue("characterType", out var characterTypeToken) && characterTypeToken != null)
+                characterType = (CharacterType)characterTypeToken.Value<int>();
 
-            if (jsonDict.ContainsKey("attackType") && jsonDict["attackType"] != null)
-                attackType = (AttackType)Convert.ToInt32(jsonDict["attackType"]);
+            if (jsonData.TryGetValue("attackType", out var attackTypeToken) && attackTypeToken != null)
+                attackType = (AttackType)attackTypeToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterIndex") && jsonDict["characterIndex"] != null)
-                characterIndex = (CharacterIndex)Convert.ToInt32(jsonDict["characterIndex"]);
+            if (jsonData.TryGetValue("characterIndex", out var characterIndexToken) && characterIndexToken != null)
+                characterIndex = (CharacterIndex)characterIndexToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterGrade") && jsonDict["characterGrade"] != null)
-                characterGrade = (CharacterGrade)Convert.ToInt32(jsonDict["characterGrade"]);
+            if (jsonData.TryGetValue("characterGrade", out var characterGradeToken) && characterGradeToken != null)
+                characterGrade = (CharacterGrade)characterGradeToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterPowerLevel") && jsonDict["characterPowerLevel"] != null)
-                characterPowerLevel = Convert.ToInt32(jsonDict["characterPowerLevel"]);
+            if (jsonData.TryGetValue("characterPowerLevel", out var characterPowerLevelToken) && characterPowerLevelToken != null)
+                characterPowerLevel = characterPowerLevelToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterClassLevel") && jsonDict["characterClassLevel"] != null)
-                characterClassLevel = Convert.ToInt32(jsonDict["characterClassLevel"]);
+            if (jsonData.TryGetValue("characterClassLevel", out var characterClassLevelToken) && characterClassLevelToken != null)
+                characterClassLevel = characterClassLevelToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterQuantity") && jsonDict["characterQuantity"] != null)
-                characterQuantity = Convert.ToInt32(jsonDict["characterQuantity"]);
+            if (jsonData.TryGetValue("characterQuantity", out var characterQuantityToken) && characterQuantityToken != null)
+                characterQuantity = characterQuantityToken.Value<int>();
 
-            if (jsonDict.ContainsKey("attackId") && jsonDict["attackId"] != null)
-                attackId = Convert.ToInt32(jsonDict["attackId"]);
+            if (jsonData.TryGetValue("attackId", out var attackIdToken) && attackIdToken != null)
+                attackId = attackIdToken.Value<int>();
 
-            if (jsonDict.ContainsKey("targetCount") && jsonDict["targetCount"] != null)
-                targetCount = Convert.ToSingle(jsonDict["targetCount"]);
+            if (jsonData.TryGetValue("targetCount", out var targetCountToken) && targetCountToken != null)
+                targetCount = targetCountToken.Value<float>();
 
-            if (jsonDict.ContainsKey("attackDamage") && jsonDict["attackDamage"] != null)
-                attackDamage = Convert.ToSingle(jsonDict["attackDamage"]);
+            if (jsonData.TryGetValue("attackDamage", out var attackDamageToken) && attackDamageToken != null)
+                attackDamage = attackDamageToken.Value<float>();
 
-            if (jsonDict.ContainsKey("attackSpeed") && jsonDict["attackSpeed"] != null)
-                attackSpeed = Convert.ToSingle(jsonDict["attackSpeed"]);
+            if (jsonData.TryGetValue("attackSpeed", out var attackSpeedToken) && attackSpeedToken != null)
+                attackSpeed = attackSpeedToken.Value<float>();
 
-            if (jsonDict.ContainsKey("detectRange") && jsonDict["detectRange"] != null)
-                detectRange = Convert.ToSingle(jsonDict["detectRange"]);
+            if (jsonData.TryGetValue("detectRange", out var detectRangeToken) && detectRangeToken != null)
+                detectRange = detectRangeToken.Value<float>();
 
-            if (jsonDict.ContainsKey("strikeRange") && jsonDict["strikeRange"] != null)
-                strikeRange = Convert.ToSingle(jsonDict["strikeRange"]);
+            if (jsonData.TryGetValue("strikeRange", out var strikeRangeToken) && strikeRangeToken != null)
+                strikeRange = strikeRangeToken.Value<float>();
 
-            if (jsonDict.ContainsKey("criticalRange") && jsonDict["criticalRange"] != null)
-                criticalRange = Convert.ToSingle(jsonDict["criticalRange"]);
+            if (jsonData.TryGetValue("criticalRange", out var criticalRangeToken) && criticalRangeToken != null)
+                criticalRange = criticalRangeToken.Value<float>();
 
-            if (jsonDict.ContainsKey("criticalDamageRate") && jsonDict["criticalDamageRate"] != null)
-                criticalDamageRate = Convert.ToSingle(jsonDict["criticalDamageRate"]);
+            if (jsonData.TryGetValue("criticalDamageRate", out var criticalDamageRateToken) && criticalDamageRateToken != null)
+                criticalDamageRate = criticalDamageRateToken.Value<float>();
 
-            if (jsonDict.ContainsKey("projectileSpeed") && jsonDict["projectileSpeed"] != null)
-                projectileSpeed = Convert.ToSingle(jsonDict["projectileSpeed"]);
+            if (jsonData.TryGetValue("projectileSpeed", out var projectileSpeedToken) && projectileSpeedToken != null)
+                projectileSpeed = projectileSpeedToken.Value<float>();
 
-            if (jsonDict.ContainsKey("isThrow") && jsonDict["isThrow"] != null)
-                isThrow = Convert.ToBoolean(jsonDict["isThrow"]);
+            if (jsonData.TryGetValue("isThrow", out var isThrowToken) && isThrowToken != null)
+                isThrow = isThrowToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("buffValue") && jsonDict["buffValue"] != null)
-                buffValue = Convert.ToSingle(jsonDict["buffValue"]);
+            if (jsonData.TryGetValue("buffValue", out var buffValueToken) && buffValueToken != null)
+                buffValue = buffValueToken.Value<float>();
 
-            if (jsonDict.ContainsKey("buffRange") && jsonDict["buffRange"] != null)
-                buffRange = Convert.ToSingle(jsonDict["buffRange"]);
+            if (jsonData.TryGetValue("buffRange", out var buffRangeToken) && buffRangeToken != null)
+                buffRange = buffRangeToken.Value<float>();
 
-            if (jsonDict.ContainsKey("buffCycle") && jsonDict["buffCycle"] != null)
-                buffCycle = Convert.ToSingle(jsonDict["buffCycle"]);
+            if (jsonData.TryGetValue("buffCycle", out var buffCycleToken) && buffCycleToken != null)
+                buffCycle = buffCycleToken.Value<float>();
 
-            if (jsonDict.ContainsKey("buffDuration") && jsonDict["buffDuration"] != null)
-                buffDuration = Convert.ToSingle(jsonDict["buffDuration"]);
+            if (jsonData.TryGetValue("buffDuration", out var buffDurationToken) && buffDurationToken != null)
+                buffDuration = buffDurationToken.Value<float>();
 
-            if (jsonDict.ContainsKey("maxStarGradeValue") && jsonDict["maxStarGradeValue"] != null)
-                maxStarGradeValue = Convert.ToInt32(jsonDict["maxStarGradeValue"]);
+            if (jsonData.TryGetValue("maxStarGradeValue", out var maxStarGradeValueToken) && maxStarGradeValueToken != null)
+                maxStarGradeValue = maxStarGradeValueToken.Value<int>();
 
-            if (jsonDict.ContainsKey("characterNameTextKey") && jsonDict["characterNameTextKey"] != null)
-                characterNameTextKey = jsonDict["characterNameTextKey"].ToString();
+            if (jsonData.TryGetValue("characterNameTextKey", out var characterNameTextKeyToken) && characterNameTextKeyToken != null)
+                characterNameTextKey = characterNameTextKeyToken.Value<string>();
 
-            if (jsonDict.ContainsKey("characterDescTextKey") && jsonDict["characterDescTextKey"] != null)
-                characterDescTextKey = jsonDict["characterDescTextKey"].ToString();
+            if (jsonData.TryGetValue("characterDescTextKey", out var characterDescTextKeyToken) && characterDescTextKeyToken != null)
+                characterDescTextKey = characterDescTextKeyToken.Value<string>();
 
-            if (jsonDict.ContainsKey("characterAttackDescTextKey") && jsonDict["characterAttackDescTextKey"] != null)
-                characterAttackDescTextKey = jsonDict["characterAttackDescTextKey"].ToString();
+            if (jsonData.TryGetValue("characterAttackDescTextKey", out var characterAttackDescTextKeyToken) && characterAttackDescTextKeyToken != null)
+                characterAttackDescTextKey = characterAttackDescTextKeyToken.Value<string>();
 
-            if (jsonDict.ContainsKey("isNFT") && jsonDict["isNFT"] != null)
-                isNFT = Convert.ToBoolean(jsonDict["isNFT"]);
+            if (jsonData.TryGetValue("isNFT", out var isNFTToken) && isNFTToken != null)
+                isNFT = isNFTToken.Value<bool>();
 
-            if (jsonDict.ContainsKey("isHiddenMission") && jsonDict["isHiddenMission"] != null)
-                isHiddenMission = Convert.ToBoolean(jsonDict["isHiddenMission"]);
+            if (jsonData.TryGetValue("isHiddenMission", out var isHiddenMissionToken) && isHiddenMissionToken != null)
+                isHiddenMission = isHiddenMissionToken.Value<bool>();
 
             Debug.Log($"CharacterData {characterName} JSON 데이터로 덮어쓰기 완료");
         }
