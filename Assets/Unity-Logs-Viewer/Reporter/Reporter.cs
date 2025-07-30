@@ -21,6 +21,8 @@ using System.IO;
 using UnityEngine;
 #if UNITY_CHANGE3
 using UnityEngine.SceneManagement;
+using System.Runtime.InteropServices;
+
 #endif
 #if UNITY_CHANGE4
 using UnityEngine.Networking;
@@ -72,6 +74,8 @@ public class Images
 
 public class Reporter : MonoBehaviour
 {
+    [SerializeField] GameObject reporter;
+   
     public enum _LogType
     {
         Assert = LogType.Assert,
@@ -614,8 +618,11 @@ public class Reporter : MonoBehaviour
 
     void Start()
     {
-        logDate = System.DateTime.Now.ToString();
-        StartCoroutine("readInfo");
+        #if __STAGE__
+            reporter.SetActive(true);
+            logDate = System.DateTime.Now.ToString();
+            StartCoroutine("readInfo");
+        #endif
     }
 
     //clear all logs
