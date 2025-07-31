@@ -65,15 +65,21 @@ namespace Framework.UI
                 });
             button_Skip.onClick.AddListener(() => OnClick_Skip());
 
-            if(limitedShopUIItem != null)
+            SetupUI();
+        }
+
+        [ContextMenu("Setup UI")]
+        private void SetupUI()
+        {
+            if (limitedShopUIItem != null)
             {
-                if(backgroundImage) backgroundImage.sprite = limitedShopUIItem.backgroundImage;
+                if (backgroundImage) backgroundImage.sprite = limitedShopUIItem.backgroundImage;
                 if (characterSpine)
                 {
                     characterSpine.skeletonDataAsset = limitedShopUIItem.characterSkeletonData;
                     characterSpine.Initialize(true);
                 }
-                if(localizeDesc) localizeDesc.StringReference.TableEntryReference = limitedShopUIItem.descLocalizeKey;
+                if (localizeDesc) localizeDesc.StringReference.TableEntryReference = limitedShopUIItem.descLocalizeKey;
             }
         }
 
