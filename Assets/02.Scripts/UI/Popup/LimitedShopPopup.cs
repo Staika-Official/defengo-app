@@ -5,6 +5,8 @@ using Framework.Util;
 using Framework.Network;
 using System;
 using Framework.GameData.Defense;
+using Spine.Unity;
+using UnityEngine.Localization.Components;
 
 namespace Framework.UI
 {
@@ -27,6 +29,10 @@ namespace Framework.UI
         [SerializeField] private TextMeshProUGUI text_ManyPrice;
 
         [SerializeField] private Slider slider_Ceiling;
+        [Header("UISet"), SerializeField] private LimitedShopUIItem limitedShopUIItem;
+        [SerializeField] private Image backgroundImage;
+        [SerializeField] private SkeletonGraphic characterSpine;
+        [SerializeField] private LocalizeStringEvent localizeDesc;
 
         private LimitedStoreItem limitedStoreItemData;
         private bool isSkip;
@@ -58,6 +64,17 @@ namespace Framework.UI
                     OnClick_BuyItem(false);
                 });
             button_Skip.onClick.AddListener(() => OnClick_Skip());
+
+            if(limitedShopUIItem != null)
+            {
+                if(backgroundImage) backgroundImage.sprite = limitedShopUIItem.backgroundImage;
+                if (characterSpine)
+                {
+                    characterSpine.skeletonDataAsset = limitedShopUIItem.characterSkeletonData;
+                    characterSpine.Initialize(true);
+                }
+                if(localizeDesc) localizeDesc.StringReference.TableEntryReference = limitedShopUIItem.descLocalizeKey;
+            }
         }
 
         private void SetLimitedStoreItem()
