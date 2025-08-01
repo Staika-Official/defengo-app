@@ -6,6 +6,7 @@ using Framework.UI;
 using Framework.Util;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace Framework.GameData.Defense
 {
@@ -153,7 +154,7 @@ namespace Framework.GameData.Defense
                     
                 }
 
-                GetCharacterFromServer();
+                await GetCharacterFromServer();
 
                 foreach (var key in dic_CharacterData.Keys)
                 {
@@ -208,17 +209,26 @@ namespace Framework.GameData.Defense
             return reward_tableList;
         }
 
-        public async void GetCharacterFromServer()
+        public async Task<bool> GetCharacterFromServer()
         {
-            var json = await NetworkManager.Instance.GetCharacterFromServer();
-            if (json != null)
+            try
             {
-                JArray array = JArray.Parse(json);
-                foreach (JObject item in array)
+                var json = await NetworkManager.Instance.GetCharacterFromServer();
+                if (json != null)
                 {
-                    var characterData = dic_CharacterData[(CharacterIndex)item["characterIndex"].Value<int>()];
-                    characterData.OverrideFromJson(item);
+                    JArray array = JArray.Parse(json);
+                    foreach (JObject item in array)
+                    {
+                        var characterData = dic_CharacterData[(CharacterIndex)item["characterIndex"].Value<int>()];
+                        characterData.OverrideFromJson(item);
+                    }
                 }
+                return true;
+            }
+            catch(System.Exception e)
+            {
+                Debug.LogError($"Error fetching character data: {e.Message}");
+                return false;
             }
         }
 
