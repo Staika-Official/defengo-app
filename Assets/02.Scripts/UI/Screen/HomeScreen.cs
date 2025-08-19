@@ -22,6 +22,7 @@ namespace Framework.UI
     {
         public static HomeScreen Instance;
         public ButtonComponent button_Play;
+        public ButtonComponent button_Friend;
         public ButtonComponent button_Inbox;
         public ButtonComponent button_Guide;
         public ButtonComponent button_Limited;
@@ -64,6 +65,11 @@ namespace Framework.UI
                 button_Play.onPointerUp = null;
                 SoundManager.Instance.PlaySound(SoundKey.SF_GAMEPLAY);
                 RequestStartGame();
+            };
+
+            button_Friend.onPointerUp = () =>
+            {
+                PopupManager.Instance.GetPopUp<FriendPopup>("friend").ActivePopup();
             };
 
             button_Inbox.onPointerUp = () =>

@@ -26,13 +26,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4176551213087354693}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4176551213371805989}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &4176551213087354699
 MeshRenderer:
@@ -150,6 +150,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4176551213371805991}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -157,7 +158,6 @@ Transform:
   m_Children:
   - {fileID: 4176551213087354698}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &4716538168294556555
 BoxCollider2D:
@@ -169,6 +169,25 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -202,6 +221,12 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -322,8 +347,8 @@ MonoBehaviour:
     inited: 1
   criticalRange:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1054574447
+    hiddenValue: 1049090927
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -331,7 +356,7 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   targetCount:
     currentCryptoKey: 1548419017
     hiddenValue: 1548419019
@@ -352,8 +377,8 @@ MonoBehaviour:
     inited: 1
   projectileSpeed:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1893598916
+    hiddenValue: 1879498436
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -361,11 +386,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   strikeRange:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1512656385
+    hiddenValue: 1515071745
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -373,11 +398,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   buffValue:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1562174130
+    hiddenValue: 1575099570
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -385,11 +410,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   buffRange:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 2099538757
+    hiddenValue: 2104173637
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -397,11 +422,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   buffCycle:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 2022694481
+    hiddenValue: 2027851601
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -409,11 +434,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   buffDuration:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1965740869
+    hiddenValue: 1976773189
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -421,11 +446,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   totalBuffValue:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1906194764
+    hiddenValue: 1899601484
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -433,11 +458,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   getAttackBuffValue:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1621451399
+    hiddenValue: 1617077639
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -445,11 +470,11 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   criticalDamageRate:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1406292370
+    hiddenValue: 1397871250
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -457,7 +482,7 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   isThrow: 0
   isDrag: 0
   isAttackType: 0
@@ -466,8 +491,8 @@ MonoBehaviour:
   maxStarGradeValue: 0
   sellPriceRatio:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1617139274
+    hiddenValue: 1620468554
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -475,8 +500,9 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   isShield: 0
+  isNonFocus: 0
   collisions: []
   characterState: 0
   pivotPosition: {x: 0, y: 0}
@@ -486,8 +512,8 @@ MonoBehaviour:
   meshRenderer: {fileID: 0}
   speedBuffValue:
     migratedVersion: 
-    currentCryptoKey: 0
-    hiddenValue: 0
+    currentCryptoKey: 1208566597
+    hiddenValue: 1212352837
     hiddenValueOldByte4:
       b1: 0
       b2: 0
@@ -495,13 +521,14 @@ MonoBehaviour:
       b4: 0
     fakeValue: 0
     fakeValueActive: 0
-    inited: 0
+    inited: 1
   projectileName: 
   particleName: 
   characterInterface: {fileID: 0}
   characterShield: {fileID: 0}
   targetedMonster: []
   buffParticle: []
+  skinID: 0
   isDestroyed: 0
   slowDownValue: 0
   slowDownDuration: 0

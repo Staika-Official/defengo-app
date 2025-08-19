@@ -238,7 +238,6 @@ namespace Framework.UI
                 LobbyNavigator.Instance.OnClick_Screen(MenuType.WALLET);
             });
 
-
             //button_Profile.onClick.AddListener(() => PopupManager.Instance.GetPopUp<ProfilePopup>("profile").ActivePopup());
             button_Profile.onClick.AddListener(() =>
                 PopupManager.Instance.GetPopUp<UserProfileDetailPopup>("userProfileDetail").ActivePopup());
