@@ -240,7 +240,12 @@ namespace Framework.UI
 
             //button_Profile.onClick.AddListener(() => PopupManager.Instance.GetPopUp<ProfilePopup>("profile").ActivePopup());
             button_Profile.onClick.AddListener(() =>
-                PopupManager.Instance.GetPopUp<UserProfileDetailPopup>("userProfileDetail").ActivePopup());
+                {
+                    var userProfilePopup = PopupManager.Instance.GetPopUp<UserProfileDetailPopup>("userProfileDetail");
+                    userProfilePopup.ActivePopup();
+                    userProfilePopup.ShowMyProfile();
+                    // userProfilePopup.SetInfo(UserInfoManager.Instance.userId, UserInfoManager.Instance.userState.equippedProfileId);
+                });
             button_Setting.onClick.AddListener(() =>
                 PopupManager.Instance.GetPopUp<SettingPopup>("setting").ActivePopup());
 
@@ -269,7 +274,7 @@ namespace Framework.UI
         // Weekly Reward Popup
         public async void CheckLeaderBoardRewardWeeklyPopup()
         {
-            await NetworkManager.Instance.GetLeaderBoardRewardData(LeaderBoardType.WAVE_WEEKLY, (data)=>
+            await NetworkManager.Instance.GetLeaderBoardRewardData(LeaderBoardType.WAVE_WEEKLY, (data) =>
             {
                 LeaderBoardRewardStatusData rewardData = JsonUtility.FromJson<LeaderBoardRewardStatusData>(data);
 

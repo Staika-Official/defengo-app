@@ -13,9 +13,25 @@ namespace Framework.UI
 {
     public class FriendPopup : PopupTemplate
     {
+        List<FriendData> recommendedFriendDatas = new List<FriendData>();
+        List<FriendData> friendDatas = new List<FriendData>();
+
+        public TMP_InputField input_UID;
+        public Button button_Search;
+        public FriendItem searchFriendItem;
+
+        public ScrollRect scrollFriends;
+        public FriendItem friendItem;
+
+        public Button button_RefreshRecommend;
+        public Transform recommendParent;
+        public FriendItem recommendFriendItem;
+
         public override void ActivePopup()
         {
             PopUpSequence(true);
+
+            LoadData();
         }
 
         public override void InActivePopup()
@@ -25,19 +41,82 @@ namespace Framework.UI
 
         public override void Initialize()
         {
+            input_UID.onValueChanged.AddListener((string txt) =>
+            {
+                button_Search.interactable = !string.IsNullOrEmpty(txt);
+                searchFriendItem.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(txt));
+            });
+
             button_Close.onClick.AddListener(() =>
             {
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
-                PopUpSequence(false);
+                InActivePopup();
             });
 
-            // _ = NetworkManager.Instance.GetTotalUserProfileDetail(UserInfoManager.Instance.userId, Success, Failed);
+            button_Search.onClick.AddListener(() =>
+            {
+                SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
+                OnClickButtonSearch();
+            });
+
+            button_RefreshRecommend.onClick.AddListener(async () =>
+            {
+                foreach (Transform child in recommendParent)
+                {
+                    Destroy(child.gameObject);
+                }
+                await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
+            });
         }
-        void Success()
+
+        async void LoadData()
+        {
+            foreach (Transform child in recommendParent)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach (Transform child in scrollFriends.content)
+            {
+                Destroy(child.gameObject);
+            }
+            await NetworkManager.Instance.GetListFriends(SuccessGetListFriend, FailedGetListFriend);
+            await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
+        }
+
+        async void OnClickButtonSearch()
+        {
+            await NetworkManager.Instance.SearchFriends(input_UID.text, (ReqSearchFriendsData data) =>
+            {
+                searchFriendItem.SetFriendData(data.friendData, data.isFriend);
+            }, null);
+        }
+
+        void SuccessGetListFriend(ReqListFriendsData data)
+        {
+            friendDatas = data.friends;
+
+            foreach (var friend in friendDatas)
+            {
+                FriendItem itm = Instantiate(friendItem, scrollFriends.content);
+                itm.gameObject.SetActive(true);
+                itm.SetFriendData(friend, true);
+            }
+        }
+        void FailedGetListFriend(string error)
         {
 
         }
-        void Failed()
+        void SuccessGetRecommendedFriends(ReqRecommendedFriendsData data)
+        {
+            recommendedFriendDatas = data.players;
+            foreach (var recommend in recommendedFriendDatas)
+            {
+                FriendItem itm = Instantiate(recommendFriendItem, recommendParent);
+                itm.gameObject.SetActive(true);
+                itm.SetFriendData(recommend, false);
+            }
+        }
+        void FailedGetRecommendedFriends(string error)
         {
 
         }

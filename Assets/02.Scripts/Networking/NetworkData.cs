@@ -365,7 +365,7 @@ namespace Framework.Network
         public int userCeiling;
         public int maxCeiling;
     }
-    
+
     [Serializable]
     public class LimitedStoreItem
     {
@@ -942,7 +942,9 @@ namespace Framework.Network
         PTIK_RANDOMBOX = 9,
         TIK_RANDOMBOX = 10,
         PTIK = 11,
-        HATCHING_ORB = 12
+        HATCHING_ORB = 12,
+        ITEM = 13,
+        FRIEND_REQUEST = 14,
     }
 
     public enum InboxStatus
@@ -1353,6 +1355,43 @@ namespace Framework.Network
     {
         public int characterId;
         public string paidType;
+    }
+    #endregion
+
+    #region Friend
+    [Serializable]
+    public class ReqRecommendedFriendsData
+    {
+        public List<FriendData> players;
+    }
+    [Serializable]
+    public class ReqListFriendsData
+    {
+        public List<FriendData> friends;
+    }
+    [Serializable]
+    public class FriendData
+    {
+        public string userId;
+        public string nickname;
+        public int equippedProfileId;
+        public DateTime lastAccessDate;
+        public DateTime blockSendEnergyDate;
+    }
+    [Serializable]
+    public class ReqSearchFriendsData
+    {
+        public bool pendingFromCaller;
+        public bool isFriend;
+        public FriendData friendData;
+        public bool pendingFromFriend;
+    }
+    [Serializable]
+    public enum FriendRequestStatus
+    {
+        PENDING,
+        ACCEPTED,
+        REJECTED
     }
     #endregion
 }

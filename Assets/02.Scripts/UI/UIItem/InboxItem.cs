@@ -33,6 +33,8 @@ namespace Framework.UI
         public ButtonComponent button_Read;
         public ButtonComponent button_GetItem;
         public ButtonComponent button_InActiveRead;
+        public ButtonComponent button_Accept;
+        public ButtonComponent button_Reject;
 
         public void Initialize(UserInbox data)
         {
@@ -163,6 +165,10 @@ namespace Framework.UI
                     button_Read.gameObject.SetActive(false);
                     button_GetItem.gameObject.SetActive(true);
                     break;
+                case InboxType.FRIEND_REQUEST:
+                    button_Accept.gameObject.SetActive(true);
+                    button_Reject.gameObject.SetActive(true);
+                    break;
                 default:
                     break;
             }
@@ -193,6 +199,17 @@ namespace Framework.UI
                 OnClick_InactiveRead();
                 button_InActiveRead.onPointerUp = null;
             };
+
+            button_Accept.onPointerUp = () =>
+            {
+
+            };
+
+            button_Reject.onPointerUp = () =>
+            {
+
+            };
+            
         }
 
         public void OnClick_InactiveRead()

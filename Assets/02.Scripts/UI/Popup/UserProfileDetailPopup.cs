@@ -135,6 +135,7 @@ namespace Framework.UI
 
         public void Success(TotalProfileData data)
         {
+            dic_profileData = new Dictionary<LeaderBoardType, ResponseProfileData>();
             //todo Daily삭제되면 타입 줄이기
             for (int i = 0; i < data.userProfile.Length; i++)
             {
@@ -168,7 +169,7 @@ namespace Framework.UI
 
         public void SetProfileData(ResponseProfileData data)
         {
-            string nickName = UserInfoManager.Instance.nickname;
+            string nickName = data.nickname;
             if (data.ranking.first > 0)
             {
                 //isGoldMedal = true;
@@ -236,6 +237,11 @@ namespace Framework.UI
             //todo Daily삭제되면 주석처리 해제 할것
             button_switching.gameObject.SetActive(false);
 
+            
+        }
+
+        public void ShowMyProfile()
+        {
             int[] userProfileIds = UserInfoManager.Instance.userProfileImageIds;
             focusProfileIdx = UserInfoManager.Instance.userState.equippedProfileId;
             UserProfileData data = DataManager.Instance.dic_userProfileData[focusProfileIdx];
@@ -243,6 +249,13 @@ namespace Framework.UI
             SetProfileImage(data);
 
             _ = NetworkManager.Instance.GetTotalUserProfileDetail(UserInfoManager.Instance.userId, Success, Failed);
+        }
+        public void ShowOtherProfile(string otherId, int otherEquippedProfileId)
+        {
+            UserProfileData data = DataManager.Instance.dic_userProfileData[otherEquippedProfileId];
+            SetProfileImage(data);
+
+            _ = NetworkManager.Instance.GetFriendProfile(otherId, Success, null);
         }
 
 

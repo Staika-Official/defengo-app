@@ -163,6 +163,24 @@ namespace Framework.Network
         public static readonly string getRouletteTable = "/game/api/roulettes";
         public static readonly string getRouletteGroup = "/game/api/user-roulettes/users/{0}/plays/{1}";
         public static readonly string postRouletteReward = "/game/api/user-roulettes/users/{0}";
+
+        //  <summary>
+        //  0: userId
+        //  1: friendId
+        //  </summary>
+        public static readonly string getRecommendedFriends = "/game/api/friend/suggest/clients/DEFENGO/users/{0}";
+        public static readonly string postFriendRequest = "/game/api/friend-request/clients/DEFENGO/users/{0}/friend/{1}";
+        public static readonly string getListFriend = "/game/api/friend/clients/DEFENGO/users/{0}";
+        public static readonly string postSendEnergy = "/game/api/friend/send-energy/clients/DEFENGO/users/{0}/friends/{1}";
+        public static readonly string delDeleteFriend = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
+        public static readonly string getSearchFriend = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
+        public static readonly string getFriendProfile = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
+
+        //  <summary>
+        //  0: userInboxValue
+        //  1: friendRequestStatus
+        //  </summary>
+        public static readonly string putHandleFriendRequest = "/game/api/friend-request/{0}/?status={1}";
     }
 
     public enum ApplicationState
@@ -244,15 +262,17 @@ namespace Framework.Network
             switch (applicationState)
             {
                 case ApplicationState.DEV:
-                    Domain.baseUrl = "http://api.dev.staika.io:8080/services";
+                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
                     Debug.unityLogger.logEnabled = true;
                     break;
                 case ApplicationState.STAGE:
-                    Domain.baseUrl = "https://api.stage.staika.io/services";
+                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
+                    // Domain.baseUrl = "https://api.stage.staika.io/services";
                     Debug.unityLogger.logEnabled = true;
                     break;
                 case ApplicationState.PRODUCTION:
-                    Domain.baseUrl = "https://api.staika.io/services";
+                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
+                    // Domain.baseUrl = "https://api.staika.io/services";
 #if !UNITY_EDITOR
                     //Debug.unityLogger.logEnabled = false; // Debug.Log 출력 여부
 #endif
@@ -3730,6 +3750,168 @@ namespace Framework.Network
                 ReqRouletteRewardData datas = GetT<ReqRouletteRewardData>(res.downloadHandler.text);
 
                 onSuccess?.Invoke(datas);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetRecommendedFriends(UnityAction<ReqRecommendedFriendsData> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getRecommendedFriends, UserInfoManager.Instance.userId), "GET");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                ReqRecommendedFriendsData data = GetT<ReqRecommendedFriendsData>(res.downloadHandler.text);
+
+                onSuccess?.Invoke(data);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetListFriends(UnityAction<ReqListFriendsData> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getListFriend, UserInfoManager.Instance.userId), "GET");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                ReqListFriendsData data = GetT<ReqListFriendsData>(res.downloadHandler.text);
+
+                onSuccess?.Invoke(data);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask SendFriendRequest(string friendId, UnityAction OnSuccess, UnityAction<string> OnFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postFriendRequest, UserInfoManager.Instance.userId, friendId), "POST");
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                OnSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                OnFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask SearchFriends(string friendId, UnityAction<ReqSearchFriendsData> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getSearchFriend, friendId), "GET");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                ReqSearchFriendsData data = GetT<ReqSearchFriendsData>(res.downloadHandler.text);
+
+                onSuccess?.Invoke(data);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetFriendProfile(string friendId, UnityAction<TotalProfileData> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getFriendProfile, UserInfoManager.Instance.userId, friendId), "GET");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                TotalProfileData data = GetT<TotalProfileData>(res.downloadHandler.text);
+
+                onSuccess?.Invoke(data);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask SendEnergy(string friendId, UnityAction onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSendEnergy, friendId), "POST");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+
+                onSuccess?.Invoke();
             }
             catch
             {
