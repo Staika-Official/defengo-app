@@ -8,6 +8,8 @@ using Framework.Sound;
 using Framework.Network;
 using System;
 using DG.Tweening;
+using Newtonsoft.Json;
+using Framework.Util;
 
 namespace Framework.UI
 {
@@ -20,9 +22,11 @@ namespace Framework.UI
         public Button button_Search;
         public FriendItem searchFriendItem;
 
+        public GameObject goListFriend;
         public ScrollRect scrollFriends;
         public FriendItem friendItem;
 
+        public GameObject goRecommendedFriend;
         public Button button_RefreshRecommend;
         public Transform recommendParent;
         public FriendItem recommendFriendItem;
@@ -44,7 +48,8 @@ namespace Framework.UI
             input_UID.onValueChanged.AddListener((string txt) =>
             {
                 button_Search.interactable = !string.IsNullOrEmpty(txt);
-                searchFriendItem.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(txt));
+                if (string.IsNullOrEmpty(txt))
+                    searchFriendItem.transform.parent.gameObject.SetActive(false);
             });
 
             button_Close.onClick.AddListener(() =>
@@ -87,13 +92,22 @@ namespace Framework.UI
         {
             await NetworkManager.Instance.SearchFriends(input_UID.text, (ReqSearchFriendsData data) =>
             {
-                searchFriendItem.SetFriendData(data.friendData, data.isFriend);
-            }, null);
+                searchFriendItem.transform.parent.gameObject.SetActive(true);
+                searchFriendItem.gameObject.SetActive(true);
+                searchFriendItem.SetFriendData(data);
+            }, (string err) =>
+            {
+                SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Invalid_UID"));
+            });
         }
 
         void SuccessGetListFriend(ReqListFriendsData data)
         {
             friendDatas = data.friends;
+
+            goListFriend.gameObject.SetActive(friendDatas.Count > 0);
+            goRecommendedFriend.gameObject.SetActive(friendDatas.Count == 0);
 
             foreach (var friend in friendDatas)
             {
@@ -104,11 +118,12 @@ namespace Framework.UI
         }
         void FailedGetListFriend(string error)
         {
-
+            Debug.Log($"Error List Friend: {error}");
         }
         void SuccessGetRecommendedFriends(ReqRecommendedFriendsData data)
         {
             recommendedFriendDatas = data.players;
+
             foreach (var recommend in recommendedFriendDatas)
             {
                 FriendItem itm = Instantiate(recommendFriendItem, recommendParent);
@@ -118,7 +133,7 @@ namespace Framework.UI
         }
         void FailedGetRecommendedFriends(string error)
         {
-
+            Debug.Log($"Error Recommended Friends: {error}");
         }
     }
 }

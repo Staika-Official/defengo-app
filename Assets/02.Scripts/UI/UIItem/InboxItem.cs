@@ -200,16 +200,24 @@ namespace Framework.UI
                 button_InActiveRead.onPointerUp = null;
             };
 
-            button_Accept.onPointerUp = () =>
+            button_Accept.onPointerUp = async () =>
             {
-
+                await NetworkManager.Instance.HandleFriendRequest(data, FriendRequestStatus.ACCEPTED, () =>
+                {
+                    InboxPopup popup = PopupManager.Instance.GetPopUp<InboxPopup>("inbox");
+                    popup.SetInboxData(true);
+                }, null);
             };
 
-            button_Reject.onPointerUp = () =>
+            button_Reject.onPointerUp = async () =>
             {
-
+                await NetworkManager.Instance.HandleFriendRequest(data, FriendRequestStatus.REJECTED, () =>
+                {
+                    InboxPopup popup = PopupManager.Instance.GetPopUp<InboxPopup>("inbox");
+                    popup.SetInboxData(true);
+                }, null);
             };
-            
+
         }
 
         public void OnClick_InactiveRead()
@@ -280,6 +288,9 @@ namespace Framework.UI
                 case InboxType.HATCHING_ORB:
                     //포스트맨에서 부화석 리스폰스 형식이 DetailInbox로 되어있어서 에셋함수를 호출
                     popup.GetAsset(data);
+                    break;
+                case InboxType.FRIEND_REQUEST:
+                    popup.SetInboxData(true);
                     break;
                 default:
                     break;

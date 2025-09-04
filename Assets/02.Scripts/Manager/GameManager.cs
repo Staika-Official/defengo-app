@@ -8,6 +8,7 @@ using Framework.GameData.Defense;
 using Framework.Network;
 using Framework.Sound;
 using Framework.Util;
+using SimpleJSON;
 using UniRx;
 using UniRx.Triggers;
 using UnityEngine;
@@ -195,7 +196,6 @@ namespace Framework.Game.Defense
         {
             rewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("gemRewardData");
             bossRewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("BossRewardData");
-
 
             for (int i = 0; i < UserInfoManager.Instance.rewardRuleList.rewardRules.Length; i++)
             {

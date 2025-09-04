@@ -173,14 +173,16 @@ namespace Framework.Network
         public static readonly string getListFriend = "/game/api/friend/clients/DEFENGO/users/{0}";
         public static readonly string postSendEnergy = "/game/api/friend/send-energy/clients/DEFENGO/users/{0}/friends/{1}";
         public static readonly string delDeleteFriend = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
-        public static readonly string getSearchFriend = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
+        public static readonly string getSearchFriend = "/game/api/friend/search/clients/DEFENGO/users/{0}/friends/{1}";
         public static readonly string getFriendProfile = "/game/api/friend/clients/DEFENGO/users/{0}/friends/{1}";
 
         //  <summary>
-        //  0: userInboxValue
-        //  1: friendRequestStatus
+        //  0: inboxValue
+        //  1: status
+        //  2: inboxId
+        //  3: userInboxId
         //  </summary>
-        public static readonly string putHandleFriendRequest = "/game/api/friend-request/{0}/?status={1}";
+        public static readonly string putHandleFriendRequest = "/game/api/friend-request/{0}/?status={1}&inboxId={2}&userInboxId={3}";
     }
 
     public enum ApplicationState
@@ -262,16 +264,16 @@ namespace Framework.Network
             switch (applicationState)
             {
                 case ApplicationState.DEV:
-                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
+                    Domain.baseUrl = "https://xgame.monsterra.io/services";
                     Debug.unityLogger.logEnabled = true;
                     break;
                 case ApplicationState.STAGE:
-                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
+                    Domain.baseUrl = "https://xgame.monsterra.io/services";
                     // Domain.baseUrl = "https://api.stage.staika.io/services";
                     Debug.unityLogger.logEnabled = true;
                     break;
                 case ApplicationState.PRODUCTION:
-                    Domain.baseUrl = "https://10fff450fd63.ngrok-free.app/services";
+                    Domain.baseUrl = "https://xgame.monsterra.io/services";
                     // Domain.baseUrl = "https://api.staika.io/services";
 #if !UNITY_EDITOR
                     //Debug.unityLogger.logEnabled = false; // Debug.Log 출력 여부
@@ -421,7 +423,7 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
-                TokenVM tokenVM = JsonUtility.FromJson<TokenVM>(res.downloadHandler.text);
+                TokenVM tokenVM = JsonConvert.DeserializeObject<TokenVM>(res.downloadHandler.text);
 
                 AccountStatus accountStatus = (AccountStatus)Enum.Parse(typeof(AccountStatus), tokenVM.accountStatus);
                 SetUserToken(tokenVM);
@@ -486,7 +488,7 @@ namespace Framework.Network
             {
 #if !UNITY_EDITOR
                 var res = await req.SendWebRequest();
-                TokenVM tokenVM = JsonUtility.FromJson<TokenVM>(res.downloadHandler.text);
+                TokenVM tokenVM = JsonConvert.DeserializeObject<TokenVM>(res.downloadHandler.text);
 
                 AccountStatus accountStatus = (AccountStatus)Enum.Parse(typeof(AccountStatus), tokenVM.accountStatus);
                 SetUserToken(tokenVM);
@@ -531,7 +533,7 @@ namespace Framework.Network
                 }
 #elif UNITY_EDITOR
                 var res = await req.SendWebRequest();
-                TokenVM tokenVm = JsonUtility.FromJson<TokenVM>(res.downloadHandler.text);
+                TokenVM tokenVm = JsonConvert.DeserializeObject<TokenVM>(res.downloadHandler.text);
                 SetUserToken(tokenVm);
                 _ = GetUserResourceByTokenModule(() => { LoginManager.Instance.SetLoginScreen(false); });
 #endif
@@ -602,7 +604,7 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
-                TokenVM tokenVM = JsonUtility.FromJson<TokenVM>(res.downloadHandler.text);
+                TokenVM tokenVM = JsonConvert.DeserializeObject<TokenVM>(res.downloadHandler.text);
 
                 SetUserToken(tokenVM);
                 _ = GetUserState();
@@ -808,7 +810,7 @@ namespace Framework.Network
             {
                 var res = await req.SendWebRequest();
 
-                ResponeUserPlay data = JsonUtility.FromJson<ResponeUserPlay>(res.downloadHandler.text);
+                ResponeUserPlay data = JsonConvert.DeserializeObject<ResponeUserPlay>(res.downloadHandler.text);
                 Success?.Invoke(data);
             }
             catch
@@ -833,7 +835,7 @@ namespace Framework.Network
             {
                 var res = await req.SendWebRequest();
 
-                GetUserProfileList data = JsonUtility.FromJson<GetUserProfileList>(res.downloadHandler.text);
+                GetUserProfileList data = JsonConvert.DeserializeObject<GetUserProfileList>(res.downloadHandler.text);
                 Success?.Invoke(data);
             }
             catch
@@ -857,7 +859,7 @@ namespace Framework.Network
             {
                 var res = await req.SendWebRequest();
 
-                DailyRewardPool data = JsonUtility.FromJson<DailyRewardPool>(res.downloadHandler.text);
+                DailyRewardPool data = JsonConvert.DeserializeObject<DailyRewardPool>(res.downloadHandler.text);
                 Success?.Invoke(data);
             }
             catch
@@ -2708,7 +2710,7 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
-                // Debug.Log(res.downloadHandler.text);
+                Debug.Log(res.downloadHandler.text);
                 TotalProfileData data = GetT<TotalProfileData>(res.downloadHandler.text);
                 Success?.Invoke(data);
             }
@@ -3012,7 +3014,7 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
-                UserAdValidInfos data = JsonUtility.FromJson<UserAdValidInfos>(res.downloadHandler.text);
+                UserAdValidInfos data = JsonConvert.DeserializeObject<UserAdValidInfos>(res.downloadHandler.text);
                 OnSuccess?.Invoke(data.userAds[0]);
             }
             catch (Exception e)
@@ -3042,7 +3044,7 @@ namespace Framework.Network
                 var res = await req.SendWebRequest();
                 //Debug.Log(res.downloadHandler.text);
 
-                UserAdInfo data = JsonUtility.FromJson<UserAdInfo>(res.downloadHandler.text);
+                UserAdInfo data = JsonConvert.DeserializeObject<UserAdInfo>(res.downloadHandler.text);
                 //OnSuccess?.Invoke(data);
 
                 OnSuccess?.Invoke(data);
@@ -3804,7 +3806,6 @@ namespace Framework.Network
                 var res = await req.SendWebRequest();
                 Debug.Log(res.downloadHandler.text);
                 ReqListFriendsData data = GetT<ReqListFriendsData>(res.downloadHandler.text);
-
                 onSuccess?.Invoke(data);
             }
             catch
@@ -3844,7 +3845,7 @@ namespace Framework.Network
 
         public async UniTask SearchFriends(string friendId, UnityAction<ReqSearchFriendsData> onSuccess, UnityAction<string> onFailed)
         {
-            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getSearchFriend, friendId), "GET");
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getSearchFriend, UserInfoManager.Instance.userId, friendId), "GET");
             
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
@@ -3856,7 +3857,6 @@ namespace Framework.Network
                 var res = await req.SendWebRequest();
                 Debug.Log(res.downloadHandler.text);
                 ReqSearchFriendsData data = GetT<ReqSearchFriendsData>(res.downloadHandler.text);
-
                 onSuccess?.Invoke(data);
             }
             catch
@@ -3900,7 +3900,59 @@ namespace Framework.Network
 
         public async UniTask SendEnergy(string friendId, UnityAction onSuccess, UnityAction<string> onFailed)
         {
-            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSendEnergy, friendId), "POST");
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSendEnergy, UserInfoManager.Instance.userId, friendId), "POST");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+
+                onSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask HandleFriendRequest(UserInbox userInbox, FriendRequestStatus friendRequestStatus, UnityAction onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.putHandleFriendRequest, userInbox.value, friendRequestStatus.ToString(), userInbox.id, userInbox.inboxId), "PUT");
+            
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+
+                onSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask DeleteFriend(string friendId, UnityAction onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.delDeleteFriend, UserInfoManager.Instance.userId, friendId), "DELETE");
             
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
@@ -3980,10 +4032,9 @@ namespace Framework.Network
 
         public T GetT<T>(string json)
         {
-            T result = JsonUtility.FromJson<T>(json);
+            // T result = JsonUtility.FromJson<T>(json);
+            T result = JsonConvert.DeserializeObject<T>(json);
             return result;
         }
-
-        
     }
 }

@@ -6,6 +6,7 @@ using Framework.GameData.Defense;
 using Framework.Network;
 using System;
 using DG.Tweening;
+using Newtonsoft.Json;
 
 namespace Framework.UI
 {
@@ -276,7 +277,7 @@ namespace Framework.UI
         {
             await NetworkManager.Instance.GetLeaderBoardRewardData(LeaderBoardType.WAVE_WEEKLY, (data) =>
             {
-                LeaderBoardRewardStatusData rewardData = JsonUtility.FromJson<LeaderBoardRewardStatusData>(data);
+                LeaderBoardRewardStatusData rewardData = JsonConvert.DeserializeObject<LeaderBoardRewardStatusData>(data);
 
                 if (rewardData.rewardStatus == "REWARD")
                 {
@@ -299,7 +300,7 @@ namespace Framework.UI
         {
             await NetworkManager.Instance.GetLeaderBoardRewardData(LeaderBoardType.WAVE_DAILY, (data) =>
             {
-                LeaderBoardRewardStatusData rewardData = JsonUtility.FromJson<LeaderBoardRewardStatusData>(data);
+                LeaderBoardRewardStatusData rewardData = JsonConvert.DeserializeObject<LeaderBoardRewardStatusData>(data);
 
                 if (rewardData.rewardStatus == "REWARD")
                 {

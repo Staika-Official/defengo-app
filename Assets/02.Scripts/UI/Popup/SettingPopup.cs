@@ -21,6 +21,9 @@ namespace Framework.UI
         public TextMeshProUGUI text_BGMVolume;
         public TextMeshProUGUI text_VerText;
 
+        public ButtonComponent button_CopyUID;
+        public TextMeshProUGUI text_UID;
+
         public DiscordEvent discordEvent;
 
         public Button button_Korean;
@@ -60,10 +63,10 @@ namespace Framework.UI
             {
                 rect_AccountGroup.sizeDelta = new Vector2(808, 640);
                 button_Termination.gameObject.SetActive(true);
-               
+
                 RectTransform rect = button_Termination.transform as RectTransform;
                 rect.anchoredPosition = new Vector2(190, -545f);
-              
+
                 text_VerText.rectTransform.anchoredPosition = new Vector2(0, -1530);
             }
             else
@@ -72,7 +75,7 @@ namespace Framework.UI
                 button_Termination.gameObject.SetActive(true);
                 RectTransform rect = button_Termination.transform as RectTransform;
                 rect.anchoredPosition = new Vector2(190, -188f);
-            
+
                 text_VerText.rectTransform.anchoredPosition = new Vector2(0, -1150);
             }
             integrationGroup.SetActive(isGuest);
@@ -100,6 +103,8 @@ namespace Framework.UI
             slider_SFXVolume.onValueChanged.AddListener((sfxVol) => OnValueChangeSFX(sfxVol));
             slider_BGMVolume.onValueChanged.AddListener((bgmVol) => OnValueChangeBGM(bgmVol));
 
+            text_UID.text = UserInfoManager.Instance.userId;
+
             bool isEnglish = LanguageManager.Instance.nationalKey == "en";
 
             koreanGroup.SetActive(!isEnglish);
@@ -117,6 +122,13 @@ namespace Framework.UI
 
             button_TermsOfUse.onClick.AddListener(() => PopupManager.Instance.GetPopUp<TermsPopup>("terms").ActivePopup());
             button_Termination.onClick.AddListener(() => PopupManager.Instance.GetPopUp<WithdrawalPopup>("withdrawal").PopUpSequence(true));
+
+            button_CopyUID.button.onClick.AddListener(() =>
+            {
+                GUIUtility.systemCopyBuffer = text_UID.text;
+                SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
+            });
         }
 
         public void OnClick_Logout()

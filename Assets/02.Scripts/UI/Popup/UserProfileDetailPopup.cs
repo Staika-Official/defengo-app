@@ -8,6 +8,7 @@ using Framework.Sound;
 using Framework.Network;
 using System;
 using DG.Tweening;
+using UnityEngine.Localization.Components;
 
 namespace Framework.UI
 {
@@ -22,11 +23,15 @@ namespace Framework.UI
         public Image image_backGround;
         public Image image_limited;
 
+        public LocalizeStringEvent text_Title;
+
         //public Transform ts_ProfileImg;
         //public TextMeshProUGUI text_UserNickname;
         //public Button button_EditNickName;
         //public Button button_Confirm;
         public Button button_editProfileDetail;
+        public ButtonComponent button_AddFriend;
+        public ButtonComponent button_DeleteFriend;
         public int focusProfileIdx;
         //public List<ProfileImageItem> profileImageItems = new();
         public CharacterCard[] characterCards;
@@ -47,6 +52,8 @@ namespace Framework.UI
         public Button button_switching;
         public LeaderBoardType focusType;
         public Dictionary<LeaderBoardType, ResponseProfileData> dic_profileData = new();
+
+        FriendItem friendItem;
 
         public override void ActivePopup()
         {
@@ -226,7 +233,29 @@ namespace Framework.UI
 
             button_editProfileDetail.onClick.AddListener(() =>
             {
-                OnClick_EditDetailProfile();
+                if (friendItem == null)
+                    OnClick_EditDetailProfile();
+            });
+
+            button_AddFriend.button.onClick.AddListener(async () =>
+            {
+                SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
+                await NetworkManager.Instance.SendFriendRequest(friendItem.friendData.userId, () =>
+                {
+                    button_AddFriend.gameObject.SetActive(false);
+                    friendItem.gameObject.SetActive(false);
+                }, null);
+            });
+
+            button_DeleteFriend.button.onClick.AddListener(async () =>
+            {
+                SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
+                await NetworkManager.Instance.DeleteFriend(friendItem.friendData.userId, () =>
+                {
+                    button_DeleteFriend.gameObject.SetActive(false);
+                    button_AddFriend.gameObject.SetActive(true);
+                    friendItem.gameObject.SetActive(false);
+                }, null);
             });
 
             //todo Daily삭제되면 주석처리 할것 / 해당버튼은 데일리 <-> 위클리 변경하는 버튼
@@ -237,11 +266,15 @@ namespace Framework.UI
             //todo Daily삭제되면 주석처리 해제 할것
             button_switching.gameObject.SetActive(false);
 
-            
+
         }
 
         public void ShowMyProfile()
         {
+            text_Title.SetEntry("UI_Profile");
+            friendItem = null;
+            button_AddFriend.gameObject.SetActive(false);
+            // text_Title.RefreshString();
             int[] userProfileIds = UserInfoManager.Instance.userProfileImageIds;
             focusProfileIdx = UserInfoManager.Instance.userState.equippedProfileId;
             UserProfileData data = DataManager.Instance.dic_userProfileData[focusProfileIdx];
@@ -250,12 +283,17 @@ namespace Framework.UI
 
             _ = NetworkManager.Instance.GetTotalUserProfileDetail(UserInfoManager.Instance.userId, Success, Failed);
         }
-        public void ShowOtherProfile(string otherId, int otherEquippedProfileId)
+        public void ShowOtherProfile(FriendItem _friendItem, int otherEquippedProfileId, bool isFriend)
         {
+            friendItem = _friendItem;
+            text_Title.SetEntry("UI_Friend");
+            button_AddFriend.gameObject.SetActive(!isFriend && !friendItem.pendingFromFriend && !friendItem.pendingFromUser);
+            button_DeleteFriend.gameObject.SetActive(isFriend);
+            // text_Title.RefreshString();
             UserProfileData data = DataManager.Instance.dic_userProfileData[otherEquippedProfileId];
             SetProfileImage(data);
 
-            _ = NetworkManager.Instance.GetFriendProfile(otherId, Success, null);
+            _ = NetworkManager.Instance.GetFriendProfile(friendItem.friendData.userId, Success, null);
         }
 
 

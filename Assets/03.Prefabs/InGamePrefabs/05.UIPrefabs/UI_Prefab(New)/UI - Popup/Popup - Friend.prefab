@@ -464,7 +464,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8191490010177308139
 RectTransform:
   m_ObjectHideFlags: 0
@@ -479,7 +479,6 @@ RectTransform:
   m_Children:
   - {fileID: 4467145692097819608}
   - {fileID: 8679450588691552481}
-  - {fileID: 6033632864339069488}
   m_Father: {fileID: 7358352492295015957}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
@@ -740,18 +739,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1632217057767332701}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7348019965523434557}
-  m_Father: {fileID: 8191490010177308139}
+  m_Father: {fileID: 7358352492295015957}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -25}
-  m_SizeDelta: {x: -130, y: -50}
+  m_AnchoredPosition: {x: 0, y: 209}
+  m_SizeDelta: {x: -130, y: -818}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4678582612609795498
 CanvasRenderer:
@@ -1326,8 +1325,10 @@ MonoBehaviour:
   input_UID: {fileID: 1577428569316977870}
   button_Search: {fileID: 4056180127389520631}
   searchFriendItem: {fileID: 2969760411179993206}
+  goListFriend: {fileID: 3712779400562815865}
   scrollFriends: {fileID: 6544387988788267785}
   friendItem: {fileID: 7859379919740371545, guid: d5f5a66acc7b25246b97b44becf6e3fd, type: 3}
+  goRecommendedFriend: {fileID: 1099308349314776852}
   button_RefreshRecommend: {fileID: 452185612134147592}
   recommendParent: {fileID: 8679450588691552481}
   recommendFriendItem: {fileID: 7859379919740371545, guid: d5f5a66acc7b25246b97b44becf6e3fd, type: 3}
@@ -1524,6 +1525,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5618460089358680984}
+  - component: {fileID: 2807353226107546228}
   m_Layer: 5
   m_Name: Viewport
   m_TagString: Untagged
@@ -1549,8 +1551,22 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: -40, y: -40}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2807353226107546228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3646546615636286944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &3712779400562815865
 GameObject:
   m_ObjectHideFlags: 0
@@ -1585,8 +1601,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -385}
-  m_SizeDelta: {x: 0, y: -770}
+  m_AnchoredPosition: {x: 0, y: -75}
+  m_SizeDelta: {x: 0, y: -150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &4099897852408867077
 GameObject:
@@ -1733,7 +1749,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 110, y: 0}
-  m_SizeDelta: {x: 0, y: 50}
+  m_SizeDelta: {x: 134.86, y: 50}
   m_Pivot: {x: 0, y: 1}
 --- !u!222 &1287043943161357125
 CanvasRenderer:
@@ -2524,10 +2540,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 20
-    m_Right: 20
-    m_Top: 20
-    m_Bottom: 20
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
   m_ChildAlignment: 1
   m_Spacing: 10
   m_ChildForceExpandWidth: 1
@@ -2956,6 +2972,7 @@ RectTransform:
   - {fileID: 4364403938400282782}
   - {fileID: 8191490010177308139}
   - {fileID: 3855367716781823244}
+  - {fileID: 6033632864339069488}
   m_Father: {fileID: 8960066656008980254}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3216,7 +3233,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1046096449509194523, guid: d5f5a66acc7b25246b97b44becf6e3fd, type: 3}
       propertyPath: m_Name
-      value: Item - Friend
+      value: Item - SearchFriend
       objectReference: {fileID: 0}
     - target: {fileID: 2440383664011400722, guid: d5f5a66acc7b25246b97b44becf6e3fd, type: 3}
       propertyPath: m_Pivot.x

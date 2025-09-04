@@ -1376,7 +1376,7 @@ namespace Framework.Network
         public string nickname;
         public int equippedProfileId;
         public DateTime lastAccessDate;
-        public DateTime blockSendEnergyDate;
+        public DateTime? blockSendEnergyDate;
     }
     [Serializable]
     public class ReqSearchFriendsData

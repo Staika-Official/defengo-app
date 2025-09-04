@@ -325,7 +325,7 @@ namespace Framework.UI
             button_Event.gameObject.SetActive(true);
             button_BattlePass.gameObject.SetActive(UserInfoManager.Instance.userPassInfo.isActivated);
             button_MonthlyPack.gameObject.SetActive(true);
-
+            button_Friend.gameObject.SetActive(true);
             button_Quest.gameObject.SetActive(true);
 
             //button_Limited.gameObject.SetActive(true);
@@ -342,6 +342,7 @@ namespace Framework.UI
             button_BattlePass.gameObject.SetActive(false);
             button_MonthlyPack.gameObject.SetActive(false);
             button_Quest.gameObject.SetActive(false);
+            button_Friend.gameObject.SetActive(false);
         }
 
         public void GetUserEventPrize()
