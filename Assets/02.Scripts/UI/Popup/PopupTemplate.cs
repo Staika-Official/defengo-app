@@ -23,6 +23,8 @@ namespace Framework.UI
 
         public void PopUpSequence(bool isActive)
         {
+            Debug.Log($"{gameObject.name} sequence: {isActive}");
+
             float alpha = isActive ? 1 : 0;
             canvasGroup.alpha = alpha;
             canvasGroup.blocksRaycasts = isActive;

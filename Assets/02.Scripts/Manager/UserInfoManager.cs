@@ -35,6 +35,7 @@ namespace Framework.GameData.Defense
         public EventInfo eventInfo;
         public RewardLeaderBoard dailyRewardBoard;
         public RewardLeaderBoard weeklyRewardBoard;
+        public RewardLeaderBoard leagueRewardBoard;
         public Dictionary<UserItemType, int> userItemDic;
 
         public UserPassInfo userPassInfo;

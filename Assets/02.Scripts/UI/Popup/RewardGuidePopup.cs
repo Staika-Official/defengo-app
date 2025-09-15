@@ -16,7 +16,7 @@ namespace Framework.UI
         [SerializeField] private Queue<RewardGroup> queue_RewardGroup = new();
         [SerializeField] private RectTransform rect_RewardViewPort;
         [SerializeField] private ScrollRect scrollRect;
-        
+
         //private readonly int naturalIndex = 6;
         //private readonly int rateIndex = 3;
         private readonly int rewardMaxIndex = 9;
@@ -30,11 +30,19 @@ namespace Framework.UI
                 text_Title.text = LanguageManager.Instance.GetStringData("UI_Daily_Rank_Title");
                 text_Desc.text = LanguageManager.Instance.GetStringData("UI_bestWaveDaliyDesc");
             }
-            else
+            else if (type == LeaderBoardType.WAVE_WEEKLY)
             {
                 data = UserInfoManager.Instance.weeklyRewardBoard;
                 text_Title.text = LanguageManager.Instance.GetStringData("UI_Weekly_Rank_Title");
                 text_Desc.text = LanguageManager.Instance.GetStringData("UI_bestWaveDesc");
+            }
+            else
+            {
+                data = UserInfoManager.Instance.leagueRewardBoard;
+                if (data == null)
+                    data = UserInfoManager.Instance.weeklyRewardBoard;
+                text_Title.text = LanguageManager.Instance.GetStringData("UI_League_Rank_Title");
+                text_Desc.text = LanguageManager.Instance.GetStringData("UI_bestWaveLeagueDesc");
             }
 
             RefreshWeeklyRewardGroup();
@@ -79,7 +87,7 @@ namespace Framework.UI
                 InActivePopup();
             });
         }
-        
+
         public RewardGroup GetWeeklyRewardGroup()
         {
             if (queue_RewardGroup.Count == 0)
@@ -118,7 +126,7 @@ namespace Framework.UI
         //         for (int i = 0; i < naturalIndex; ++i)
         //         {
         //             string natureKey = $"NATURAL_{i + 1}";
-                
+
         //             if (natureKey == key)
         //             {
         //                 validation = true;

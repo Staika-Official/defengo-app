@@ -29,7 +29,8 @@ namespace Framework.GameData.Defense
     {
         WAVE_MONSTER,
         CLONE_MONSTER,
-        BOSS_MONSTER
+        BOSS_MONSTER,
+        FIELD_BOSS_MONSTER
     }
 
     public enum FieldBuffType
@@ -136,6 +137,38 @@ namespace Framework.GameData.Defense
         EXHAUST = 3,
         CAR = 4,
         MONSTER = 5
+    }
+
+    public enum FieldBossRewardType
+    {
+        CHARACTER = 1,
+        BUFF = 2
+    }
+
+    public enum FieldBossBuffType
+    {
+        GET_RANDOM_CHARACTER = 0,
+        GET_GEM = 1,
+        DECREASE_RELOCATION_COST = 2,
+        INCREASE_ATTACK_DAMAGE_ALL = 3,
+        INCREASE_ATTACK_DAMAGE_LESS_RANGE = 4,
+        INCREASE_ATTACK_DAMAGE_MORE_RANGE = 5,
+        INCREASE_MISSION_REWARD = 6,
+        DECREASE_BOSS_COOLTIME = 7,
+        INCREASE_BOSS_REWARD  = 8,
+        DECREASE_UPGRADE_COST = 11,
+        INCREASE_MONSTER_REWARD = 12
+    }
+
+    public enum FieldBossMonster
+    {
+        TRUSH = 1,
+        SMOKER = 2,
+        SOTTY = 3,
+        LOCKY = 4,
+        PARASITE = 5,
+        BOOMBER = 6,
+        EMBEREON = 7
     }
 
     public enum RankingType
@@ -637,6 +670,27 @@ namespace Framework.GameData.Defense
         public Color color_BackGround;
         public Color color_Button;
         public Color color_Line;
+    }
+
+    [Serializable]
+    public class FieldBossRewardGroupData
+    {
+        public FieldBossRewardData[] data;
+    }
+
+    [Serializable]
+    public class FieldBossRewardData
+    {
+        public int id;
+        public int reward_grade_group;
+        public float emerge_rate;
+        public int reward_type;
+        public int buff_type;
+        public float value_1;
+        public float value_2;
+        public float value_3;
+        public string title;
+        public string desc;
     }
 
     [Serializable]

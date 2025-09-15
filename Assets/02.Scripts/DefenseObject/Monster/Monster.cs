@@ -26,7 +26,17 @@ namespace Framework.Game.Defense
         public ObscuredFloat defense;
         public ObscuredFloat getSlowDownValue;
         public bool isBoss;
-        public MonsterType monsterType;
+        public MonsterType monsterType
+        {
+            get => _monsterType;
+            set
+            {
+                _monsterType = value;
+                if (_monsterType == MonsterType.BOSS_MONSTER || _monsterType == MonsterType.FIELD_BOSS_MONSTER)
+                    Debug.Log($"{gameObject.name} set monsterType {_monsterType}");
+            }
+        }
+        MonsterType _monsterType;
 
         public bool isFrozen;
 
@@ -57,6 +67,7 @@ namespace Framework.Game.Defense
         //todo::dongmin
         public IEnumerator deadTimerCoroutine;
         public readonly float deadTime = 5f;
+        public bool IsBossAttack { get; set; }
 
         public abstract void Abillity();
 
@@ -71,8 +82,10 @@ namespace Framework.Game.Defense
 
         private void OnCheterDetected()
         {
-           _ = NetworkManager.Instance.AbusingRecord("Cheat On Monster");
+            _ = NetworkManager.Instance.AbusingRecord("Cheat On Monster");
         }
+
+        public virtual void FieldBossInitialize(BossData bossData) { }
 
         public void SetMonsterMove(SkeletonDataAsset animData, int currentArrayIdx)
         {
@@ -109,8 +122,8 @@ namespace Framework.Game.Defense
 
         public void SetBossMove()
         {
-            monsterType = MonsterType.BOSS_MONSTER;
-            
+            // monsterType = MonsterType.BOSS_MONSTER;
+            IsBossAttack = false;
             CurrentArrayIdx = 0;
             CellData data = GridManager.Instance.GetCellData(CurrentArrayIdx);
             transform.localPosition = data.cellPosition;
@@ -187,7 +200,7 @@ namespace Framework.Game.Defense
         {
             TrackEntry entry = anim.AnimationState.SetAnimation(0, animName, false);
 
-            if (isDead && monsterType != MonsterType.CLONE_MONSTER)
+            if (isDead && monsterType != MonsterType.CLONE_MONSTER && monsterType != MonsterType.FIELD_BOSS_MONSTER)
             {
                 ObjectParticle goParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("GoIconEffect");
                 UIManager.Instance.goParticles.Add(goParticle);
@@ -197,7 +210,7 @@ namespace Framework.Game.Defense
 
             yield return new WaitForSpineAnimationComplete(entry);
             if (isDead)
-            { 
+            {
                 DieMethod();
             }
             else
@@ -209,7 +222,7 @@ namespace Framework.Game.Defense
         public void HitDamage(float damage, DamageType damageType, float criticalDamageRate)
         {
             if (!IsAlive) return;
-           // if (isCritical) damage *= ConfigData.CRITICAL_DAMAGE;
+            // if (isCritical) damage *= ConfigData.CRITICAL_DAMAGE;
             if (damageType == DamageType.CRITICAL) damage *= criticalDamageRate;
 
             DamageText damageText = GameManager.Instance.objectPoolManager.GetObject<DamageText>("DamageText");
@@ -250,6 +263,7 @@ namespace Framework.Game.Defense
             }
             else
             {
+                if (IsBossAttack) return;
                 string animKey = isFrozen ? "Hit_Frozen" : "Hit";
                 StartCoroutine(HitSequenceAsync(false, animKey));
             }
@@ -269,8 +283,9 @@ namespace Framework.Game.Defense
             if (isBoss)
             {
                 GameManager.Instance.monsterSpawner.killedBossLevel = waveIndex;
-               // Debug.Log("Boss Level : " + waveIndex);
+                // Debug.Log("Boss Level : " + waveIndex);
                 GameManager.Instance.missionManager.EventMission(waveIndex);
+                ++GameManager.Instance.bossKillCount;
             }
 
 
@@ -282,7 +297,12 @@ namespace Framework.Game.Defense
                 case MonsterType.CLONE_MONSTER:
                     break;
                 case MonsterType.BOSS_MONSTER:
-                    GameManager.Instance.MonsterGemReward(waveIndex -  1, false, isBoss);
+                    GameManager.Instance.MonsterGemReward(waveIndex - 1, false, isBoss);
+                    break;
+                case MonsterType.FIELD_BOSS_MONSTER:
+                    Debug.Log("Field Monster Die~~~");
+                    // 필드 보스 보상 팝업 생성 이벤트 
+                    UIManager.Instance.fieldBossRewardPopup.ActivePopup();
                     break;
                 default:
                     break;
@@ -308,7 +328,7 @@ namespace Framework.Game.Defense
         {
             CellData data = GridManager.Instance.GetCellData(nextIdx);
             NextPositionIdx = data.cellIndex;
-            int value = prevPositionIdx - NextPositionIdx;     
+            int value = prevPositionIdx - NextPositionIdx;
             IsHorizontal = Mathf.Abs(value) == 1;
 
             nextCellPos = data.cellPosition;
@@ -333,9 +353,101 @@ namespace Framework.Game.Defense
             }
         }
 
+        public IEnumerator EnterBossSequenceAsync()
+        {
+            IsAlive = false;
+            IsMove = false;
+            if (orbStackInterface != null)
+            {
+                orbStackInterface.ReturnObject();
+                blackOrbCount = 0;
+                orbStackInterface = null;
+            }
+
+            if (projectiles.Count > 0)
+            {
+                for (int i = 0; i < projectiles.Count; i++)
+                {
+                    projectiles[i].ReturnObjectPool();
+                }
+            }
+
+            if (dic_StateParticle.Count > 0)
+            {
+                foreach (var particle in dic_StateParticle.Keys.ToList())
+                {
+                    if (particle.Contains("ToxicMon"))
+                    {
+                        GameManager.Instance.objectPoolManager.ReturnObject(dic_StateParticle[particle], particle);
+                        dic_StateParticle.Remove(particle);
+                    }
+                }
+                anim.skeleton.SetColor(monsterDefalutColor);
+            }
+
+            projectiles.Clear();
+
+            isFrozen = false;
+            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("MonsterDisappear");
+            objectParticle.transform.position = transform.localPosition;
+            objectParticle.SimplePlay();
+
+            TrackEntry entry = anim.AnimationState.SetAnimation(0, "Die", false);
+
+            yield return new WaitForSpineAnimationComplete(entry);
+            monsterInterface.transform.SetParent(transform);
+            monsterInterface.ReturnObjectPool();
+            GameManager.Instance.objectPoolManager.ReturnObject(objectParticle, "MonsterDisappear");
+            //GameManager.Instance.monsterSpawner.RemoveMonster(this);
+            //Debug.Log(GameManager.Instance.monsterSpawner.monsterCount);
+            GameManager.Instance.objectPoolManager.ReturnObject(this, "Monster");
+        }
+
+        public void EnterBossWave()
+        {
+            Debug.Log("EnterBossWave");
+            IsAlive = false;
+            IsMove = false;
+            if (orbStackInterface != null)
+            {
+                orbStackInterface.ReturnObject();
+                blackOrbCount = 0;
+                orbStackInterface = null;
+            }
+
+            if (projectiles.Count > 0)
+            {
+                for (int i = 0; i < projectiles.Count; i++)
+                {
+                    projectiles[i].ReturnObjectPool();
+                }
+            }
+
+            if (dic_StateParticle.Count > 0)
+            {
+                foreach (var particle in dic_StateParticle.Keys.ToList())
+                {
+                    if (particle.Contains("ToxicMon"))
+                    {
+                        GameManager.Instance.objectPoolManager.ReturnObject(dic_StateParticle[particle], particle);
+                        dic_StateParticle.Remove(particle);
+                    }
+                }
+                anim.skeleton.SetColor(monsterDefalutColor);
+            }
+
+            projectiles.Clear();
+
+            isFrozen = false;
+            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("MonsterDisappear");
+            objectParticle.SimplePlay();
+            //EndOfUse();
+        }
+
         public void EndOfUseMonster(bool isFinish)
         {
-            if(orbStackInterface != null)
+            Debug.Log($"{gameObject.name} End Of Use");
+            if (orbStackInterface != null)
             {
                 orbStackInterface.ReturnObject();
                 blackOrbCount = 0;
@@ -351,11 +463,11 @@ namespace Framework.Game.Defense
                 }
             }
 
-            if(dic_StateParticle.Count > 0)
+            if (dic_StateParticle.Count > 0)
             {
                 foreach (var particle in dic_StateParticle.Keys.ToList())
                 {
-                    if(particle.Contains("ToxicMon"))
+                    if (particle.Contains("ToxicMon"))
                     {
                         GameManager.Instance.objectPoolManager.ReturnObject(dic_StateParticle[particle], particle);
                         dic_StateParticle.Remove(particle);
@@ -368,17 +480,24 @@ namespace Framework.Game.Defense
 
             if (isFinish)
             {
-                GameManager.Instance.Damaged();
-
                 switch (monsterType)
                 {
                     case MonsterType.WAVE_MONSTER:
+                        GameManager.Instance.Damaged();
                         GameManager.Instance.MonsterGemReward(waveIndex - 1, false, isBoss);
                         break;
                     case MonsterType.CLONE_MONSTER:
+                        GameManager.Instance.Damaged();
                         break;
                     case MonsterType.BOSS_MONSTER:
+                        ++GameManager.Instance.bossKillCount;
+
+                        GameManager.Instance.Damaged();
                         GameManager.Instance.MonsterGemReward(waveIndex - 1, false, isBoss);
+                        break;
+                    case MonsterType.FIELD_BOSS_MONSTER:
+                        Debug.Log("Field Boss Game Over");
+                        GameManager.Instance.FieldBossDamage();
                         break;
                     default:
                         break;
@@ -401,7 +520,7 @@ namespace Framework.Game.Defense
             }
 
             orbStackInterface.HitMonster(blackOrbCount);
-            if(blackOrbCount >= 4)
+            if (blackOrbCount >= 4)
             {
                 ExplosionBlackOrb(damage, additiveDamage);
                 blackOrbCount = 0;
@@ -422,7 +541,7 @@ namespace Framework.Game.Defense
 
         public void ElectricSequence(bool isStart)
         {
-            if(isStart)
+            if (isStart)
             {
                 electricCount++;
                 if (electricCount == 1)
@@ -437,7 +556,7 @@ namespace Framework.Game.Defense
             {
                 electricCount--;
 
-                if(electricCount <= 0)
+                if (electricCount <= 0)
                 {
                     GameManager.Instance.objectPoolManager.ReturnObject(dic_StateParticle["ElectroHit"], "ElectroHit");
                     dic_StateParticle.Remove("ElectroHit");
@@ -454,9 +573,9 @@ namespace Framework.Game.Defense
 
         public void SlowDownSequence(float value, float durationOrRange, Projectile projectile = null, IceGround iceGround = null)
         {
-            if(value >= getSlowDownValue)
+            if (value >= getSlowDownValue)
             {
-                if(projectile != null)
+                if (projectile != null)
                 {
                     SlowDownSeq = ExcuteSlowDown(value, durationOrRange, projectile);
                     StartCoroutine(SlowDownSeq);
@@ -474,7 +593,7 @@ namespace Framework.Game.Defense
             }
             else
             {
-                if(projectile != null)
+                if (projectile != null)
                 {
                     projectile.ReturnObjectPool();
                 }
@@ -482,7 +601,7 @@ namespace Framework.Game.Defense
                 {
                     return;
                 }
-                
+
             }
         }
 
@@ -491,7 +610,7 @@ namespace Framework.Game.Defense
             currentSpeed = (speed - (speed * value)) * 0.52f;
             isFrozen = true;
 
-            if(anim.AnimationName == "Walk")
+            if (anim.AnimationName == "Walk")
             {
                 SetWalkSequence();
             }
@@ -502,7 +621,7 @@ namespace Framework.Game.Defense
 
                 float distance = Calculator.DistanceCheck(pos - iceGround.positionVector);
 
-                if(distance > range)
+                if (distance > range)
                 {
                     isFrozen = false;
                     if (anim.AnimationName == "Walk_Frozen")
@@ -524,7 +643,7 @@ namespace Framework.Game.Defense
             getSlowDownValue = value;
             currentSpeed = (speed - (speed * value)) * 0.52f;
             yield return new WaitForSeconds(duration);
-            
+
             projectiles.Remove(projectile);
             projectile.ReturnObjectPool();
             currentSpeed = speed * 0.52f;
@@ -588,19 +707,19 @@ namespace Framework.Game.Defense
             }
         }
 
-        
+
         public IEnumerator OwlrusStormSequence(float damage, float addtiveDamage, DamageType damageType, float criticalDamageRate)
         {
             while (IsAlive)
             {
                 float totalDamage = 0f;
-                
+
                 totalDamage = damage + maxHealth * addtiveDamage;
-                
+
                 HitDamage(totalDamage, damageType, criticalDamageRate);
 
                 float hitTik = ConfigData.ATTACK_HIT_TIK_RATE * 0.5f;
-                
+
                 yield return new WaitForSeconds(hitTik);
             }
         }
@@ -610,18 +729,18 @@ namespace Framework.Game.Defense
             while (IsAlive)
             {
                 action?.Invoke(transform);
-                
+
                 HitDamage(damage, damageType, criticalDamageRate);
 
                 yield return new WaitForSeconds(ConfigData.ATTACK_HIT_TIK_RATE);
             }
         }
-        
+
 
         public void HammerSequence(float damage, float additiveDamage, DamageType damageType, float criticalDamageRate)
         {
             float totalDamage = 0f;
-            
+
             totalDamage = Mathf.Floor(damage + health * additiveDamage);
             //Debug.Log($"Monster HP{health}");
             //Debug.Log($"hammering Per(최력비례댐) Damage{totalDamage}");

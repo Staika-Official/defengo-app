@@ -14,6 +14,12 @@ namespace Framework.Network
         JOIN_IN_PROGRESS
 
     }
+    
+    public enum NetworkBattleStatus
+    {
+        LOBBY,
+        INGAME,
+    }
 
     public class SignInGuestDTO
     {
@@ -98,6 +104,21 @@ namespace Framework.Network
     {
         public int userId;
         public string nickname;
+    }
+
+    [Serializable]
+    public class NetworkBattleData
+    {
+        public int playerIdx;
+        public string nickname;
+        public int[] decList;
+        public int profileId;
+        public bool isHost;
+        public bool isInitialize;
+        public string tier;
+        public int waveCount;
+        public bool isGameOver;
+        public int rank;
     }
 
     [Serializable]
@@ -818,7 +839,8 @@ namespace Framework.Network
     public enum LeaderBoardType
     {
         WAVE_DAILY,
-        WAVE_WEEKLY
+        WAVE_WEEKLY,
+        LEAGUE
     }
 
     [Serializable]

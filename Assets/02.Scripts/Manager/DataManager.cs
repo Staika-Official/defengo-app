@@ -15,6 +15,7 @@ namespace Framework.GameData.Defense
     {
         public bool isOwned;
         public ProfileType profileType;
+        public bool isCharacter;
         public int profileIndex;
         public Sprite sprite_image;
         public CharacterGrade characterGrade;

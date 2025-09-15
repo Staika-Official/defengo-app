@@ -730,6 +730,48 @@ namespace Framework.Game.Defense
 
             return character;
         }
+        
+        public Character GetFixedCharacter(CharacterIndex characterIndex)
+        {
+            ObjectPoolManager objectPoolManager = GameManager.Instance.objectPoolManager;
+
+            Character character = characterIndex switch
+            {
+                CharacterIndex.PENGGO => objectPoolManager.GetObject<CharacterPenggo>("PengGo"),
+                CharacterIndex.FORTIS => objectPoolManager.GetObject<CharacterFortis>("Fortis"),
+                CharacterIndex.MEOSK => objectPoolManager.GetObject<CharacterMeosk>("Meosk"),
+                CharacterIndex.CUB_FOXY => objectPoolManager.GetObject<CharacterCubFoxy>("CubFoxy"),
+                CharacterIndex.RAZY => objectPoolManager.GetObject<CharacterRazy>("Razy"),
+                CharacterIndex.CARONA => objectPoolManager.GetObject<CharacterCaronaPenggo>("CaronaPengGo"),
+                CharacterIndex.LEMMING_RICH => objectPoolManager.GetObject<CharacterLemmingRich>("LemmingRich"),
+                CharacterIndex.DARKRAZY => objectPoolManager.GetObject<CharacterDarkRazy>("DarkRazy"),
+                CharacterIndex.KIRING => objectPoolManager.GetObject<CharacterKiring>("Kiring"),
+                CharacterIndex.PATROL => objectPoolManager.GetObject<CharacterPatrol>("Patrol"),
+                CharacterIndex.EMPEROR_PENGGO => objectPoolManager.GetObject<CharacterEmperorPenggo>("EmperorPengGo"),
+                CharacterIndex.WHITE_MAGICIAN_FOXY => objectPoolManager.GetObject<CharacterWhiteMagicianFoxy>("WhiteMagicianFoxy"),
+                CharacterIndex.BLACK_MAGICIAN_FOXY => objectPoolManager.GetObject<CharacterBlackMagicianFoxy>("BlackMagicianFoxy"),
+                CharacterIndex.BASIC_WOLF => objectPoolManager.GetObject<CharacterBasicWolf>("BasicWolf"),
+                CharacterIndex.BEOSK => objectPoolManager.GetObject<CharacterBeosk>("Beosk"),
+                CharacterIndex.WILLOW => objectPoolManager.GetObject<CharacterWillow>("Willow"),
+                CharacterIndex.DAVI => objectPoolManager.GetObject<CharacterDavi>("Davi"),
+                CharacterIndex.POLARIS => objectPoolManager.GetObject<CharacterPolaris>("Polaris"),
+                CharacterIndex.KYLE => objectPoolManager.GetObject<CharacterKyle>("Kyle"),
+                CharacterIndex.MARRIER => objectPoolManager.GetObject<CharacterMarrier>("Marrier"),
+                CharacterIndex.DARKWOLF => objectPoolManager.GetObject<CharacterDarkWolf>("DarkWolf"),
+                CharacterIndex.PUDDLE => objectPoolManager.GetObject<CharacterPuddle>("Puddle"),
+                CharacterIndex.BARD => objectPoolManager.GetObject<CharacterBard>("Bard"),
+                CharacterIndex.GUARDIAN => objectPoolManager.GetObject<CharacterGuardian>("Guardian"),
+                CharacterIndex.TRICKSTER => objectPoolManager.GetObject<CharacterTrickster>("Trickster"),
+                CharacterIndex.LEMMING_TOXIN => objectPoolManager.GetObject<CharacterLemmingToxin>("LemmingToxin"),
+                CharacterIndex.HIFIVE => objectPoolManager.GetObject<CharacterHiFive>("HiFive"),
+                CharacterIndex.YURI => objectPoolManager.GetObject<CharacterYuri>("Yuri"),
+                CharacterIndex.OWLRUS => objectPoolManager.GetObject<CharacterOwlrus>("Owlrus"),
+                CharacterIndex.FLORA => objectPoolManager.GetObject<CharacterFlora>("Flora"),
+                _ => null,
+            };
+
+            return character;
+        }
 
         public void TestSummonCharacter(KeyCode keyCode)
         {
@@ -754,6 +796,28 @@ namespace Framework.Game.Defense
             //character.Initialize(glacier, 3);
             
             GameManager.Instance.characterSpawner.SetQuestCharacterStarCount(character.starGradeIndex);
+        }
+        
+        public void SummonFixedCharacter(CharacterIndex characterIndex, int starGrade)
+        {
+            if (!GridManager.Instance.IsPossibleSummon()) return;
+            summonCount++;
+
+            Character character = GetFixedCharacter(characterIndex);
+            Glacier glacier = GridManager.Instance.PossibleSummonIdx();
+            glacier.isImpossibleSummon = true;
+            character.Initialize(glacier, starGrade);
+        }
+
+        public void SummonFixedCharacter(CharacterIndex characterIndex, Glacier glacier, int starGrade)
+        {
+            if (!GridManager.Instance.IsPossibleSummon()) return;
+            summonCount++;
+            Debug.Log("Summon Fixed Monster Idx : " + characterIndex);
+            Character character = GetFixedCharacter(characterIndex);
+            // Glacier glacier = GridManager.Instance.PossibleSummonIdx();
+            glacier.isImpossibleSummon = true;
+            character.Initialize(glacier, starGrade);
         }
 
         //UI Controller

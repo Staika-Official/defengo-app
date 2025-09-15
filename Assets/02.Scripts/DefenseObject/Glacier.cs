@@ -96,6 +96,20 @@ namespace Framework.Game.Defense
             glacierState++;
         }
 
+        public void FieldBossDestroyedTile()
+        {
+            isImpossibleSummon = true;
+            SoundManager.Instance.PlaySound(SoundKey.SF_GLACIER_BROKEN);
+            //DestroyedTile();
+
+            ObjectParticle particle1 = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("FallingWater");
+            Vector2 pos = new(transform.localPosition.x, transform.localPosition.y + 0.4f);
+            particle1.PlayParticle(pos, 0);
+
+            anim.AnimationState.SetAnimation(0, "Broken", true);
+            GameManager.Instance.characterSpawner.DestroyedTile(glacierIndex);
+        }
+
         public void DestroyedTile()
         {
             isImpossibleSummon = true;

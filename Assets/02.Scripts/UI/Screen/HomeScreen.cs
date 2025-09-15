@@ -14,6 +14,7 @@ using Framework.Sound;
 using System;
 using System.Globalization;
 using com.adjust.sdk;
+using UnityEngine.Events;
 
 
 namespace Framework.UI
@@ -22,6 +23,7 @@ namespace Framework.UI
     {
         public static HomeScreen Instance;
         public ButtonComponent button_Play;
+        public ButtonComponent button_NetworkPlay;
         public ButtonComponent button_Friend;
         public ButtonComponent button_Inbox;
         public ButtonComponent button_Guide;
@@ -49,6 +51,8 @@ namespace Framework.UI
 
         public Animation anim_Transition;
 
+        public GameObject networkPrefab;
+
         public int focusDecIdx;
         public UIDec uiDec;
         public bool isDecDataReady = false;
@@ -62,9 +66,12 @@ namespace Framework.UI
         {
             button_Play.onPointerUp = () =>
             {
-                button_Play.onPointerUp = null;
-                SoundManager.Instance.PlaySound(SoundKey.SF_GAMEPLAY);
-                RequestStartGame();
+                PopupManager.Instance.GetPopUp<StartUpSingleModePopup>("startUpSingleMode").ActivePopup();
+            };
+
+            button_NetworkPlay.onPointerUp = () =>
+            {
+                PopupManager.Instance.GetPopUp<StartUpBattleModePopup>("startUpBattleMode").ActivePopup();
             };
 
             button_Friend.onPointerUp = () =>
@@ -112,11 +119,11 @@ namespace Framework.UI
 
             DateTime utcNow = DateTime.UtcNow;
             string date = utcNow.ToString("yyyy-MM-dd");
-            
+
             bool isLimitedPeriod = DataManager.Instance.limitedStoreItem != null;
 
             button_Limited.gameObject.SetActive(isLimitedPeriod);
-            
+
             if (isLimitedPeriod)
             {
                 DateTime period = DateTime.Parse(DataManager.Instance.limitedStoreItem.toDate);
@@ -175,7 +182,7 @@ namespace Framework.UI
 
         public void ReleasePlayButton(bool isInterectable)
         {
-            button_Play.SetInterectible(isInterectable);
+            // button_Play.SetInterectible(isInterectable);
         }
 
         public void GameStart()
@@ -203,7 +210,31 @@ namespace Framework.UI
                     AdjustInitializer.TrackEvent("qds6zs");
                 }
                 SoundManager.Instance.PlaySound(SoundKey.BGM_INGAME);
+                Debug.Log($"Scene load completed, set single");
+                Game.Defense.GameManager.Instance.gameMode = Game.Defense.GameMode.SINGLE;
             };
+        }
+
+
+        public IEnumerator StartGameSequence(UnityAction unityAction)
+        {
+            anim_Transition.gameObject.SetActive(true);
+            anim_Transition.Play();
+
+            float length = anim_Transition["TransitionEntry"].length;
+
+            yield return new WaitForSeconds(length);
+
+            unityAction?.Invoke();
+            //yield return new WaitForSeconds(0.5f);
+            //SceneLoadManager.Instance.SwitchingScene(3);
+
+            // SceneLoadManager.onCompleteLoadScene = () =>
+            // {
+            //     // D_game_start
+            //     AdjustInitializer.SendEventMessage("qds6zs");
+            //     SoundManager.Instance.PlaySound(SoundKey.BGM_INGAME);
+            // };
         }
 
         public async void RequestStartGame()

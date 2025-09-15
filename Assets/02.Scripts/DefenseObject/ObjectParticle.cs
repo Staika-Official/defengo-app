@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Framework.Util;
+using UnityEngine.Events;
 
 namespace Framework.Game.Defense
 {
@@ -52,12 +53,12 @@ namespace Framework.Game.Defense
         }
 
 
-        public void PlayParticle(Vector2 pos, float buffDuration)
+        public void PlayParticle(Vector2 pos, float buffDuration, UnityAction action = null)
         {
-            StartCoroutine(PlayParticleAsync(pos, buffDuration));
+            StartCoroutine(PlayParticleAsync(pos, buffDuration, action));
         }
 
-        public IEnumerator PlayParticleAsync(Vector2 pos, float buffDuration)
+        public IEnumerator PlayParticleAsync(Vector2 pos, float buffDuration, UnityAction action = null)
         {
             bool isLoop = Mathf.Approximately(0, buffDuration);
             transform.localPosition = pos;
@@ -68,6 +69,7 @@ namespace Framework.Game.Defense
                     particleSystems[i].Play();
                 }
                 yield return new WaitForSeconds(buffDuration);
+                action?.Invoke();
 
                 GameManager.Instance.objectPoolManager.ReturnObject(this, particleName);
             }

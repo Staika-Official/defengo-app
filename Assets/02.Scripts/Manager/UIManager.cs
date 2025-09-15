@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using CodeStage.AntiCheat.ObscuredTypes;
 using DG.Tweening;
 using Framework.GameData.Defense;
 using Framework.Network;
@@ -21,16 +22,20 @@ namespace Framework.Game.Defense
         public UISequences uISequences_WaveCountTimer;
 
         public ButtonComponent button_SummonCharacter;
+        public SummonButton summonButton;
         public ButtonComponent button_Relocation;
         public ButtonComponent button_SummonBoss;
         public ButtonComponent button_Pause;
         public ButtonComponent button_MisstionCheck;
+        public ButtonComponent button_rank;
+        public ButtonComponent button_giveUp;
 
         public TextMeshProUGUI text_Gem;
         public TextMeshProUGUI text_Go;
 
         public TextMeshProUGUI text_RelocationCost;
         public TextMeshProUGUI text_SummonBossLevel;
+        public TextMeshProUGUI text_bossAmount;
         public TextMeshProUGUI text_BossReward;
         public TextMeshProUGUI text_SummonCharacterCost;
         public TextMeshProUGUI text_Interest;
@@ -45,7 +50,7 @@ namespace Framework.Game.Defense
         public Transform dynamicFocusCanvas;
         public Transform interestParticlePos;
         public ObjectParticle interestParticle;
-        public GameObject icon_BossActive;
+        public GameObject[] icon_BossActive;
         public GameObject icon_SummonCharacterActive;
 
         public Transform goScoreDestination;
@@ -58,9 +63,18 @@ namespace Framework.Game.Defense
         public GameOverPopup gameOverPopup;
         public MissionPopup missionPopup;
         public SellPopup sellPopup;
+        public InGameRankPopup inGameRankPopup;
+        public BossSelectPopup bossSelectPopup;
+        public FieldBossRewardPopup fieldBossRewardPopup;
+        public BattleResultPopup battleResultPopup;
+        public BattleResultTablePopup battleResultTablePopup;
         public GameObject sellPanel;
-        public Image image_BossCoolTime;
+        public Image[] image_BossCoolTime;
         public Image image_WaveCountFill;
+        public int bossAmount;
+        public IngameStatusMessage ingameStatusMessage;
+
+        public BossWaveItem BossWaveItem;
 
         public Animation anim_Interest;
         public Animation anim_Upgrade;
@@ -141,9 +155,9 @@ namespace Framework.Game.Defense
 
         public void SetPossibleSummon(bool isPossible)
         {
-            button_SummonCharacter.SetInterectible(isPossible);
-            icon_SummonCharacterActive.SetActive(isPossible);
-
+            // button_SummonCharacter.SetInterectible(isPossible);
+            // icon_SummonCharacterActive.SetActive(isPossible);
+            summonButton.SetPossibleSummon(isPossible);
         }
 
         // public void SetUpgradeAnim(CharacterIndex index, int level)
@@ -254,16 +268,65 @@ namespace Framework.Game.Defense
             text_Interest.text = "0";
             text_Go.text = "0";
             text_Gem.text = "0";
+            bossAmount = 0;
             InitPopup();
             SetBossSummon();
         }
 
-        public void Initialize()
+        bool IsBattleMode = false;
+        public void Initialize(bool isBattleMode)
         {
-            button_SummonCharacter.onPointerUp = () =>
+            IsBattleMode = isBattleMode;
+            
+            if (IsBattleMode)
             {
-                OnClick_SummonCharacter();
-            };
+                if (!inGameRankPopup.gameObject.activeSelf)
+                {
+                    inGameRankPopup.gameObject.SetActive(true);
+                    inGameRankPopup.PopUpSequence(false);
+                }
+                inGameRankPopup.Initialize();
+
+                if (!fieldBossRewardPopup.gameObject.activeSelf)
+                {
+                    fieldBossRewardPopup.gameObject.SetActive(true);
+                    fieldBossRewardPopup.PopUpSequence(false);
+                }
+                fieldBossRewardPopup.Initialize();
+
+                if (!bossSelectPopup.gameObject.activeSelf)
+                {
+                    bossSelectPopup.gameObject.SetActive(true);
+                    bossSelectPopup.PopUpSequence(false);
+                }
+                bossSelectPopup.Initialize();
+
+                if (!battleResultTablePopup.gameObject.activeSelf)
+                {
+                    battleResultTablePopup.gameObject.SetActive(true);
+                    battleResultTablePopup.PopUpSequence(false);
+                }
+                battleResultTablePopup.Initialize();
+
+                if (!battleResultPopup.gameObject.activeSelf)
+                {
+                    battleResultPopup.gameObject.SetActive(true);
+                    battleResultPopup.PopUpSequence(false);
+                }
+                battleResultPopup.Initialize();
+
+                button_Pause.gameObject.SetActive(false);
+                button_rank.gameObject.SetActive(true);
+                button_rank.onPointerUp = OnClick_RankButton;
+                button_giveUp.gameObject.SetActive(true);
+                button_giveUp.onPointerUp = OnClick_GiveUpButton;
+            }
+
+            // button_SummonCharacter.onPointerUp = () =>
+            // {
+            //     OnClick_SummonCharacter();
+            // };
+            summonButton.Initilize();
 
             button_Relocation.onPointerUp = () =>
             {
@@ -294,6 +357,7 @@ namespace Framework.Game.Defense
             text_Interest.text = "0";
             text_Go.text = "0";
             text_Gem.text = "0";
+            bossAmount = 0;
             InitPopup();
             SetBossSummon();
         }
@@ -329,14 +393,42 @@ namespace Framework.Game.Defense
 
         public void SetBossSummon()
         {
-            icon_BossActive.SetActive(true);
+            // icon_BossActive[bossAmount].SetActive(true);
 
-            image_BossCoolTime.fillAmount = 1;
+            // image_BossCoolTime[bossAmount].fillAmount = 1;
+            // button_SummonBoss.SetInterectible(true);
+
+            // int level = GameManager.Instance.monsterSpawner.bossIdx;
+            // int levelIdx = level >= GameManager.Instance.bossRewardData.rewards.Length ? GameManager.Instance.bossRewardData.rewards.Length - 1 : level;
+            // SetBossInfo(level + 1, GameManager.Instance.bossRewardData.rewards[levelIdx].rewardValue);
+            icon_BossActive[bossAmount].SetActive(true);
+
+            image_BossCoolTime[bossAmount].fillAmount = 1;
             button_SummonBoss.SetInterectible(true);
 
             int level = GameManager.Instance.monsterSpawner.bossIdx;
             int levelIdx = level >= GameManager.Instance.bossRewardData.rewards.Length ? GameManager.Instance.bossRewardData.rewards.Length - 1 : level;
             SetBossInfo(level + 1, GameManager.Instance.bossRewardData.rewards[levelIdx].rewardValue);
+            bossAmount++;
+
+            if (bossAmount == 2)
+            {
+                icon_BossActive[0].SetActive(false);
+            }
+
+            bool isBossAmount = bossAmount > 0;
+
+            text_bossAmount.gameObject.SetActive(isBossAmount);
+            text_bossAmount.text = $"x{bossAmount}";
+            if (bossAmount == 1)
+            {
+                if (BossCoolTimeCo == null)
+                {
+                    BossCoolTimeCo = BossCoolTime();
+
+                    StartCoroutine(BossCoolTimeCo);
+                }
+            }
         }
 
         public void SetBossInfo(int bossLevel, int bossReward)
@@ -348,15 +440,20 @@ namespace Framework.Game.Defense
             text_BossReward.text = bossRewardData;
         }
 
+        public ObscuredFloat bossCoolTimeBuffValue = 0;
+        public int BOSS_COOLTIME => (int)(ConfigData.BOSS_COOLTIME - ConfigData.BOSS_COOLTIME * bossCoolTimeBuffValue);
         public IEnumerator BossCoolTime()
         {
             float timer = 0;
-            button_SummonBoss.SetInterectible(false);
+            // button_SummonBoss.SetInterectible(false);
+            image_BossCoolTime[bossAmount].gameObject.SetActive(true);
+            image_BossCoolTime[bossAmount].fillAmount = 0;
+
             while (true)
             {
                 timer += Time.deltaTime;
-                image_BossCoolTime.fillAmount = timer / ConfigData.BOSS_COOLTIME;
-                if (timer >= ConfigData.BOSS_COOLTIME)
+                image_BossCoolTime[bossAmount].fillAmount = timer / BOSS_COOLTIME;
+                if (timer >= BOSS_COOLTIME)
                 {
                     SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_COOLTIME);
                     SetBossSummon();
@@ -365,6 +462,7 @@ namespace Framework.Game.Defense
                 yield return Time.deltaTime;
             }
         }
+
         public static Transform GetDynamicCanvasTransform()
         {
             return Instance.dynamicCanvas;
@@ -425,6 +523,15 @@ namespace Framework.Game.Defense
             pausePopup.ActivePopup();
         }
 
+        public void OnClick_RankButton()
+        {
+            inGameRankPopup.ActivePopup();
+        }
+        public void OnClick_GiveUpButton()
+        {
+            GameManager.Instance.GameOver();
+        }
+
         public void OnClick_Relocation()
         {
             SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
@@ -434,12 +541,55 @@ namespace Framework.Game.Defense
 
         public void OnClick_SummonBoss()
         {
+
+            // SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
+            // image_BossCoolTime.fillAmount = 0;
+            // icon_BossActive.SetActive(false);
+            // StartCoroutine(BossCoolTime());
+            // GameManager.Instance.SummonBoss();
+
+
+            // int level = GameManager.Instance.monsterSpawner.bossIdx;
+
+            // StartCoroutine(SetBossMessage(level));
+            // int levelIdx = level >= GameManager.Instance.bossRewardData.rewards.Length ? GameManager.Instance.bossRewardData.rewards.Length - 1 : level;
+            // SetBossInfo(level + 1, GameManager.Instance.bossRewardData.rewards[levelIdx].rewardValue);
+
+            int tempBossAmount = bossAmount == 2 ? 1 : bossAmount;
+            //icon_BossActive[tempBossAmount].SetActive(false);
+            image_BossCoolTime[tempBossAmount].gameObject.SetActive(false);
+
+            bossAmount--;
+
+            bool isBossAmount = bossAmount > 0;
+            if (isBossAmount)
+            {
+                icon_BossActive[0].SetActive(true);
+            }
+
+
+            text_bossAmount.gameObject.SetActive(isBossAmount);
+            text_bossAmount.text = $"x{bossAmount}";
+            button_SummonBoss.SetInterectible(bossAmount > 0);
             SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
-            image_BossCoolTime.fillAmount = 0;
-            icon_BossActive.SetActive(false);
-            StartCoroutine(BossCoolTime());
+            //image_BossCoolTime[bossAmount].fillAmount = 0;
+
+            if (BossCoolTimeCo == null)
+            {
+                BossCoolTimeCo = BossCoolTime();
+                StartCoroutine(BossCoolTimeCo);
+            }
+            else
+            {
+                StopCoroutine(BossCoolTimeCo);
+                BossCoolTimeCo = BossCoolTime();
+                StartCoroutine(BossCoolTimeCo);
+            }
+
+            //StartCoroutine(BossCoolTime());
             GameManager.Instance.SummonBoss();
 
+            icon_BossActive[bossAmount].SetActive(false);
 
             int level = GameManager.Instance.monsterSpawner.bossIdx;
 
@@ -448,6 +598,7 @@ namespace Framework.Game.Defense
             SetBossInfo(level + 1, GameManager.Instance.bossRewardData.rewards[levelIdx].rewardValue);
         }
 
+        public IEnumerator BossCoolTimeCo;
         public IEnumerator SetBossMessage(int level)
         {
             text_bossMessageLevel.text = $"Lv.{level}";
@@ -462,8 +613,8 @@ namespace Framework.Game.Defense
 
             TutorialManager.Instance.BossSummonSequence();
             SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
-            image_BossCoolTime.fillAmount = 0;
-            icon_BossActive.SetActive(false);
+            image_BossCoolTime[0].fillAmount = 0;
+            icon_BossActive[bossAmount].SetActive(false);
             StartCoroutine(BossCoolTime());
             GameManager.Instance.TutorialSummonBoss();
 

@@ -1,0 +1,420 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Fusion;
+using Fusion.Sockets;
+using System;
+using Framework.UI;
+using Framework.GameData.Defense;
+using UnityEngine.SceneManagement;
+using Framework.Util;
+using System.Linq;
+using Framework.Game.Defense;
+
+namespace Framework.Network
+{
+    /// <summary>
+    /// Handles network connection logic for matchmaking, session management,
+    /// and gameplay state synchronization using Photon Fusion.
+    /// </summary>
+    public class NetworkConnect : SimulationBehaviour, INetworkRunnerCallbacks
+    {
+        public static NetworkConnect Instance;
+
+        [Header("Network State")]
+        public bool isHost;
+        public int hostIdx;
+        public int metaScore;
+        public NetworkRunner runner;
+        public Dictionary<int, NetworkBattleData> dic_PlayerData = new(); // player index -> battle data
+        public bool isJoin;
+        public NetworkBattleStatus networkBattleStatus;
+        public int playerIdx;
+        public string nickname;
+        public int playerCount = 1;
+
+        [Header("References")]
+        public GameObject networkObjectPrefab;
+        public NetworkGameManager networkGameManager;
+
+        private void Start()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                Debug.Log("[NetworkConnect] Singleton Instance created.");
+            }
+        }
+
+        /// <summary>
+        /// Called only by host to check if room is full, then start the game.
+        /// </summary>
+        public void CheckPlayerCount()
+        {
+            Debug.Log($"[NetworkConnect] Checking player count... Host={isHost}, " +
+                      $"MaxPlayers={runner?.SessionInfo.MaxPlayers}, Current={runner?.SessionInfo.PlayerCount}");
+
+            if (isHost && runner.SessionInfo.MaxPlayers == runner.SessionInfo.PlayerCount)
+            {
+                Debug.Log("[NetworkConnect] All players joined, starting game...");
+                StartCoroutine(GameStart());
+            }
+        }
+
+        /// <summary>
+        /// Connects to the shared lobby to list/join/create sessions.
+        /// </summary>
+        public async void ConnectToLobby()
+        {
+            Debug.Log("[NetworkConnect] Connecting to lobby...");
+
+            if (runner == null)
+            {
+                runner = gameObject.AddComponent<NetworkRunner>();
+                Debug.Log("[NetworkConnect] NetworkRunner component added.");
+            }
+
+            await runner.JoinSessionLobby(SessionLobby.Shared);
+            Debug.Log("[NetworkConnect] Connected to session lobby.");
+        }
+
+        /// <summary>
+        /// Joins an existing session by name.
+        /// </summary>
+        public async void JoinSession(string sessionName)
+        {
+            isHost = false;
+            Debug.Log($"[NetworkConnect] Joining session: {sessionName}");
+
+            if (runner == null)
+                runner = gameObject.AddComponent<NetworkRunner>();
+
+            runner.ProvideInput = true;
+            runner.AddCallbacks(this);
+
+            var result = await runner.StartGame(new StartGameArgs()
+            {
+                GameMode = Fusion.GameMode.Shared,
+                SessionName = sessionName,
+            });
+
+            if (result.Ok)
+            {
+                Debug.Log("[NetworkConnect] Successfully joined session.");
+                // MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                // popup.ActivePopup();
+                networkBattleStatus = NetworkBattleStatus.LOBBY;
+            }
+            else
+            {
+                Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
+                MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                popup.InActivePopup();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new session as host with session properties.
+        /// </summary>
+        public async void CreateSession()
+        {
+            isHost = true;
+            Debug.Log("[NetworkConnect] Creating new session as host...");
+
+            var customProps = new Dictionary<string, SessionProperty>
+            {
+                ["averageScore"] = metaScore,
+                ["averageRate"] = 40,
+            };
+
+            if (runner == null)
+                runner = gameObject.AddComponent<NetworkRunner>();
+
+            runner.ProvideInput = true;
+            runner.AddCallbacks(this);
+
+            var result = await runner.StartGame(new StartGameArgs()
+            {
+                GameMode = Fusion.GameMode.Shared,
+                PlayerCount = playerCount,
+                SessionProperties = customProps
+            });
+
+            if (result.Ok)
+            {
+                Debug.Log("[NetworkConnect] Session created successfully.");
+                // MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                // popup.ActivePopup();
+                networkBattleStatus = NetworkBattleStatus.LOBBY;
+            }
+            else
+            {
+                Debug.LogError($"[NetworkConnect] Failed to create session: {result.ShutdownReason}");
+                MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                popup.InActivePopup();
+            }
+        }
+
+        [Rpc]
+        public static void Rpc_LoadGameScene(NetworkRunner runner, string idx)
+        {
+            Debug.Log($"[NetworkConnect] Rpc_LoadGameScene triggered by Player {idx}. " +
+                      $"LocalPlayer={runner.LocalPlayer.AsIndex}");
+
+            Instance.StartCoroutine(HomeScreen.Instance.StartGameSequence(Instance.GameStartSequence));
+        }
+
+        public void GameStartSequence()
+        {
+            Debug.Log("[NetworkConnect] Running GameStartSequence...");
+
+            if (isHost)
+            {
+                Debug.Log("[NetworkConnect] Host is loading battle scene.");
+                runner.LoadScene(SceneRef.FromIndex(3), LoadSceneMode.Single);
+            }
+        }
+
+        public IEnumerator GameStart()
+        {
+            Debug.Log("[NetworkConnect] GameStart coroutine started. Waiting 4s...");
+            yield return new WaitForSeconds(4f);
+            Rpc_LoadGameScene(runner, runner.LocalPlayer.AsIndex.ToString());
+        }
+
+        public PlayerRef GetPlayerRef(int idx)
+        {
+            foreach (var item in runner.ActivePlayers)
+            {
+                if (item.AsIndex == idx)
+                    return item;
+            }
+            Debug.LogWarning($"[NetworkConnect] PlayerRef for idx {idx} not found.");
+            return default;
+        }
+
+        // -------------------------------------------------------------------
+        // INetworkRunnerCallbacks Implementation
+        // -------------------------------------------------------------------
+
+        public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
+        {
+            Debug.Log($"[NetworkConnect] Player joined: {player.AsIndex}");
+
+            if (player.AsIndex == runner.LocalPlayer.AsIndex)
+            {
+                Debug.Log("[NetworkConnect] This is the local player joining.");
+
+                NetworkBattleData data = new()
+                {
+                    profileId = UserInfoManager.Instance.userState.equippedProfileId,
+                    isHost = isHost,
+                    nickname = UserInfoManager.Instance.nickname,
+                    playerIdx = runner.LocalPlayer.AsIndex,
+                    decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds
+                };
+
+                this.playerIdx = data.playerIdx;
+                this.nickname = data.nickname;
+
+                Rpc_JoinGame(runner, JsonUtility.ToJson(data));
+            }
+            else
+            {
+                Debug.Log($"[NetworkConnect] Syncing player data for new player {player.AsIndex}.");
+                if (player.AsIndex > runner.LocalPlayer.AsIndex)
+                {
+                    NetworkBattleData data = new()
+                    {
+                        profileId = UserInfoManager.Instance.userState.equippedProfileId,
+                        isHost = isHost,
+                        nickname = UserInfoManager.Instance.nickname,
+                        playerIdx = runner.LocalPlayer.AsIndex,
+                        decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
+                        isGameOver = false
+                    };
+
+                    Rpc_JoinGame(this.runner, player, JsonUtility.ToJson(data));
+                }
+            }
+        }
+
+        public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
+        {
+            Debug.Log($"[NetworkConnect] Player left: {player.AsIndex}");
+
+            // Host migration logic...
+            NetworkBattleData data = dic_PlayerData[player.AsIndex];
+            if (data.isHost)
+            {
+                Debug.Log("[NetworkConnect] Host left, reassigning...");
+                var playerIndexes = dic_PlayerData.Values
+                                                  .Where(x => x.playerIdx != data.playerIdx)
+                                                  .Select(x => x.playerIdx)
+                                                  .OrderBy(x => x)
+                                                  .ToList();
+
+                if (playerIdx == playerIndexes.FirstOrDefault())
+                {
+                    isHost = true;
+                    Rpc_SetHost(runner, playerIdx);
+                    Debug.Log("[NetworkConnect] I am the new host!");
+                }
+            }
+
+            // Handle lobby vs in-game logic
+            switch (networkBattleStatus)
+            {
+                case NetworkBattleStatus.LOBBY:
+                    Debug.Log("[NetworkConnect] Updating lobby UI after player left.");
+                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+                    dic_PlayerData.Remove(player.AsIndex);
+                    break;
+
+                case NetworkBattleStatus.INGAME:
+                    string nickname = dic_PlayerData[player.AsIndex].nickname;
+                    UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
+                    UIManager.Instance.ingameStatusMessage.SetMessage($"{nickname} has left the game", nickname);
+                    data.isGameOver = true;
+
+                    if (runner.ActivePlayers.Count() == 1)
+                    {
+                        Debug.Log("[NetworkConnect] Last player remaining -> Win condition.");
+                        GameManager.Instance.GameOver();
+                    }
+                    break;
+            }
+        }
+
+        public void OnSceneLoadDone(NetworkRunner runner)
+        {
+            Debug.Log($"[NetworkConnect] Scene load completed, spawning player object. {runner == null} - {networkObjectPrefab == null}");
+            GameManager.Instance.gameMode = Game.Defense.GameMode.BATTLE;
+            NetworkObject networkObject = runner.Spawn(networkObjectPrefab);
+            runner.SetPlayerObject(Runner.LocalPlayer, networkObject);
+        }
+
+        public void OnSceneLoadStart(NetworkRunner runner)
+        {
+            networkBattleStatus = NetworkBattleStatus.INGAME;
+            Debug.Log("[NetworkConnect] Scene load started, entering INGAME state.");
+        }
+
+        public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+        {
+            Debug.Log($"[NetworkConnect] Session list updated, found {sessionList.Count} sessions.");
+
+            if (sessionList.Count == 0)
+            {
+                Debug.Log("[NetworkConnect] No sessions found, creating new one.");
+                CreateSession();
+                return;
+            }
+
+            foreach (var session in sessionList)
+            {
+                if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
+                    continue;
+
+                Debug.Log($"[NetworkConnect] Joining available session: {session.Name}");
+                JoinSession(session.Name);
+                return;
+            }
+
+            Debug.Log("[NetworkConnect] No suitable session found, creating new one.");
+            CreateSession();
+        }
+
+        public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+        {
+            Debug.LogWarning($"[NetworkConnect] Runner shutdown. Reason={shutdownReason}");
+        }
+
+        public void InitializeCheck(int idx)
+        {
+            Debug.Log($"[NetworkConnect] InitializeCheck called for player {idx}.");
+            dic_PlayerData[idx].isInitialize = true;
+
+            if (isHost)
+            {
+                bool allReady = dic_PlayerData.Values.All(p => p.isInitialize);
+                if (allReady)
+                {
+                    Debug.Log("[NetworkConnect] All players ready. Closing session and starting countdown.");
+                    runner.SessionInfo.IsOpen = false;
+                    Rpc_CountStart(runner);
+                }
+            }
+        }
+
+        public void OnDestroy()
+        {
+            Debug.Log("[NetworkConnect] Destroyed. Clearing instance.");
+            Instance = null;
+        }
+
+        // -------------------------------------------------------------------
+        // Empty Callbacks (kept for completeness, just added logs)
+        // -------------------------------------------------------------------
+        public void OnConnectedToServer(NetworkRunner runner) => Debug.Log("[NetworkConnect] Connected to server.");
+        public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) => Debug.LogError($"[NetworkConnect] Connection failed: {reason}");
+        public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) => Debug.Log("[NetworkConnect] ConnectRequest received.");
+        public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) => Debug.Log("[NetworkConnect] Custom auth response received.");
+        public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) => Debug.LogError($"[NetworkConnect] Disconnected from server: {reason}");
+        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) => Debug.Log("[NetworkConnect] Host migration event.");
+        public void OnInput(NetworkRunner runner, NetworkInput input) { }
+        public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
+        public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+        public void OnObjectExitAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }
+        public void OnBeforeSpawned(NetworkRunner runner, NetworkObject obj) => Debug.Log("[NetworkConnect] OnBeforeSpawned event.");
+        public void OnReliableDataProgress(NetworkRunner runner, PlayerRef player, ReliableKey key, float progress) { }
+        public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ReliableKey key, ArraySegment<byte> data) { }
+        public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) => Debug.Log("[NetworkConnect] Simulation message received.");
+
+        // -------------------------------------------------------------------
+        // RPCs
+        // -------------------------------------------------------------------
+        [Rpc]
+        public static void Rpc_SetHost(NetworkRunner runner, int idx)
+        {
+            Instance.dic_PlayerData[idx].isHost = true;
+            Debug.Log($"[NetworkConnect] Rpc_SetHost: Player {idx} is new Host.");
+        }
+
+        [Rpc]
+        public static void Rpc_JoinGame(NetworkRunner runner, string data)
+        {
+            Debug.Log("[NetworkConnect] Rpc_JoinGame (all players).");
+            NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
+            Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+
+            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+
+            if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
+            {
+                Debug.Log("[NetworkConnect] All players joined, starting game.");
+                Instance.StartCoroutine(Instance.GameStart());
+            }
+
+            foreach (var item in Instance.dic_PlayerData.Values)
+                item.isInitialize = false;
+        }
+
+        [Rpc]
+        public static void Rpc_JoinGame(NetworkRunner runner, [RpcTarget] PlayerRef playerRef, string data)
+        {
+            Debug.Log("[NetworkConnect] Rpc_JoinGame (targeted).");
+            NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
+            Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+
+            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+        }
+
+        [Rpc]
+        public static void Rpc_CountStart(NetworkRunner runner)
+        {
+            Debug.Log("[NetworkConnect] Rpc_CountStart triggered. Starting countdown...");
+            GameManager.Instance.CountStart();
+        }
+    }
+}

@@ -496,6 +496,24 @@ namespace Framework.Game.Defense
                 GameManager.Instance.GameOver();
             }
         }
+        
+        public IEnumerator FieldBossDamageSequence()
+        {
+            for (int i = 0; i < glaciersTiles.Count; i++)
+            {
+                if (glaciersTiles[i].glacierState != GlacierState.DESTROYED)
+                {
+                    glaciersTiles[i].FieldBossDestroyedTile();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+            GameManager.Instance.GameOver();
+        }
+
+        public void FieldBossDamage()
+        {
+            StartCoroutine(FieldBossDamageSequence());
+        }
 
         public void OnDestroy()
         {

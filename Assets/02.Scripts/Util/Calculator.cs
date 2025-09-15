@@ -103,7 +103,7 @@ namespace Framework.Util
 
             return Vector3.Lerp(b0, b1, time);
         }
-        
+
         public static int[] GetExpiredTime(DateTime dateTime)
         {
             TimeSpan expiredDate = dateTime - DateTime.Now;
@@ -114,6 +114,66 @@ namespace Framework.Util
             temp[2] = expiredDate.Minutes;
 
             return temp;
+        }
+        
+        public static int[] GetMultiIndex(int arrayLength, int targetCount)
+        {
+            int[] targetArray = new int[targetCount];
+            int[] array = new int[arrayLength];
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = i;
+            }
+
+            for (int i = 0; i < array.Length; ++i)
+            {
+                int random1 = UnityEngine.Random.Range(0, array.Length);
+                int random2 = UnityEngine.Random.Range(0, array.Length);
+
+                (array[random1], array[random2]) = (array[random2], array[random1]);
+            }
+
+            for (int i = 0; i < targetArray.Length; i++)
+            {
+                targetArray[i] = array[i];
+            }
+
+            return targetArray;
+        }
+        
+        public static int GetIndependentTrial(float[] array)
+        {
+            float[] tempArr = new float[array.Length];
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (i == 0)
+                {
+                    tempArr[i] = array[i];
+                }
+                else
+                {
+                    tempArr[i] = tempArr[i - 1] + array[i];
+                }
+            }
+
+            float a = UnityEngine.Random.Range(0.0f, 1.0f);
+
+            for (int i = 0; i < tempArr.Length; i++)
+            {
+                if (a > tempArr[i])
+                {
+                    continue;
+                }
+
+                if (a < tempArr[i])
+                {
+                    return i;
+                }
+            }
+
+            return default;
         }
     }
 }

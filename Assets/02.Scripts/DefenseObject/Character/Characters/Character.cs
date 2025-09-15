@@ -91,6 +91,9 @@ namespace Framework.Game.Defense
         public List<ObjectParticle> buffParticle = new();
 
         public IEnumerator actionCoroutine;
+        
+        public bool IsLockdown { get; set; }
+        public bool IsInfected { get; set; }
 
         public int skinID;
 
@@ -148,7 +151,7 @@ namespace Framework.Game.Defense
             skinID = characterData.selectSkinType == SkinGradeType.NONE ? 0 : characterData.selectSkinID;
             //캐릭터 클릭시 포커스되면 안되는 캐릭터는 true 예: 챠미 (같은캐릭터는 포커스되지만 다른캐릭터에서 챠미를 포커스 하지못하게 하도록) 
             isNonFocus = false;
-            
+
             //스파인 애니메이션 데이터
             SkeletonDataAsset data = characterData.anim;
             anim.skeletonDataAsset = data;
@@ -309,7 +312,7 @@ namespace Framework.Game.Defense
                 SoundManager.Instance.PlaySound(SoundKey.SF_COMBINE_BIG);
             }
         }
-        
+
         public void UpgradeCharacter()
         {
             //업그레이드 되면 버프나 폴라리스의 타이머나 진행중인 것들을 초기화해주기위한
@@ -404,7 +407,7 @@ namespace Framework.Game.Defense
             //합쳐진 캐릭터를 업그레이드 시켜주는 함수 (합쳐지는 캐릭터도 반환하면서 새로운 캐릭터를 생성시키는거와 동일)
             mergeCharacter.UpgradeCharacter();
             CharacterUpgradeSound(mergeCharacter);
-            
+
             //생성된 캐릭터 리스트에서 제외
             GameManager.Instance.characterSpawner.AddOrRemoveSummonedCharacterList(this, false);
             //현재빙하에캐릭터 생성가능 표시를 해줌
@@ -1153,7 +1156,7 @@ namespace Framework.Game.Defense
                 //}
 
                 //virual change dongmin
-                
+
                 CharacterTypeCheckToMarge(character);
             }
             else
@@ -1201,6 +1204,59 @@ namespace Framework.Game.Defense
         }
 
         public virtual void RemoveBuffCharacter(Character character) { }
+
+        public virtual void Lockdown()
+        {
+            Debug.Log($"{transform.name} is LockDown");
+            IsLockdown = true;
+
+        }
+
+        public virtual void ReleaseLockdown()
+        {
+            IsLockdown = false;
+            Debug.Log($"{transform.name} Release Lockdown");
+        }
+
+        public void Infect()
+        {
+
+        }
+
+        public void ReleaseInfect()
+        {
+
+        }
+
+        public void SetBomb()
+        {
+            Debug.Log($"{transform.name} : Set Bomb");
+
+            string particleName = starGradeIndex == 0 ? "BossEf_Bomb1" : "BossEf_Bomb2";
+
+            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
+            objectParticle.transform.position = transform.position;
+            objectParticle.SimplePlay();
+
+            if (starGradeIndex == 0)
+            {
+
+            }
+            else
+            {
+
+            }
+
+        }
+
+        public void BombExplosion()
+        {
+            string particleName = starGradeIndex == 0 ? "BossEf_BombExplosion1" : "BossEf_BombExplosion1";
+
+            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
+            objectParticle.transform.position = transform.position;
+            objectParticle.SimplePlay();
+        }
         #endregion
     }
 }

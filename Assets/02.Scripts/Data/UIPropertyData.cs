@@ -54,6 +54,13 @@ namespace Framework.UI
         public float grdientOffset;
         public float grdientZoom;
     }
+    
+    [Serializable]
+    public class FieldBossRewardIcon
+    {
+        public Sprite sprite_itemIcon;
+        public Sprite sprite_buffIcon;
+    }
 
     [Serializable]
     public class RandomBoxTxtColor
@@ -80,6 +87,16 @@ namespace Framework.UI
         public bool is_Active_Grdient;
         public UnityEngine.Gradient color_Inner_Grdient;
         public Color color_Profile;
+    }
+
+    [Serializable]
+    public class TitlePropertyColor
+    {
+        public Color color_cardTitle;
+        public Color color_lineColor;
+        public Color color_line;
+        public Color color_titleColor;
+        public Color color_highlight;
     }
 
     [CreateAssetMenu(menuName = "CharacterCardInfo")]
@@ -114,5 +131,7 @@ namespace Framework.UI
         public SerializableDictionary<string, Sprite> dic_RandomRewardIcon;
         public SerializableDictionary<SkinGradeType, SkinColor> dic_CharacterSkinColor;
         public SerializableDictionary<string, Sprite> dic_userItemIcon;
+        public SerializableDictionary<FieldBossBuffType, FieldBossRewardIcon> dic_FieldBossRewardItemIcon;
+        public SerializableDictionary<int, TitlePropertyColor> dic_fieldBossRewardCardTitleColor;
     }
 }

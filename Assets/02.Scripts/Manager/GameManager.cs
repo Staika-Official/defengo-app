@@ -1,3 +1,4 @@
+using Framework.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using UniRx.Triggers;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
+using Newtonsoft.Json;
 
 namespace Framework.Game.Defense
 {
@@ -22,7 +24,15 @@ namespace Framework.Game.Defense
         WAIT,
         PLAY,
         END,
+        WAIT_BOSS_WAVE,
         GAME_OVER
+    }
+
+    public enum GameMode
+    {
+        SINGLE,
+        BATTLE,
+        TUTORIAL
     }
 
     public class GameManager : MonoBehaviour
@@ -35,6 +45,7 @@ namespace Framework.Game.Defense
 
         public Transform gameWorld;
         public GameState gameState;
+        public GameMode gameMode;
         public float timeCount;
         public int waveReadyTimer = 3;
         public string completedMission = "";
@@ -67,10 +78,16 @@ namespace Framework.Game.Defense
         public ObscuredInt summonCount;
         public ObscuredInt bossSummonCost;
         public ObscuredInt relocationCost;
+        public ObscuredFloat relocationCostDiscount = 0;
         public ObscuredInt relocationCount;
+        public ObscuredFloat missionRewardBuffValue = 0;
+        public ObscuredFloat bossRewardBuffValue = 0;
+        public ObscuredFloat monsterRewardBuffValue = 0;
+        public ObscuredFloat upgradeCostBuffValue = 0;
         public bool isTestMode = false;
         public bool isGameOver = false;
         public int TotalGo = 0;
+        public ObscuredInt bossKillCount;
 
         private Coroutine openPausePopupCorou = null;
 
@@ -81,8 +98,6 @@ namespace Framework.Game.Defense
             Instance = this;
 
             ObscuredCheatingDetector.StartDetection(OnCheterDetected);
-
-            //UserInfoManager.Instance.userState.finishedTutorial = false;
         }
 
         private void OnCheterDetected()
@@ -109,12 +124,24 @@ namespace Framework.Game.Defense
             this.UpdateAsObservable()
                 .Where(_ => Input.GetKeyDown(KeyCode.C))
                 .Subscribe(_ => ChangeGem(1000));
+            this.UpdateAsObservable()
+            .Where(_ => Input.GetKeyDown(KeyCode.P))
+            .Subscribe(_ => monsterSpawner.ClearMonster());
+            this.UpdateAsObservable()
+                .Where(_ => Input.GetKeyDown(KeyCode.B))
+                .Subscribe(_ => BossWaveSeqeunce(5, UserInfoManager.Instance.nickname));
 #endif
-            GetRewardData();
         }
 
         public IEnumerator GameStartSequence()
         {
+            GetRewardData();
+            Debug.Log(gameMode);
+
+            if (!UserInfoManager.Instance.userState.finishedTutorial && gameMode == GameMode.SINGLE)
+            {
+                gameMode = GameMode.TUTORIAL;
+            }
 
             anim_Transition.SetTrigger("TransitionOut");
 
@@ -131,23 +158,31 @@ namespace Framework.Game.Defense
 
             isPlayingIntro = false;
 
-            if (!UserInfoManager.Instance.userState.finishedTutorial)
+            switch (gameMode)
             {
-                TutorialManager.Instance.Initialize();
-                TutorialInitialize();
-            }
-            else
-            {
-                Initialize();
+                case GameMode.SINGLE:
+                    Initialize();
+                    yield return new WaitForSeconds(1f);
+                    CountStart();
+                    break;
+                case GameMode.BATTLE:
+                    BattleInitialize();
+                    break;
+                case GameMode.TUTORIAL:
+                    TutorialManager.Instance.Initialize();
+                    TutorialInitialize();
+                    break;
+                default:
+
+                    break;
             }
 
-            yield return new WaitForSeconds(1f);
+            // yield return new WaitForSeconds(1f);
 
-
-            if (UserInfoManager.Instance.userState.finishedTutorial)
-            {
-                CountStart();
-            }
+            // if (UserInfoManager.Instance.userState.finishedTutorial)
+            // {
+            //     CountStart();
+            // }
         }
 
         public static bool GetGameState()
@@ -171,6 +206,24 @@ namespace Framework.Game.Defense
             UIManager.Instance.ChangeValueSequnce(summonCost, 0, UIManager.Instance.text_SummonCharacterCost);
         }
 
+        public void BattleInitialize()
+        {
+            relocationCount = 0;
+            textGem = 0;
+            summonCount = 0;
+            Go = 0;
+            IncreaseRelocationCost();
+            ChangeGem(ConfigData.START_GEM);
+            UIManager.Instance.Initialize(true);
+            relocationCost = 0;
+            summonCost = ConfigData.GEM_SUMMON_FIRST;
+            waveReadyTimer = ConfigData.WAVE_READY_TIMER;
+            UIManager.Instance.ChangeValueSequnce(summonCost, 0, UIManager.Instance.text_SummonCharacterCost);
+            buffManager.Initialize();
+            renderSortManager.Initialized();
+            NetworkConnect.Instance.networkGameManager.RpcInitializeComplete(NetworkConnect.Instance.playerIdx);
+        }
+
         public void Initialize()
         {
             relocationCount = 0;
@@ -178,12 +231,13 @@ namespace Framework.Game.Defense
             summonCount = 0;
             Go = 0;
 
+            bossKillCount = 0;
             completedMission = "";
             totalCompletedMission = "";
 
             IncreaseRelocationCost();
             ChangeGem(ConfigData.START_GEM);
-            UIManager.Instance.Initialize();
+            UIManager.Instance.Initialize(false);
             relocationCost = 0;
             summonCost = ConfigData.GEM_SUMMON_FIRST;
             waveReadyTimer = ConfigData.WAVE_READY_TIMER;
@@ -197,24 +251,49 @@ namespace Framework.Game.Defense
             rewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("gemRewardData");
             bossRewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("BossRewardData");
 
-            for (int i = 0; i < UserInfoManager.Instance.rewardRuleList.rewardRules.Length; i++)
-            {
-                RewardRule rewardRule = UserInfoManager.Instance.rewardRuleList.rewardRules[i];
-                dic_RewardRules.Add(rewardRule.code, rewardRule);
-            }
+            Debug.Log($"Get reward data: {JsonConvert.SerializeObject(rewardData)}");
+            Debug.Log($"Get boss reward data: {JsonConvert.SerializeObject(bossRewardData)}");
 
-            playId = UserInfoManager.Instance.playId;
+            switch (gameMode)
+            {
+                case GameMode.SINGLE:
+                    for (int i = 0; i < UserInfoManager.Instance.rewardRuleList.rewardRules.Length; i++)
+                    {
+                        RewardRule rewardRule = UserInfoManager.Instance.rewardRuleList.rewardRules[i];
+                        dic_RewardRules.Add(rewardRule.code, rewardRule);
+                    }
+                    playId = UserInfoManager.Instance.playId;
+                    break;
+                case GameMode.BATTLE:
+                    RewardRuleList rewardRuleList = await DataLoadManager.Instance.GetDataAsyncBinary<RewardRuleList>("testWaveData");
+
+                    Debug.Log($"Get battle reward rule list: {JsonConvert.SerializeObject(rewardRuleList)}");
+                    for (int i = 0; i < rewardRuleList.rewardRules.Length; i++)
+                    {
+                        RewardRule rewardRule = rewardRuleList.rewardRules[i];
+                        dic_RewardRules.Add(rewardRule.code, rewardRule);
+                    }
+                    break;
+                default:
+
+                    break;
+            }
         }
 
         public void MonsterGemReward(int idx, bool isLoss, bool isBoss)
         {
+            Debug.Log($"Monster Gem Reward: IDX: {idx} - IsLoss: {isLoss} - isBoss: {isBoss}");
             RewardsTableData data = isBoss ? bossRewardData : rewardData;
 
             if (idx >= data.rewards.Length)
             {
                 idx = isBoss ? data.rewards.Length - 1 : data.rewards.Length - 1;
             }
-            int value = data.rewards[idx].rewardValue;
+            int value = 0;
+            if (!isBoss)
+                value = (int)(data.rewards[idx].rewardValue + data.rewards[idx].rewardValue * monsterRewardBuffValue);
+            else
+                value = (int)(data.rewards[idx].rewardValue + data.rewards[idx].rewardValue * bossRewardBuffValue);
 
             if (isLoss)
             {
@@ -227,6 +306,11 @@ namespace Framework.Game.Defense
             {
                 ChangeGem(value);
             }
+        }
+
+        public void MissionGemReward()
+        {
+
         }
 
         public void TutorialSummon(CharacterIndex characterIndex, int glacierIdx)
@@ -243,6 +327,14 @@ namespace Framework.Game.Defense
             {
                 //Debug.Log("Not Enough Gem");
             }
+        }
+
+        public void SummonFixedCharacter(CharacterIndex characterIndex, int starGrade)
+        {
+            characterSpawner.SummonFixedCharacter(characterIndex, starGrade);
+            summonCount++;
+            bool isPossible = GridManager.Instance.IsPossibleSummon();
+            UIManager.Instance.SetPossibleSummon(isPossible);
         }
 
         public void SummonCharacter()
@@ -279,11 +371,23 @@ namespace Framework.Game.Defense
             monsterSpawner.TutorialSummonBoss();
         }
 
+        public void DecreaseRelocationCost(float value)
+        {
+            if (relocationCostDiscount == 0)
+            {
+                relocationCostDiscount = value;
+            }
+            else
+            {
+                relocationCostDiscount = relocationCostDiscount + relocationCostDiscount * value;
+            }
+        }
+
         public void IncreaseRelocationCost()
         {
             int temp = relocationCost;
-
-            relocationCost = ConfigData.GEM_RELOCATION * relocationCount;
+            int cost = ConfigData.GEM_RELOCATION * relocationCount;
+            relocationCost = (int)(cost - cost * relocationCostDiscount);
             UIManager.Instance.ChangeValueSequnce(relocationCost, temp, UIManager.Instance.text_RelocationCost);
             CalcPossibleCostAction();
         }
@@ -318,12 +422,13 @@ namespace Framework.Game.Defense
 
         public void UpgradeLevel(CharacterIndex characterIndex, int cost, UnityAction action)
         {
-            if (Gem >= cost)
+            int upgradeCost = (int)(cost - cost * upgradeCostBuffValue);
+            if (Gem >= upgradeCost)
             {
                 characterSpawner.UpgradeLevel(characterIndex);
                 //UIManager.Instance.SetUpgradeAnim(characterIndex);
                 SoundManager.Instance.PlaySound(SoundKey.SF_UPGRADE);
-                ChangeGem(-1 * cost);
+                ChangeGem(-1 * upgradeCost);
 
                 action();
             }
@@ -428,6 +533,11 @@ namespace Framework.Game.Defense
             UIManager.Instance.ChangeValueSequnce(Go, temp, UIManager.Instance.text_Go);
         }
 
+        public static Transform GetGameWorldTransform()
+        {
+            return Instance.gameWorld;
+        }
+
         public void CalcPossibleCostAction()
         {
             bool isPossibleSummon = summonCost <= Gem && GridManager.Instance.IsPossibleSummon();
@@ -465,7 +575,8 @@ namespace Framework.Game.Defense
         {
             SoundManager.Instance.PlaySound(SoundKey.SF_MISSION_COMPLETE);
 
-            int goValue = dic_RewardRules[$"MISSION_{missionIndex}"].rewardGo;
+            int go = dic_RewardRules[$"MISSION_{missionIndex}"].rewardGo;
+            int goValue = (int)(go + go * missionRewardBuffValue);
 
             ++missionManager.currentMissionClear;
             ++missionManager.totalMissionClear;
@@ -481,7 +592,7 @@ namespace Framework.Game.Defense
                 completedMission += $",{missionIndex}";
             }
 
-            if (!UserInfoManager.Instance.userState.finishedTutorial)
+            if (gameMode == GameMode.TUTORIAL)
             {
                 TutorialManager.Instance.nextSequence?.Invoke();
             }
@@ -499,6 +610,21 @@ namespace Framework.Game.Defense
 
         public void GameOver()
         {
+            switch (gameMode)
+            {
+                case GameMode.SINGLE:
+                    SingleGameOver();
+                    break;
+                case GameMode.BATTLE:
+                    BattleGameOver();
+                    break;
+                case GameMode.TUTORIAL:
+                    break;
+            }
+        }
+
+        public void SingleGameOver()
+        {
             if (isGameOver) return;
             isGameOver = true;
 
@@ -515,13 +641,25 @@ namespace Framework.Game.Defense
                 _ = NetworkManager.Instance.GetRouletteGroup(playId, (ReqRouletteGroupData data) =>
                 {
                     UIManager.Instance.RoulettePopup(data);
-                }, ()=>
+                }, () =>
                 {
                     GameFinishedSend();
                 });
             }
             else
                 GameFinishedSend();
+        }
+
+        public void BattleGameOver()
+        {
+            if (isGameOver) return;
+            isGameOver = true;
+            gameState = GameState.GAME_OVER;
+            SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
+            NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+
+            UIManager.Instance.battleResultPopup.SetResultInfo(0, waveIdx);
+            Debug.Log("Battle Game Over");
         }
 
         public void GameFinishedSend(int bounsWave = 0)
@@ -590,6 +728,15 @@ namespace Framework.Game.Defense
             //waveIdx = monsterSpawner.currentWaveIdx;
         }
 
+        public UnityAction BossDataAction;
+        public void FieldBossWaveStart()
+        {
+            if (gameState == GameState.GAME_OVER) return;
+            gameState = GameState.PLAY;
+            //monsterSpawner.SetFieldBossWaveStart(bossData);
+            BossDataAction?.Invoke();
+        }
+
         public void TutorialWaveStart()
         {
             if (gameState == GameState.GAME_OVER) return;
@@ -597,6 +744,8 @@ namespace Framework.Game.Defense
             monsterSpawner.TutorialExcuteNextWave();
             //waveIdx = monsterSpawner.currentWaveIdx;
         }
+
+        public int testTemp = 0;
 
         public void ChangeBGM(bool isAppocalypseMode)
         {
@@ -628,7 +777,6 @@ namespace Framework.Game.Defense
 
             //Debug.Log("SetPlayRecord Data Reward Value : " + rewardRule.rewardGo);
 
-            //int reqGo = rewardRule.rewardGo * killedMonsterCount;
             int reqGo = rewardRule.rewardGo * monsterSpawner.killedMonsterCount;
             int bossGo = killedBossLevel != 0 ? dic_RewardRules[$"BOSS_{killedBossLevel}"].rewardGo : 0;
             int missionGo = 0;
@@ -699,7 +847,106 @@ namespace Framework.Game.Defense
             onCompleteWave?.Invoke();
             UIManager.Instance.WaveEndSequence();
             InterestPayment();
-            StartCoroutine(WaitForNextWave());
+            if (waveIdx != 0 && waveIdx % 5 == 0 && gameMode == GameMode.BATTLE)
+            {
+                ReachBossWave();
+            }
+            else
+            {
+                countNextWave = WaitForNextWave(WaveStart);
+                StartCoroutine(countNextWave);
+            }
+        }
+
+        /// <summary>
+        /// 보스 웨이브 도달한 유저가 호출
+        /// </summary>
+        public void ReachBossWave()
+        {
+            float[] rewardGroup = new float[]
+            {
+                0.35f,
+                0.43f,
+                0.22f
+            };
+            int rewardGroupIndex = Calculator.GetIndependentTrial(rewardGroup);
+            Debug.Log("rewardGroup Index : " + rewardGroupIndex);
+            NetworkConnect.Instance.networkGameManager.Rpc_ReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex);
+        }
+        public float tempBossAddHealth;
+        public float SetAddBossHealth(int roundId)
+        {
+            tempBossAddHealth = 0;
+            float addHealth = 0;
+            int addRound = roundId - 1 - waveIdx;
+            int tempRoundIdx = waveIdx;
+            if (addRound == 0)
+            {
+                WaveData tempData = monsterSpawner.GetCurrentWaveData();
+                int monsterCount = tempData.appearMonCount - monsterSpawner.killedMonsterCount;
+                float health = tempData.monHealth * monsterCount;
+                addHealth += health;
+            }
+            else
+            {
+                for (int i = 0; i < addRound; i++)
+                {
+                    if (i == 0)
+                    {
+                        WaveData tempData = monsterSpawner.GetCurrentWaveData();
+                        int monsterCount = tempData.appearMonCount - monsterSpawner.killedMonsterCount;
+                        float health = tempData.monHealth * monsterCount;
+                        addHealth += health;
+                    }
+                    else
+                    {
+                        WaveData tempData = monsterSpawner.GetCurrentWaveData(tempRoundIdx);
+                        float health = tempData.appearMonCount * tempData.monHealth;
+                        addHealth += health;
+                    }
+                    tempRoundIdx++;
+                }
+            }
+            tempBossAddHealth = addHealth;
+            return addHealth;
+        }
+        /// <summary>
+        /// 보스 시퀀스 시작
+        /// </summary>
+        public void BossWaveSeqeunce(int roundId, string nickname)
+        {
+            UIManager.Instance.BossWaveItem.gameObject.SetActive(true);
+            Debug.Log("BossWave Sequence wave Idx : " + roundId);
+            float addhealth = SetAddBossHealth(roundId);
+            waveIdx = roundId;
+            monsterSpawner.currentWaveIdx = roundId - 1;
+            monsterSpawner.waveIdx = roundId;
+
+            Debug.Log("AddHealth : " + addhealth);
+            UIManager.Instance.BossWaveItem.Initialize(addhealth);
+            UIManager.Instance.ChangeWaveValue(roundId);
+            waveIdx = roundId;
+            switch (gameState)
+            {
+                case GameState.WAIT:
+                    if (countNextWave != null)
+                    {
+                        StopCoroutine(countNextWave);
+                    }
+                    UIManager.Instance.ActiveTimeCount(false);
+                    monsterSpawner.StartBossWave();
+                    break;
+                case GameState.PLAY:
+                    monsterSpawner.ClearMonster();
+                    UIManager.Instance.WaveEndSequence();
+                    break;
+                case GameState.END:
+                    break;
+                case GameState.WAIT_BOSS_WAVE:
+                    break;
+                case GameState.GAME_OVER:
+                    break;
+            }
         }
 
         public void Damaged()
@@ -714,9 +961,28 @@ namespace Framework.Game.Defense
             }
         }
 
+        public void FieldBossDamage()
+        {
+            GridManager.Instance.FieldBossDamage();
+        }
+
+        public void TileCheck()
+        {
+            // Todo : Execute Tile Check
+            // Game Over or Next Wave
+        }
+        public IEnumerator countNextWave;
+
         public void CountStart()
         {
-            StartCoroutine(WaitForNextWave());
+            countNextWave = WaitForNextWave(WaveStart);
+            StartCoroutine(countNextWave);
+        }
+
+        public void BossWaveCountStart()
+        {
+            countNextWave = WaitForNextWave(FieldBossWaveStart);
+            StartCoroutine(countNextWave);
         }
 
         public void TutorialCountStart()
@@ -755,7 +1021,7 @@ namespace Framework.Game.Defense
             TutorialWaveStart();
         }
 
-        public IEnumerator WaitForNextWave()
+        public IEnumerator WaitForNextWave(UnityAction action)
         {
             UIManager.Instance.ActiveTimeCount(true);
 
@@ -783,7 +1049,7 @@ namespace Framework.Game.Defense
             }
             UIManager.Instance.ActiveTimeCount(false);
 
-            WaveStart();
+            action?.Invoke();
         }
 
         private IEnumerator WaitOpenPausePopup()

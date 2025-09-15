@@ -7,6 +7,10 @@ using Framework.Network;
 using Framework.Util;
 using Spine.Unity;
 using UnityEngine;
+using UniRx.Triggers;
+using UniRx;
+using DG.Tweening;
+using Cysharp.Threading.Tasks.Triggers;
 
 namespace Framework.Game.Defense
 {
@@ -92,7 +96,13 @@ namespace Framework.Game.Defense
         {
             currentWaveIdx = 0;
             //string waveData = "WaveData";
-            string waveData = UserInfoManager.Instance.userState.finishedTutorial ? "WaveData" : "WaveData1";
+            string waveData = GameManager.Instance.gameMode switch
+            {
+                GameMode.SINGLE => "WaveData",
+                GameMode.BATTLE => "WaveData",
+                GameMode.TUTORIAL => "WaveData1",
+                _ => "WaveData",
+            };
             infiniteData = await DataLoadManager.Instance.GetDataAsyncBinary<InfiniteData>(waveData);
 
             bossData = await DataLoadManager.Instance.GetDataAsyncBinary<BossMonsterData>("BossMonsterData");
@@ -120,14 +130,43 @@ namespace Framework.Game.Defense
             this.monsterPath = monsterPath;
         }
 
+        public IEnumerator spawnMonster;
+
         public void ExecuteNextWave()
         {
-            StartCoroutine(SetMonsterStart());
+            spawnMonster = SetMonsterStart();
+            StartCoroutine(spawnMonster);
         }
 
         public void TutorialExcuteNextWave()
         {
             StartCoroutine(TutorialSetMonsterStart());
+        }
+
+        public void StartBossWave()
+        {
+            switch (GameManager.Instance.gameState)
+            {
+                case GameState.WAIT:
+                    if (spawnMonster != null)
+                    {
+                        StopCoroutine(spawnMonster);
+                    }
+                    break;
+                case GameState.PLAY:
+                    for (int i = 0; i < monsters.Count; i++)
+                    {
+                    }
+                    break;
+                case GameState.END:
+                    break;
+                case GameState.WAIT_BOSS_WAVE:
+                    break;
+                case GameState.GAME_OVER:
+                    break;
+                default:
+                    break;
+            }
         }
 
         public void SummonBoss()
@@ -142,6 +181,7 @@ namespace Framework.Game.Defense
             BossMonster data = bossData.bossMonsters[bossIdx];
 
             NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
+            normalBossMonster.monsterType = MonsterType.BOSS_MONSTER;
             normalBossMonster.isBoss = true;
             normalBossMonster.waveIndex = bossIdx + 1;
             normalBossMonster.transform.name = "NormalBoss";
@@ -149,6 +189,23 @@ namespace Framework.Game.Defense
             normalBossMonster.health = 500;
             normalBossMonster.SetBossMove();
             monsters.Add(normalBossMonster);
+        }
+
+        public void SetFieldBossWaveStart(BossData bossData)
+        {
+            Monster monster = bossData.bossIndex switch
+            {
+                FieldBossMonster.TRUSH => GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105"),
+                FieldBossMonster.SMOKER => GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101"),
+                // FieldBossMonster.SOTTY => GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3"),
+                // FieldBossMonster.LOCKY => GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4"),
+                // FieldBossMonster.PARASITE => GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5"),
+                FieldBossMonster.BOOMBER => GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6"),
+                FieldBossMonster.EMBEREON => throw new System.NotImplementedException(),
+                _ => throw new System.NotImplementedException(),
+            };
+            monster.FieldBossInitialize(bossData);
+            monsters.Add(monster);
         }
 
         public void SetBossMonsterStart()
@@ -166,6 +223,7 @@ namespace Framework.Game.Defense
             {
                 case 101:
                     CarBossMonster carBossMonster = GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101");
+                    carBossMonster.monsterType = MonsterType.BOSS_MONSTER;
                     carBossMonster.isBoss = true;
                     carBossMonster.waveIndex = bossIdx + 1;
                     carBossMonster.transform.name = "CarBoss";
@@ -179,6 +237,7 @@ namespace Framework.Game.Defense
                     break;
                 case 105:
                     NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
+                    normalBossMonster.monsterType = MonsterType.BOSS_MONSTER;
                     normalBossMonster.isBoss = true;
                     normalBossMonster.waveIndex = bossIdx + 1;
                     normalBossMonster.transform.name = "NormalBoss";
@@ -296,6 +355,20 @@ namespace Framework.Game.Defense
             }
         }
 
+        public WaveData GetCurrentWaveData()
+        {
+            WaveData waveData = currentWaveIdx >= infiniteData.waveDatas.Length ? infiniteData.waveDatas[^1] : infiniteData.waveDatas[currentWaveIdx];
+
+            return waveData;
+        }
+
+        public WaveData GetCurrentWaveData(int waveIdx)
+        {
+            WaveData waveData = waveIdx >= infiniteData.waveDatas.Length ? infiniteData.waveDatas[^1] : infiniteData.waveDatas[waveIdx];
+            //Debug.Log("current Wave idx : " + waveData.index);
+            return waveData;
+        }
+
         public IEnumerator SetMonsterStart()
         {
             IsGameOver = true;
@@ -379,11 +452,39 @@ namespace Framework.Game.Defense
             }
             else
             {
-                GameManager.Instance.SetPlayRecordData(killedBossLevel, currentWaveIdx);
-                killedBossLevel = 0;
+                switch (GameManager.Instance.gameMode)
+                {
+                    case GameMode.SINGLE:
+                        GameManager.Instance.SetPlayRecordData(killedBossLevel, currentWaveIdx);
+                        killedMonsterCount = 0;
+                        killedBossLevel = 0;
+                        GameManager.Instance.WaveEnd();
+                        isWaveStart = false;
+                        break;
+                    case GameMode.BATTLE:
+                        GameManager.Instance.SetPlayRecordData(killedBossLevel, currentWaveIdx);
+                        killedMonsterCount = 0;
+                        killedBossLevel = 0;
+                        GameManager.Instance.WaveEnd();
+                        isWaveStart = false;
+                        break;
+                }
+            }
+        }
 
-                GameManager.Instance.WaveEnd();
-                isWaveStart = false;
+        public void ClearMonster()
+        {
+            if (spawnMonster != null)
+            {
+                StopCoroutine(spawnMonster);
+            }
+
+            for (int i = 0; i < monsters.Count; i++)
+            {
+                if (monsters[i].monsterType == MonsterType.WAVE_MONSTER)
+                {
+                    StartCoroutine(monsters[i].EnterBossSequenceAsync());
+                }
             }
         }
 
@@ -409,12 +510,20 @@ namespace Framework.Game.Defense
                             if (currentWaveIdx >= infiniteData.waveDatas.Length)
                             {
                                 UIManager.Instance.ChangeWaveValue(currentWaveIdx + 1);
+                                if (GameManager.Instance.gameMode == GameMode.BATTLE)
+                                {
+                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1);
+                                }
                                 GameManager.Instance.waveIdx = currentWaveIdx + 1;
                             }
                             else
                             {
                                 int idx = infiniteData.waveDatas[currentWaveIdx].wave;
                                 UIManager.Instance.ChangeWaveValue(idx);
+                                if (GameManager.Instance.gameMode == GameMode.BATTLE)
+                                {
+                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, idx);
+                                }
                                 GameManager.Instance.waveIdx = idx;
                             }
                             WaveEnd();
@@ -430,6 +539,23 @@ namespace Framework.Game.Defense
                     {
                         TutorialManager.Instance.nextSequence?.Invoke();
                     }
+                    break;
+                case MonsterType.FIELD_BOSS_MONSTER:
+                    Debug.Log("at monsterSpawner wave Idx : " + currentWaveIdx);
+                    currentWaveIdx++;
+                    if (currentWaveIdx >= infiniteData.waveDatas.Length)
+                    {
+                        //UIManager.Instance.ChangeWaveValue(currentWaveIdx + 1);
+                        GameManager.Instance.waveIdx = currentWaveIdx + 1;
+                    }
+                    else
+                    {
+                        int idx = infiniteData.waveDatas[currentWaveIdx].wave;
+                        //UIManager.Instance.ChangeWaveValue(idx);
+                        GameManager.Instance.waveIdx = idx;
+                    }
+                    monsters.Remove(monster);
+                    //Debug.Log("Field Boss!!!");
                     break;
             }
         }
