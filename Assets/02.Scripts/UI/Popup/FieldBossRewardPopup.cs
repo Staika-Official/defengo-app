@@ -59,14 +59,15 @@ namespace Framework.UI
 
             openAnimation.Play();
 
+            refreshCount = ConfigData.BATTLE_REWARD_REFRESH_COUNT;
+            text_Refresh.text = $"{LanguageManager.Instance.GetStringData("UI_Refresh")} {refreshCount}";
+            button_refresh.SetInterectible(refreshCount > 0);
+
             StartCoroutine(SetCountDown());
         }
 
         public async void SetRewardItem()
         {
-            if (refreshCount <= 0)
-                return;
-            refreshCount--;
             text_Refresh.text = $"{refreshCount}";
             button_refresh.SetInterectible(refreshCount > 0);
             fieldBossRewardGroupData = await DataLoadManager.Instance.GetDataAsyncBinary<FieldBossRewardGroupData>("FieldBossRewardGroupData");
@@ -106,7 +107,7 @@ namespace Framework.UI
         public override void Initialize()
         {
             refreshCount = ConfigData.BATTLE_REWARD_REFRESH_COUNT;
-            text_Refresh.text = $"{refreshCount}";
+            text_Refresh.text = $"{LanguageManager.Instance.GetStringData("UI_Refresh")} {refreshCount}";
             button_refresh.SetInterectible(refreshCount > 0);
 
             button_refresh.onPointerUp = Onclick_Refresh;
@@ -124,6 +125,9 @@ namespace Framework.UI
 
         public void Onclick_Refresh()
         {
+            if (refreshCount <= 0)
+                return;
+            refreshCount--;
             SetRewardItem();
         }
 

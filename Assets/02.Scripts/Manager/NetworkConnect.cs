@@ -49,6 +49,15 @@ namespace Framework.Network
 
         public MyBattleLeaderboardInfo myCurrentRank;
 
+        public bool IsCurrentHost()
+        {
+            // 1. If I was already host, I’m still host
+            if (isHost)
+                return true;
+
+            return false;
+        }
+
         void Awake()
         {
             if (Instance == null)

@@ -232,7 +232,7 @@ namespace Framework.Game.Defense
             UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
             buffManager.Initialize();
             renderSortManager.Initialized();
-            NetworkConnect.Instance.networkGameManager.RpcInitializeComplete(NetworkConnect.Instance.playerIdx);
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestInitializeComplete(NetworkConnect.Instance.playerIdx);
         }
 
         public void Initialize()
@@ -691,7 +691,7 @@ namespace Framework.Game.Defense
             if (!NetworkConnect.Instance.isFriendlyMatch)
                 CallEndBattle(payload);
             else
-                NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx);
 
             //Sort
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
@@ -715,7 +715,7 @@ namespace Framework.Game.Defense
         {
             await NetworkManager.Instance.EndBattle(payload, () =>
             {
-                NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx);
             }, () =>
             {
                 CallEndBattle(payload);
@@ -961,7 +961,7 @@ namespace Framework.Game.Defense
             Debug.Log("rewardGroup Index : " + rewardGroupIndex);
             var TempbossList = UIManager.Instance.bossSelectPopup.TempbossList;
             int randomIdx = Random.Range(0, TempbossList.Length);
-            NetworkConnect.Instance.networkGameManager.Rpc_ReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
         }
         public float tempBossAddHealth;
         public float SetAddBossHealth(int roundId)

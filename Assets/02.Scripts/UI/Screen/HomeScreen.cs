@@ -230,6 +230,7 @@ namespace Framework.UI
 
         public IEnumerator StartGameSequence(UnityAction unityAction)
         {
+            Debug.Log($"{gameObject.name} StartGame Sequence");
             anim_Transition.gameObject.SetActive(true);
             anim_Transition.Play();
 
@@ -253,6 +254,7 @@ namespace Framework.UI
         {
             if (show)
             {
+                Debug.Log($"{gameObject.name} Show transition only");
                 anim_Transition.gameObject.SetActive(true);
                 anim_Transition.Play();
 

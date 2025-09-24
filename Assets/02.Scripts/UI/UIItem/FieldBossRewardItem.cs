@@ -52,6 +52,8 @@ namespace Framework.UI
         public void Initialize(FieldBossRewardData data)
         {
             fieldBossBuffType = (FieldBossBuffType)data.buff_type;
+            selected = false;
+            
             image_grayStar.gameObject.SetActive(false);
             image_fiveStar.gameObject.SetActive(false);
             image_buffIcon.gameObject.SetActive(false);
@@ -240,7 +242,7 @@ namespace Framework.UI
             Debug.Log("Onclick Select Reward Type : " + fieldBossBuffType);
             selected = true;
             SelectAction?.Invoke();
-            NetworkConnect.Instance.networkGameManager.Rpc_SelectdFieldBossReward(NetworkConnect.Instance.playerIdx);
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestSelectFieldBossReward(NetworkConnect.Instance.playerIdx);
             clickAnimation.Play();
         }
 

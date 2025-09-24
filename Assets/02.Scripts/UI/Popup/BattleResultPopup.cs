@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Framework.Game.Defense;
+using Framework.Network;
 
 namespace Framework.UI
 {
@@ -16,6 +17,7 @@ namespace Framework.UI
 
         public void SetResultInfo(int rank, int wave, int monsterKilled)
         {
+            NetworkConnect.Instance.networkGameManager.rank = rank;
             text_rank.text = $"{rank}";
             text_wave.text = $"{wave}";
             text_monsterKilled.text = $"{monsterKilled}";
