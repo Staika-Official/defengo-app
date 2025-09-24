@@ -15,6 +15,7 @@ namespace Framework.UI
         public static LobbyManager Instance;
         public ScreenTemplate[] lobbyScreens;
         public TextMeshProUGUI text_Nickname;
+        public TextMeshProUGUI text_RankTier;
         public TextMeshProUGUI text_Energy;
         public TextMeshProUGUI text_Gem;
         public TextMeshProUGUI text_Taika;
@@ -176,6 +177,7 @@ namespace Framework.UI
         public void Initialize()
         {
             GetEnergyValue();
+            GetMyBattleRank();
 
             if (UserInfoManager.Instance.userState.equippedProfileId == 0)
             {
@@ -253,7 +255,7 @@ namespace Framework.UI
             //toastMessage.Initialize();
 
             //testCode
-            //UserInfoManager.Instance.userState.finishedTutorial = false; 
+            // UserInfoManager.Instance.userState.finishedTutorial = false; 
             //bool isUserTutorial = true;
 
             bool isUserTutorial = !UserInfoManager.Instance.userState.finishedTutorial;
@@ -322,6 +324,14 @@ namespace Framework.UI
         public void GetEnergyValue()
         {
             NetworkManager.Instance.GetEnergyValue(SuccessData, FailedData);
+        }
+
+        public async void GetMyBattleRank()
+        {
+            await NetworkManager.Instance.GetMyBattleLeaderboard((data) =>
+            {
+                text_RankTier.text = DataManager.Instance.GetRankTierConfig(data.finalRank).description;
+            }, null);
         }
 
         public void SuccessData(ResponeUserPlay data)

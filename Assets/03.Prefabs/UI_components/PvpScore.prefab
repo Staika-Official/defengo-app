@@ -31,7 +31,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2407559746930311092}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -145,6 +144,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2407559746930311092}
   - component: {fileID: 2074561636086299341}
+  - component: {fileID: 6788131512868823691}
   m_Layer: 5
   m_Name: PvpScore
   m_TagString: Untagged
@@ -167,7 +167,6 @@ RectTransform:
   - {fileID: 4229772591346386996}
   - {fileID: 2996230480032925892}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -186,6 +185,20 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &6788131512868823691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4395004419343035520}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bead2481ea461446937286183348064, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text_Reason: {fileID: 8348117736864119363}
+  text_Score: {fileID: 7283142028322799909}
 --- !u!1 &7548027491900928484
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,7 +230,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2407559746930311092}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}

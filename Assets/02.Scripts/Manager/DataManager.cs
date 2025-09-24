@@ -58,6 +58,8 @@ namespace Framework.GameData.Defense
         public List<LimitedShopCeilingTableData> LimitedShopCeilingTableDataList;
         public List<RewardTableData> RewardTableDataList;
         public Dictionary<string, List<int>> RouletteTableData = new();
+        public Dictionary<int, RankTierConfig> rankTierConfigs = new();
+        public BattleConfig battleConfig = new BattleConfig();
 
         private void Start()
         {
@@ -152,7 +154,7 @@ namespace Framework.GameData.Defense
                     data.characterQuantity = 0;
 
                     //character skin
-                    
+
                 }
 
                 await GetCharacterFromServer();
@@ -226,7 +228,7 @@ namespace Framework.GameData.Defense
                 }
                 return true;
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 Debug.LogError($"Error fetching character data: {e.Message}");
                 return false;
@@ -248,6 +250,22 @@ namespace Framework.GameData.Defense
                     RouletteTableData[kvp.Key] = kvp.Value;
 
             //Debug.Log($"RouletTable {RouletteTableData}");
+        }
+
+        public async void LoadRankTierConfig()
+        {
+            await NetworkManager.Instance.GetRankTierConfig((config) =>
+            {
+                foreach (var c in config)
+                    rankTierConfigs.Add(c.id, c);
+            });
+        }
+        public RankTierConfig GetRankTierConfig(int rankId)
+        {
+            if (rankTierConfigs.ContainsKey(rankId))
+                return rankTierConfigs[rankId];
+            else
+                return rankTierConfigs[rankTierConfigs.Keys.ToList()[0]];
         }
     }
 }

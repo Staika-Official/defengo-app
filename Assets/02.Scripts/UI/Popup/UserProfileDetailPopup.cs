@@ -9,6 +9,7 @@ using Framework.Network;
 using System;
 using DG.Tweening;
 using UnityEngine.Localization.Components;
+using Framework.Util;
 
 namespace Framework.UI
 {
@@ -199,7 +200,12 @@ namespace Framework.UI
             text_bestBossLevel.text = data.bestBossLevel == 0 ? "-" : $"Lv.{data.bestBossLevel}";
             text_bestScore.text = RankInfo(data.bestScore);
 
-            if (data.bestCharacter.Length != 0)
+            if (data.bestCharacter == null || data.bestCharacter.Length == 0)
+            {
+                objectFriendlyCharacter.SetActive(false);
+                objectNullFriendlyCharacter.SetActive(true);
+            }
+            else
             {
                 objectFriendlyCharacter.SetActive(true);
                 objectNullFriendlyCharacter.SetActive(false);
@@ -210,11 +216,6 @@ namespace Framework.UI
                     characterCards[i].Initialize(characterData);
                     characterCards[i].text_Level.text = $"Lv.{data.bestCharacter[i].classLevel}";
                 }
-            }
-            else
-            {
-                objectFriendlyCharacter.SetActive(false);
-                objectNullFriendlyCharacter.SetActive(true);
             }
         }
 
@@ -242,6 +243,8 @@ namespace Framework.UI
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
                 await NetworkManager.Instance.SendFriendRequest(friendItem.friendData.userId, () =>
                 {
+                    SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
                     button_AddFriend.gameObject.SetActive(false);
                     friendItem.gameObject.SetActive(false);
                 }, null);

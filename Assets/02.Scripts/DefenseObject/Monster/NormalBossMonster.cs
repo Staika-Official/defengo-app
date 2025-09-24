@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Framework.Util;
+using Framework.GameData.Defense;
 
 namespace Framework.Game.Defense
 {
@@ -33,6 +34,16 @@ namespace Framework.Game.Defense
             IsAlive = false;
             GameManager.Instance.monsterSpawner.RemoveMonster(this);
             GameManager.Instance.objectPoolManager.ReturnObject(this, "Boss_105");
+        }
+
+        public override void FieldBossInitialize(BossData bossData)
+        {
+            monsterType = MonsterType.FIELD_BOSS_MONSTER;
+            isBoss = true;
+            transform.name = "Trush";
+            speed = bossData.monsterSpeed;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            SetBossMove();
         }
     }
 }

@@ -31,10 +31,18 @@ namespace Framework.UI
         public Transform recommendParent;
         public FriendItem recommendFriendItem;
 
+        bool isBattleInvite = false;
+
         public override void ActivePopup()
         {
             PopUpSequence(true);
 
+            input_UID.text = "";
+        }
+
+        public void Show(bool isBattleInvite)
+        {
+            this.isBattleInvite = isBattleInvite;
             LoadData();
         }
 
@@ -85,21 +93,35 @@ namespace Framework.UI
                 Destroy(child.gameObject);
             }
             await NetworkManager.Instance.GetListFriends(SuccessGetListFriend, FailedGetListFriend);
-            await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
+            if (!isBattleInvite)
+                await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
         }
 
         async void OnClickButtonSearch()
         {
-            await NetworkManager.Instance.SearchFriends(input_UID.text, (ReqSearchFriendsData data) =>
+            if (!isBattleInvite)
             {
-                searchFriendItem.transform.parent.gameObject.SetActive(true);
-                searchFriendItem.gameObject.SetActive(true);
-                searchFriendItem.SetFriendData(data);
-            }, (string err) =>
+                await NetworkManager.Instance.SearchFriends(input_UID.text, (ReqSearchFriendsData data) =>
+                {
+                    searchFriendItem.transform.parent.gameObject.SetActive(true);
+                    searchFriendItem.gameObject.SetActive(true);
+                    searchFriendItem.SetFriendData(data);
+                }, (string err) =>
+                {
+                    SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Invalid_UID"));
+                });
+            }
+            else
             {
-                SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
-                popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Invalid_UID"));
-            });
+                var friend = friendDatas.Find(x => x.userId == input_UID.text);
+                if (friend != null)
+                {
+                    searchFriendItem.transform.parent.gameObject.SetActive(true);
+                    searchFriendItem.gameObject.SetActive(true);
+                    searchFriendItem.SetFriendData(friend, true, isBattleInvite);
+                }
+            }
         }
 
         void SuccessGetListFriend(ReqListFriendsData data)
@@ -113,7 +135,7 @@ namespace Framework.UI
             {
                 FriendItem itm = Instantiate(friendItem, scrollFriends.content);
                 itm.gameObject.SetActive(true);
-                itm.SetFriendData(friend, true);
+                itm.SetFriendData(friend, true, isBattleInvite);
             }
         }
         void FailedGetListFriend(string error)
@@ -128,7 +150,7 @@ namespace Framework.UI
             {
                 FriendItem itm = Instantiate(recommendFriendItem, recommendParent);
                 itm.gameObject.SetActive(true);
-                itm.SetFriendData(recommend, false);
+                itm.SetFriendData(recommend, false, isBattleInvite);
             }
         }
         void FailedGetRecommendedFriends(string error)

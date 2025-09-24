@@ -111,7 +111,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -15.900024, y: -14.620209}
-  m_SizeDelta: {x: 22, y: 0}
+  m_SizeDelta: {x: 22, y: 23.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &265411166389445865
 CanvasRenderer:
@@ -523,7 +523,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4271466704470584955
 RectTransform:
   m_ObjectHideFlags: 0
@@ -838,7 +838,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uB9E4\uCE6D \uC911..."
+  m_text: Matching...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: -901028585359562673, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
@@ -1503,6 +1503,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6003281971221307708}
     m_Modifications:
+    - target: {fileID: 2982937575079070910, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3537847943556003424, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1616,6 +1620,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6003281971221307708}
     m_Modifications:
+    - target: {fileID: 2982937575079070910, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3537847943556003424, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1729,6 +1737,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6003281971221307708}
     m_Modifications:
+    - target: {fileID: 2982937575079070910, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3537847943556003424, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2068,6 +2080,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6003281971221307708}
     m_Modifications:
+    - target: {fileID: 2982937575079070910, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3537847943556003424, guid: 5a492ffdd9a7c274489d33f0e1ed63ef, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

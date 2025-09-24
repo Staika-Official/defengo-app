@@ -138,6 +138,7 @@ namespace Framework.UI
 
         public void GamePlayTutorial()
         {
+            HomeScreen.Instance.button_NetworkPlay.transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = false;
             HomeScreen.Instance.button_Play.transform.SetParent(tutorialPivot);
             //nextSequence = null;
 
@@ -440,7 +441,7 @@ namespace Framework.UI
             //인게임
             //UIManager.Instance.GameOver();
             LobbyManager.Instance.GetEnergyValue();
-            
+
             Debug.Log("Finish");
         }
 

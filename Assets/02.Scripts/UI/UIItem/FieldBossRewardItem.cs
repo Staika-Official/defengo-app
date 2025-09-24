@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using Framework.GameData.Defense;
 using UnityEngine.Events;
 using Newtonsoft.Json;
+using Framework.Network;
 
 namespace Framework.UI
 {
@@ -38,6 +39,8 @@ namespace Framework.UI
         public FieldBossBuffType fieldBossBuffType;
         public UnityAction SelectAction;
 
+        bool selected = false;
+
         private void Start()
         {
             button_selcectReward.onClick.AddListener(() =>
@@ -60,7 +63,8 @@ namespace Framework.UI
                 images_stars[i].gameObject.SetActive(false);
             }
 
-            bool isCharacterType = data.buff_type == 0;
+            bool isCharacterType = data.buff_type == 0 || data.buff_type == 10;
+            selected = false;
 
             SetColor(isCharacterType);
 
@@ -68,6 +72,7 @@ namespace Framework.UI
             {
                 image_characterIcon.gameObject.SetActive(true);
                 int starGrade = (int)data.value_1;
+                if (starGrade > 5) starGrade = 5;
 
                 if (starGrade == 0)
                 {
@@ -89,15 +94,16 @@ namespace Framework.UI
                     image_fiveStar.gameObject.SetActive(false);
                     for (int i = 0; i < starGrade; i++)
                     {
-                        images_stars[i].gameObject.SetActive(true);
+                        if (i < images_stars.Length)
+                            images_stars[i].gameObject.SetActive(true);
                     }
                 }
 
                 int characterDecIdx = UnityEngine.Random.Range(0, 5);
                 DecData decData = GameManager.Instance.characterSpawner.currentDecData[characterDecIdx];
                 image_characterIcon.sprite = DataManager.Instance.dic_CharacterData[decData.characterIndex].sprite_ChracterPortrait;
-                text_itemName.text = "Summon Character";
-                text_description.text = "Summon Character";
+                text_itemName.text = LanguageManager.Instance.GetStringData("UI_Fieldboss_Reward_Character_Title");
+                text_description.text = LanguageManager.Instance.GetStringData("UI_Fieldboss_Reward_Character_Title");
 
                 SelectAction = () =>
                 {
@@ -113,8 +119,8 @@ namespace Framework.UI
                 image_itemIcon.sprite = fieldBossRewardIcon.sprite_itemIcon;
                 image_buffIcon.sprite = fieldBossRewardIcon.sprite_buffIcon;
 
-                text_itemName.text = data.title;
-                text_description.text = string.Format(data.desc, data.value_1, data.value_2, data.value_3);
+                text_description.text = LanguageManager.Instance.GetStringData("UI_Fieldboss_Reward_Buff_Title");
+                string desc = LanguageManager.Instance.GetStringData($"UI_Fieldboss_Reward_Buff_{(int)fieldBossBuffType}");
 
                 switch (fieldBossBuffType)
                 {
@@ -123,71 +129,93 @@ namespace Framework.UI
                         {
                             GameManager.Instance.ChangeGem((int)data.value_1);
                         };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.DECREASE_RELOCATION_COST:
                         SelectAction = () =>
                         {
                             GameManager.Instance.DecreaseRelocationCost(data.value_1);
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_ATTACK_DAMAGE_ALL:
                         SelectAction = () =>
                         {
-                            foreach (var character in GameManager.Instance.characterSpawner.summonedCharacters)
-                            {
-                                character.AttackValueBuff(true, data.value_1);
-                            }
+                            GameManager.Instance.attackAllBuffValue += data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_ATTACK_DAMAGE_LESS_RANGE:
                         SelectAction = () =>
                         {
-                            foreach (var character in GameManager.Instance.characterSpawner.summonedCharacters)
-                            {
-                                if (character.attackRange <= data.value_1)
-                                    character.AttackValueBuff(true, data.value_2);
-                            }
+                            GameManager.Instance.attackRangeLessBuffValue += data.value_2;
+                            GameManager.Instance.attackRangeLessBuffTrigger = data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2 * 10, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_ATTACK_DAMAGE_MORE_RANGE:
                         SelectAction = () =>
                         {
-                            foreach (var character in GameManager.Instance.characterSpawner.summonedCharacters)
-                            {
-                                if (character.attackRange >= data.value_1)
-                                    character.AttackValueBuff(true, data.value_2);
-                            }
+                            GameManager.Instance.attackRangeMoreBuffValue += data.value_2;
+                            GameManager.Instance.attackRangeMoreBuffTrigger = data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2 * 10, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_MISSION_REWARD:
                         SelectAction = () =>
                         {
                             GameManager.Instance.missionRewardBuffValue += data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.DECREASE_BOSS_COOLTIME:
                         SelectAction = () =>
                         {
                             UIManager.Instance.bossCoolTimeBuffValue += data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_BOSS_REWARD:
                         SelectAction = () =>
                         {
                             GameManager.Instance.bossRewardBuffValue += data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
+                        break;
+                    case FieldBossBuffType.INCREASE_ATTACK_SPEED_ALL:
+                        SelectAction = () =>
+                        {
+                            GameManager.Instance.attackSpeedBuffValue += data.value_1;
+                        };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.DECREASE_UPGRADE_COST:
                         SelectAction = () =>
                         {
-                            GameManager.Instance.upgradeCostBuffValue += data.value_1;
+                            GameManager.Instance.BuffUpgradeCost(data.value_1);
                         };
+                        text_itemName.text = string.Format(desc, data.value_1 * 10, data.value_2, data.value_3);
                         break;
                     case FieldBossBuffType.INCREASE_MONSTER_REWARD:
                         SelectAction = () =>
                         {
                             GameManager.Instance.monsterRewardBuffValue += data.value_1;
                         };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2, data.value_3);
+                        break;
+                    case FieldBossBuffType.DECREASE_SUMMON_PRICE:
+                        SelectAction = () =>
+                        {
+                            GameManager.Instance.BuffSummonCost((int)data.value_1);
+                        };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2, data.value_3);
+                        break;
+                    case FieldBossBuffType.INCREASE_ATTACK_RANGE_ALL:
+                        SelectAction = () =>
+                        {
+                            GameManager.Instance.attackRangeBuffValue += data.value_1;
+                        };
+                        text_itemName.text = string.Format(desc, data.value_1, data.value_2, data.value_3);
                         break;
                 }
             }
@@ -207,9 +235,12 @@ namespace Framework.UI
 
         public void OnClick_SelectReward(FieldBossBuffType fieldBossBuffType)
         {
+            if (selected)
+                return;
             Debug.Log("Onclick Select Reward Type : " + fieldBossBuffType);
-
+            selected = true;
             SelectAction?.Invoke();
+            NetworkConnect.Instance.networkGameManager.Rpc_SelectdFieldBossReward(NetworkConnect.Instance.playerIdx);
             clickAnimation.Play();
         }
 

@@ -467,6 +467,16 @@ namespace Framework.Game.Defense
             float damage = calcStarGradeAttackDamage + calcUpgradeAttackDamage;
 
             totalDamage = damage + getAttackBuffValue;
+
+            if (attackRange < GameManager.Instance.attackRangeLessBuffTrigger)
+            {
+                totalDamage *= GameManager.Instance.attackRangeLessBuffValue;
+            }
+            if (attackRange >= GameManager.Instance.attackRangeMoreBuffTrigger)
+            {
+                totalDamage *= GameManager.Instance.attackRangeMoreBuffValue;
+            }
+            totalDamage *= GameManager.Instance.attackAllBuffValue;
         }
 
         //파티클 버프를 추가시켜줄 함수 (함수 의도 : 버프파티클을 소지한 캐릭터를 찾고 반환하기 위한 작업)
@@ -665,7 +675,7 @@ namespace Framework.Game.Defense
                 float dis = Calculator.DistanceCheck(currentGridPos - monPos);
 
                 //몬스터와의 거리가 사거리보다 길다면 타겟 몬스터 제외 
-                if (dis > attackRange)
+                if (dis > (attackRange + GameManager.Instance.attackRangeBuffValue))
                 {
                     targetedMonster.Remove(targetedMonster[i]);
                 }
@@ -684,7 +694,7 @@ namespace Framework.Game.Defense
                 Vector2 monPos = Calculator.TransformationVector(monster.prevPositionIdx);
 
                 float dis = Calculator.DistanceCheck(currentGridPos - monPos);
-                if (dis <= attackRange)
+                if (dis <= (attackRange + GameManager.Instance.attackRangeBuffValue))
                 {
                     bool isThing = true;
 
@@ -760,6 +770,7 @@ namespace Framework.Game.Defense
                 }
                 //스피드버프 벨류가 0이아니라면 어택스피드 * 스피드버프 벨류 곱하기 하고 아니라면 그냥 어택스피드
                 float duration = speedBuffValue != 0 ? attackSpeed * speedBuffValue : attackSpeed;
+                duration *= GameManager.Instance.attackSpeedBuffValue;
 
                 //1초 시간의 0.초 단위로 구분해줌
                 temp = 1 / duration;

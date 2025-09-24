@@ -52,5 +52,15 @@ namespace Framework.Game.Defense
             GameManager.Instance.monsterSpawner.RemoveMonster(this);
             GameManager.Instance.objectPoolManager.ReturnObject(this, "Boss_101");
         }
+
+        public override void FieldBossInitialize(BossData bossData)
+        {
+            monsterType = MonsterType.FIELD_BOSS_MONSTER;
+            isBoss = true;
+            transform.name = "Smoker";
+            speed = bossData.monsterSpeed;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            SetBossMove();
+        }
     }
 }

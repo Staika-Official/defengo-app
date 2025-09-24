@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 using Framework.Util;
 using System.Linq;
 using Framework.Game.Defense;
+using System.Threading.Tasks;
+using Random = UnityEngine.Random;
 
 namespace Framework.Network
 {
@@ -31,13 +33,23 @@ namespace Framework.Network
         public NetworkBattleStatus networkBattleStatus;
         public int playerIdx;
         public string nickname;
-        public int playerCount = 1;
+        public int minPlayerCount = 2;
+        public int maxPlayerCount = 3;
+        public bool isFriendlyMatch;
+        public string roomName = "";
+        public string roomPassword = "";
+        public int playId;
+        public string roomUuid;
+        public int sessionId;
+        public string userId;
 
         [Header("References")]
         public GameObject networkObjectPrefab;
         public NetworkGameManager networkGameManager;
 
-        private void Start()
+        public MyBattleLeaderboardInfo myCurrentRank;
+
+        void Awake()
         {
             if (Instance == null)
             {
@@ -64,16 +76,21 @@ namespace Framework.Network
         /// <summary>
         /// Connects to the shared lobby to list/join/create sessions.
         /// </summary>
-        public async void ConnectToLobby()
+        public async void ConnectToLobby(bool isFriendlyMatch, string roomName = "", string roomPassword = "")
         {
-            Debug.Log("[NetworkConnect] Connecting to lobby...");
+            this.isFriendlyMatch = isFriendlyMatch;
+            this.roomName = roomName;
+            this.roomPassword = roomPassword;
+
+            Debug.Log($"[NetworkConnect] Connecting to lobby... ~ Is Friendly Match: {isFriendlyMatch}");
 
             if (runner == null)
             {
                 runner = gameObject.AddComponent<NetworkRunner>();
                 Debug.Log("[NetworkConnect] NetworkRunner component added.");
             }
-
+            await Task.Delay(Random.Range(0, 1000));
+            await NetworkManager.Instance.GetMyBattleLeaderboard((myRank) => myCurrentRank = myRank, (myRank) => myCurrentRank = myRank);
             await runner.JoinSessionLobby(SessionLobby.Shared);
             Debug.Log("[NetworkConnect] Connected to session lobby.");
         }
@@ -94,23 +111,64 @@ namespace Framework.Network
 
             var result = await runner.StartGame(new StartGameArgs()
             {
-                GameMode = Fusion.GameMode.Shared,
+                GameMode = Fusion.GameMode.AutoHostOrClient,
                 SessionName = sessionName,
             });
 
             if (result.Ok)
             {
                 Debug.Log("[NetworkConnect] Successfully joined session.");
-                // MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                // popup.ActivePopup();
+                roomUuid = runner.SessionInfo.Name;
                 networkBattleStatus = NetworkBattleStatus.LOBBY;
+                await NetworkManager.Instance.ReadyForBattle(new ReadyBattlePayload(roomUuid, UserInfoManager.Instance.userId), (response) =>
+                {
+                    sessionId = response.sessionId;
+                }, null);
             }
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
-                MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                popup.InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
             }
+            StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
+        }
+
+        /// <summary>
+        /// Joins an existing friendly session by name & password.
+        /// </summary>
+        public async void JoinFriendlySession(string sessionName)
+        {
+            isHost = false;
+            Debug.Log($"[NetworkConnect] Joining friendly session: {sessionName}");
+
+            if (runner == null)
+                runner = gameObject.AddComponent<NetworkRunner>();
+
+            runner.ProvideInput = true;
+            runner.AddCallbacks(this);
+
+            var result = await runner.StartGame(new StartGameArgs()
+            {
+                GameMode = Fusion.GameMode.AutoHostOrClient,
+                SessionName = sessionName,
+            });
+
+            if (result.Ok)
+            {
+                Debug.Log("[NetworkConnect] Successfully joined session.");
+                roomUuid = runner.SessionInfo.Name;
+                networkBattleStatus = NetworkBattleStatus.LOBBY;
+                // await NetworkManager.Instance.ReadyForBattle(new ReadyBattlePayload(roomUuid, UserInfoManager.Instance.userId), (response) =>
+                // {
+                //     sessionId = response.sessionId;
+                // }, null);
+            }
+            else
+            {
+                Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+            }
+            StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
 
         /// <summary>
@@ -135,31 +193,90 @@ namespace Framework.Network
 
             var result = await runner.StartGame(new StartGameArgs()
             {
-                GameMode = Fusion.GameMode.Shared,
-                PlayerCount = playerCount,
+                GameMode = Fusion.GameMode.AutoHostOrClient,
+                PlayerCount = maxPlayerCount,
                 SessionProperties = customProps
             });
 
             if (result.Ok)
             {
                 Debug.Log("[NetworkConnect] Session created successfully.");
-                // MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                // popup.ActivePopup();
+                roomUuid = runner.SessionInfo.Name;
                 networkBattleStatus = NetworkBattleStatus.LOBBY;
+                await NetworkManager.Instance.ReadyForBattle(new ReadyBattlePayload(roomUuid, UserInfoManager.Instance.userId), (response) =>
+                {
+                    sessionId = response.sessionId;
+                }, null);
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
             }
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to create session: {result.ShutdownReason}");
-                MatchMakingPopup popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                popup.InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
             }
+            StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
+        }
+
+        /// <summary>
+        /// Creates a new session with friend.
+        /// </summary>
+        public async void CreateFriendlySession()
+        {
+            isHost = true;
+            Debug.Log("[NetworkConnect] Creating new session as host...");
+
+            var customProps = new Dictionary<string, SessionProperty>
+            {
+                ["averageScore"] = metaScore,
+                ["averageRate"] = 40,
+                ["password"] = UserInfoManager.Instance.userId,
+            };
+
+            if (runner == null)
+                runner = gameObject.AddComponent<NetworkRunner>();
+
+            runner.ProvideInput = true;
+            runner.AddCallbacks(this);
+
+            var result = await runner.StartGame(new StartGameArgs()
+            {
+                GameMode = Fusion.GameMode.AutoHostOrClient,
+                PlayerCount = maxPlayerCount,
+                SessionProperties = customProps
+            });
+
+            if (result.Ok)
+            {
+                Debug.Log("[NetworkConnect] Friendly Session created successfully.");
+                roomUuid = runner.SessionInfo.Name;
+                roomName = runner.SessionInfo.Name;
+                roomPassword = UserInfoManager.Instance.userId;
+                networkBattleStatus = NetworkBattleStatus.LOBBY;
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+                // await NetworkManager.Instance.ReadyForBattle(new ReadyBattlePayload(roomUuid, UserInfoManager.Instance.userId), (response) =>
+                // {
+                //     sessionId = response.sessionId;
+                // }, null);
+            }
+            else
+            {
+                Debug.LogError($"[NetworkConnect] Failed to create session: {result.ShutdownReason}");
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+            }
+            StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
 
         [Rpc]
-        public static void Rpc_LoadGameScene(NetworkRunner runner, string idx)
+        public static async void Rpc_LoadGameScene(NetworkRunner runner, string idx)
         {
             Debug.Log($"[NetworkConnect] Rpc_LoadGameScene triggered by Player {idx}. " +
                       $"LocalPlayer={runner.LocalPlayer.AsIndex}");
+
+            if (!Instance.isFriendlyMatch)
+            {
+                StartBattlePayload payload = new StartBattlePayload(Instance.userId, Instance.roomUuid, Instance.nickname, UserSlotManager.Instance.focusIdx, Instance.sessionId);
+                await NetworkManager.Instance.StartBattle(payload, (playId) => Instance.playId = playId, null);
+            }
 
             Instance.StartCoroutine(HomeScreen.Instance.StartGameSequence(Instance.GameStartSequence));
         }
@@ -171,6 +288,7 @@ namespace Framework.Network
             if (isHost)
             {
                 Debug.Log("[NetworkConnect] Host is loading battle scene.");
+                StopAllCoroutines();
                 runner.LoadScene(SceneRef.FromIndex(3), LoadSceneMode.Single);
             }
         }
@@ -178,7 +296,7 @@ namespace Framework.Network
         public IEnumerator GameStart()
         {
             Debug.Log("[NetworkConnect] GameStart coroutine started. Waiting 4s...");
-            yield return new WaitForSeconds(4f);
+            yield return new WaitForSeconds(0.5f);
             Rpc_LoadGameScene(runner, runner.LocalPlayer.AsIndex.ToString());
         }
 
@@ -211,11 +329,15 @@ namespace Framework.Network
                     isHost = isHost,
                     nickname = UserInfoManager.Instance.nickname,
                     playerIdx = runner.LocalPlayer.AsIndex,
-                    decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds
+                    decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
+                    isGameOver = false,
+                    userId = UserInfoManager.Instance.userId,
+                    rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
                 };
 
                 this.playerIdx = data.playerIdx;
                 this.nickname = data.nickname;
+                this.userId = data.userId;
 
                 Rpc_JoinGame(runner, JsonUtility.ToJson(data));
             }
@@ -231,7 +353,8 @@ namespace Framework.Network
                         nickname = UserInfoManager.Instance.nickname,
                         playerIdx = runner.LocalPlayer.AsIndex,
                         decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
-                        isGameOver = false
+                        isGameOver = false,
+                        rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
                     };
 
                     Rpc_JoinGame(this.runner, player, JsonUtility.ToJson(data));
@@ -267,8 +390,17 @@ namespace Framework.Network
             {
                 case NetworkBattleStatus.LOBBY:
                     Debug.Log("[NetworkConnect] Updating lobby UI after player left.");
-                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
                     dic_PlayerData.Remove(player.AsIndex);
+                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+
+                    if (Instance.dic_PlayerData.Count <= 1)
+                    {
+                        if (Instance.ICountMatchingTimeOut != null)
+                            Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                        if (Instance.ICountTimeStart != null)
+                            Instance.StopCoroutine(Instance.ICountTimeStart);
+                        Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
+                    }
                     break;
 
                 case NetworkBattleStatus.INGAME:
@@ -302,27 +434,58 @@ namespace Framework.Network
 
         public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
         {
-            Debug.Log($"[NetworkConnect] Session list updated, found {sessionList.Count} sessions.");
-
-            if (sessionList.Count == 0)
+            if (isFriendlyMatch)
             {
-                Debug.Log("[NetworkConnect] No sessions found, creating new one.");
+
+                Debug.Log($"[NetworkConnect] Session list updated, found {sessionList.Count} sessions.");
+
+                if (sessionList.Count == 0)
+                {
+                    Debug.Log("[NetworkConnect] No sessions found, creating new one.");
+                    CreateFriendlySession();
+                    return;
+                }
+
+                foreach (var session in sessionList)
+                {
+                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
+                        continue;
+                    session.Properties.TryGetValue("password", out var pw);
+                    if (session.Name == roomName && roomPassword == pw)
+                    {
+                        Debug.Log($"[NetworkConnect] Joining available friendly session: {session.Name}");
+                        JoinFriendlySession(session.Name);
+                        return;
+                    }
+                }
+
+                Debug.Log("[NetworkConnect] No suitable session found, creating new one.");
+                CreateFriendlySession();
+            }
+            else
+            {
+                Debug.Log($"[NetworkConnect] Session list updated, found {sessionList.Count} sessions.");
+
+                if (sessionList.Count == 0)
+                {
+                    Debug.Log("[NetworkConnect] No sessions found, creating new one.");
+                    CreateSession();
+                    return;
+                }
+
+                foreach (var session in sessionList)
+                {
+                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
+                        continue;
+
+                    Debug.Log($"[NetworkConnect] Joining available session: {session.Name}");
+                    JoinSession(session.Name);
+                    return;
+                }
+
+                Debug.Log("[NetworkConnect] No suitable session found, creating new one.");
                 CreateSession();
-                return;
             }
-
-            foreach (var session in sessionList)
-            {
-                if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
-                    continue;
-
-                Debug.Log($"[NetworkConnect] Joining available session: {session.Name}");
-                JoinSession(session.Name);
-                return;
-            }
-
-            Debug.Log("[NetworkConnect] No suitable session found, creating new one.");
-            CreateSession();
         }
 
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
@@ -344,6 +507,25 @@ namespace Framework.Network
                     runner.SessionInfo.IsOpen = false;
                     Rpc_CountStart(runner);
                 }
+            }
+        }
+
+        public void FieldBossRewardCheck(int idx)
+        {
+            Debug.Log($"[NetworkConnect] Fieldboss reward called for player {idx}.");
+            dic_PlayerData[idx].selectedFieldBossReward = true;
+
+            bool allReady = dic_PlayerData.Values.All(p => (p.selectedFieldBossReward && !p.isGameOver) || p.isGameOver);
+            if (allReady)
+            {
+                Debug.Log("[NetworkConnect] All players selected reward");
+
+                foreach (var val in dic_PlayerData.Values)
+                {
+                    val.selectedFieldBossReward = false;
+                }
+
+                GameManager.Instance.CountStart();
             }
         }
 
@@ -388,16 +570,61 @@ namespace Framework.Network
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
             Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
 
-            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+            var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+            popup.UpdateUserInfo();
 
             if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
             {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
                 Debug.Log("[NetworkConnect] All players joined, starting game.");
                 Instance.StartCoroutine(Instance.GameStart());
+            }
+            else if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountTimeStart());
+            }
+            else
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
             }
 
             foreach (var item in Instance.dic_PlayerData.Values)
                 item.isInitialize = false;
+        }
+
+        Coroutine ICountMatchingTimeOut;
+        Coroutine ICountTimeStart;
+        IEnumerator CountTimeStart()
+        {
+            int cd = 30;
+            while (cd > 0)
+            {
+                cd -= 1;
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").text_TimeCount.text = $"{cd / 60:00} : {cd % 60:00}";
+                yield return new WaitForSeconds(1);
+            }
+            Instance.StartCoroutine(Instance.GameStart());
+        }
+        IEnumerator CountMatchingTimeOut()
+        {
+            int cd = 30;
+            if (isFriendlyMatch)
+                cd = 300;
+            yield return new WaitForSeconds(cd);
+            if (networkBattleStatus != NetworkBattleStatus.LOBBY)
+                yield break;
+            SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+            popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Battle_Terminated"));
+            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
         }
 
         [Rpc]
@@ -407,7 +634,32 @@ namespace Framework.Network
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
             Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
 
-            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
+            if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                Debug.Log("[NetworkConnect] All players joined, starting game.");
+                Instance.StartCoroutine(Instance.GameStart());
+            }
+            else if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountTimeStart());
+            }
+            else
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
+            }
+
+            var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+            popup.UpdateUserInfo();
         }
 
         [Rpc]

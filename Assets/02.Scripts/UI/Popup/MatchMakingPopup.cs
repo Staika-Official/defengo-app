@@ -6,13 +6,14 @@ using Framework.GameData.Defense;
 using TMPro;
 using Fusion;
 using Framework.Network;
+using Framework.Util;
 
 namespace Framework.UI
 {
 
     public class MatchMakingPopup : PopupTemplate
     {
-        public Dictionary<PlayerRef, NetworkUserInfo> dic_PlayerData = new();
+        // public Dictionary<PlayerRef, NetworkUserInfo> dic_PlayerData = new();
         public List<MatchingUserInfoItem> matchingUserInfoItems = new();
         public TextMeshProUGUI text_Matching;
         public TextMeshProUGUI text_TimeCount;
@@ -33,10 +34,30 @@ namespace Framework.UI
                 decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds
             };
             matchingUserInfoItems[0].UserInfoInitialize(playerData);
+
+            bool isFriendlyMatch = NetworkConnect.Instance.isFriendlyMatch;
+            int maxPlayerCount = NetworkConnect.Instance.maxPlayerCount;
+
+            for (int i = 1; i < matchingUserInfoItems.Count; i++)
+            {
+                if (i < maxPlayerCount)
+                {
+                    matchingUserInfoItems[i].button_Invite.gameObject.SetActive(false);
+                    matchingUserInfoItems[i].matching.SetActive(true);
+                    matchingUserInfoItems[i].locked.SetActive(false);
+                }
+                else
+                {
+                    matchingUserInfoItems[i].button_Invite.gameObject.SetActive(false);
+                    matchingUserInfoItems[i].matching.SetActive(false);
+                    matchingUserInfoItems[i].locked.SetActive(true);
+                }
+            }
         }
 
         public override void InActivePopup()
         {
+            button_Close.gameObject.SetActive(false);
             PopUpSequence(false);
         }
 
@@ -50,6 +71,7 @@ namespace Framework.UI
 
         public async void Shutdown()
         {
+            button_Close.gameObject.SetActive(false);
             StopCoroutine(timer);
             timer = null;
             await NetworkConnect.Instance.runner.Shutdown();
@@ -59,6 +81,8 @@ namespace Framework.UI
         public void UpdateUserInfo()
         {
             int idx = 1;
+            bool isFriendlyMatch = NetworkConnect.Instance.isFriendlyMatch;
+            int maxPlayerCount = NetworkConnect.Instance.maxPlayerCount;
 
             foreach (var item in NetworkConnect.Instance.dic_PlayerData)
             {
@@ -72,18 +96,42 @@ namespace Framework.UI
                     idx++;
                 }
             }
+
+            for (int i = NetworkConnect.Instance.dic_PlayerData.Count; i < matchingUserInfoItems.Count; i++)
+            {
+                if (i < maxPlayerCount)
+                {
+                    matchingUserInfoItems[i].button_Invite.gameObject.SetActive(isFriendlyMatch);
+                    matchingUserInfoItems[i].matching.SetActive(!isFriendlyMatch);
+                    matchingUserInfoItems[i].locked.SetActive(false);
+                }
+                else
+                {
+                    matchingUserInfoItems[i].button_Invite.gameObject.SetActive(false);
+                    matchingUserInfoItems[i].matching.SetActive(false);
+                    matchingUserInfoItems[i].locked.SetActive(true);
+                }
+            }
+
+            button_Close.gameObject.SetActive(true);
         }
 
         public IEnumerator SetTimeCount()
         {
             while (true)
             {
-                text_TimeCount.text = $"{timeCount / 60:00} : {timeCount % 60:00}";
+                if (NetworkConnect.Instance.dic_PlayerData.Count <= 1)
+                {
+                    text_Matching.text = LanguageManager.Instance.GetStringData("UI_Matching_Time");
+                    text_TimeCount.text = $"{timeCount / 60:00} : {timeCount % 60:00}";
+                }
+                else
+                {
+                    text_Matching.text = LanguageManager.Instance.GetStringData("UI_Starting_Time");
+                }
                 yield return new WaitForSeconds(1);
                 timeCount++;
             }
         }
-
-
     }
 }

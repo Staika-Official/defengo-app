@@ -13,12 +13,15 @@ namespace  Framework.UI
     {
         public Animator animator;
         public TextMeshProUGUI text_bossHealth;
+
+        int bossIdx = 0;
         
-        public void Initialize(float addhealth)
+        public void Initialize(float addhealth, int bossIdx)
         {
+            this.bossIdx = bossIdx;
             Debug.Log($"{gameObject.name} init SetBossSummon - Add Health: {addhealth}");
             animator.Rebind();
-            
+
             text_bossHealth.text = $"+{addhealth}";
             animator.SetTrigger("SetBossSummon");
         }
@@ -28,6 +31,7 @@ namespace  Framework.UI
             Debug.Log($"{gameObject.name} OnCompleteAnim");
             gameObject.SetActive(false);
             UIManager.Instance.bossSelectPopup.ActivePopup();
+            UIManager.Instance.bossSelectPopup.Show(bossIdx);
         }
     }
 }

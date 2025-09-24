@@ -19,47 +19,49 @@ namespace Framework.UI
         public int targetIdx;
         public ObscuredString targetBossName;
         public readonly string[] TempbossList = {
-            "Boomber"/*"Locky,"Trush", "Smoker", "Sotty", "Locky", "Parasite", "Boomber", "Emberon"*/
+            /* "Boomber",  */"Trush", "Smoker"/*"Locky, "Sotty", "Locky", "Parasite", "Boomber", "Emberon"*/
         };
 
         public override void ActivePopup()
         {
             PopUpSequence(true);
+        }
 
-            StartCoroutine(SetOpenAnimation());
+        public void Show(int randomIdx)
+        {
+            StartCoroutine(SetOpenAnimation(randomIdx));
         }
 
         // ReSharper disable Unity.PerformanceAnalysis
-        public IEnumerator SetOpenAnimation()
+        public IEnumerator SetOpenAnimation(int randomIdx)
         {
             infiniteHorizontalScroll.SetStart();
             openSequence.Play();
 
             yield return new WaitForSeconds(openSequence.clip.length);
 
-            int randomIdx = Random.Range(0, TempbossList.Length);
             int idx = (int)dic_bossData[TempbossList[randomIdx]].bossIndex;
-            
+
             BossData bossData = dic_bossData[TempbossList[randomIdx]];
 
             GameManager.Instance.BossDataAction = () =>
             {
                 GameManager.Instance.monsterSpawner.SetFieldBossWaveStart(bossData);
             };
-            
+
             infiniteHorizontalScroll.OnCompleteSeqeunce = () =>
             {
                 PopUpSequence(false);
                 GameManager.Instance.BossWaveCountStart();
                 // 카운트 다운 시작 시퀀스
             };
-            
+
             for (int i = bossSelectItems.Count - 1; i >= 0; i--)
             {
                 if (bossSelectItems[i].bossIdx == idx)
                 {
                     int temp = i;
-                    while(temp < 10)
+                    while (temp < 10)
                     {
                         temp += bossSelectItems.Count;
                     }

@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Framework.Sound;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace Framework.UI
 {
@@ -18,6 +19,7 @@ namespace Framework.UI
         public GameObject fixedCharacterInfo;
         public GameObject normalSummonGroup;
         public GameObject fiveStar;
+        public GameObject grayStar;
         public GameObject[] stars;
         public bool isFixedSummon;
         public UnityAction SummonFixedCharacter;
@@ -36,6 +38,7 @@ namespace Framework.UI
                 normalSummonGroup.SetActive(true);
                 fixedCharacterInfo.SetActive(false);
                 isFixedSummon = false;
+                GameManager.Instance.BuffSummonCost(0);
 
                 GameManager.Instance.CalcPossibleCostAction();
             }
@@ -63,6 +66,7 @@ namespace Framework.UI
             isFixedSummon = true;
             fixedCharacterInfo.SetActive(true);
             normalSummonGroup.SetActive(false);
+            UIManager.Instance.text_SummonCharacterCost.text = $"0";
 
             button_summonCharacter.SetInterectible(true);
             summonCharacterActive.SetActive(true);
@@ -72,19 +76,41 @@ namespace Framework.UI
             image_characterPortrait.sprite = characterData.sprite_ChracterPortrait;
             image_background.color = DataManager.Instance.uiPropertyData.dic_CharacterCardInfo[characterData.characterGrade].color_BackGround;
 
-            if (starGrade < 5)
+            if (starGrade == 0)
+            {
+                grayStar.gameObject.SetActive(true);
+                for (int i = 0; i < stars.Length; i++)
+                {
+                    stars[i].gameObject.SetActive(false);
+                }
+                fiveStar.gameObject.SetActive(false);
+            }
+            else if (starGrade == 5)
             {
                 for (int i = 0; i < stars.Length; i++)
                 {
-                    stars[i].SetActive(i < starGrade);
+                    stars[i].gameObject.SetActive(false);
+                }
+                grayStar.gameObject.SetActive(false);
+                fiveStar.gameObject.SetActive(true);
+            }
+            else
+            {
+                grayStar.gameObject.SetActive(false);
+                fiveStar.gameObject.SetActive(false);
+                for (int i = 0; i < starGrade; i++)
+                {
+                    if (i < stars.Length)
+                        stars[i].gameObject.SetActive(true);
+                }
+                for (int i = starGrade; i < stars.Length; i++)
+                {
+                    stars[i].gameObject.SetActive(false);
                 }
             }
-            else 
-            {
-                
-            }
-            
-            
+
+            SetPossibleSummon(GridManager.Instance.IsPossibleSummon());
+
             SummonFixedCharacter = () =>
             {
                 GameManager.Instance.SummonFixedCharacter(characterIndex, starGrade);
@@ -93,10 +119,24 @@ namespace Framework.UI
 
         public void SetPossibleSummon(bool isPossible)
         {
-            if (isFixedSummon) return;
-
-            button_summonCharacter.SetInterectible(isPossible);
-            summonCharacterActive.SetActive(isPossible);
+            if (isFixedSummon)
+            {
+                if (GridManager.Instance.IsPossibleSummon())
+                {
+                    button_summonCharacter.SetInterectible(true);
+                    summonCharacterActive.SetActive(true);
+                }
+                else
+                {
+                    button_summonCharacter.SetInterectible(false);
+                    summonCharacterActive.SetActive(false);
+                }
+            }
+            else
+            {
+                button_summonCharacter.SetInterectible(isPossible);
+                summonCharacterActive.SetActive(isPossible);
+            }
         }
     }
 }

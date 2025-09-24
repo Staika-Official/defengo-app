@@ -34,7 +34,8 @@ namespace Framework.UI
         [SerializeField] private Button button_leagueTip;
         [SerializeField] private MyRank myRank;
         [SerializeField] private int dailyLastRoundId = 0;
-        [SerializeField] private int lastRoundId = 0;
+        [SerializeField] private int weeklyLastRoundId = 0;
+        [SerializeField] private int leagueLastRoundId = 0;
         [SerializeField] private int focusRoundId;
 
         [SerializeField] private GameObject guideNotification;
@@ -52,7 +53,7 @@ namespace Framework.UI
         [SerializeField] private Button[] buttons_Date;
         [SerializeField] private Button[] buttons_weeks;
 
-        [SerializeField] private LeaderBoardType focusLeaderBoardType = LeaderBoardType.WAVE_DAILY;
+        [SerializeField] private LeaderBoardType focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
 
         [SerializeField] private List<RankInfoItem> activeRankinfoItems = new();
         [SerializeField] private Queue<RankInfoItem> rankInfoItems = new();
@@ -68,13 +69,18 @@ namespace Framework.UI
             if (UserInfoManager.Instance.userState.finishedTutorial == false)
             {
                 focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
-                toggle.SelectTab(0);
+                toggle.SelectTab(1);
             }
 
-            TogglePage(0);
+            TogglePage(1);
             //TogglePage(false);
-
-            focusRoundId = focusLeaderBoardType == LeaderBoardType.WAVE_DAILY ? dailyLastRoundId : lastRoundId;
+            focusRoundId = focusLeaderBoardType switch
+            {
+                LeaderBoardType.WAVE_DAILY => dailyLastRoundId,
+                LeaderBoardType.WAVE_WEEKLY => dailyLastRoundId,
+                LeaderBoardType.LEAGUE => dailyLastRoundId,
+                _ => dailyLastRoundId
+            };
             animator.Rebind();
             animator.SetTrigger("_GoEntry");
 
@@ -134,7 +140,8 @@ namespace Framework.UI
             switch (tab)
             {
                 case 0:
-                    focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
+                    focusRoundId = leagueLastRoundId;
+                    focusLeaderBoardType = LeaderBoardType.LEAGUE;
 
                     dailyObject.SetActive(false);
                     weeklyObject.SetActive(false);
@@ -150,7 +157,7 @@ namespace Framework.UI
                     GetLeaderBoardBestWavesData(focusRoundId);
                     break;
                 case 1:
-                    focusRoundId = lastRoundId;
+                    focusRoundId = weeklyLastRoundId;
                     focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
 
                     //todo DailyRanking관련 이미지 오브젝트
@@ -199,13 +206,37 @@ namespace Framework.UI
 
         public async void GetLeaderBoardBestWavesData(int roundId)
         {
-            await NetworkManager.Instance.GetLeaderBoardBestWaves(focusLeaderBoardType, roundId, SetLeaderBoardRankingData, Failed);
-            await NetworkManager.Instance.GetMyLeaderBoardRankInfo(focusLeaderBoardType, roundId, SetMyRankInfo, Failed);
+            if (focusLeaderBoardType == LeaderBoardType.LEAGUE)
+            {
+                await NetworkManager.Instance.GetBattleLeaderboard(SetLeaderBoardRankingData, FailedGetBattleLeaderboard);
+                await NetworkManager.Instance.GetMyBattleLeaderboard(SetMyRankInfo, FailedGetMyRank);
+            }
+            else
+            {
+                await NetworkManager.Instance.GetLeaderBoardBestWaves(focusLeaderBoardType, roundId, SetLeaderBoardRankingData, Failed);
+                await NetworkManager.Instance.GetMyLeaderBoardRankInfo(focusLeaderBoardType, roundId, SetMyRankInfo, Failed);
+            }
         }
 
         public void SetMyRankInfo(string json)
         {
             myRank.SetMyRank(json);
+        }
+        public void SetMyRankInfo(MyBattleLeaderboardInfo leader)
+        {
+            myRank.SetMyRank(leader);
+        }
+
+        void FailedGetMyRank(MyBattleLeaderboardInfo defRank)
+        {
+
+        }
+        void FailedGetBattleLeaderboard()
+        {
+            noRank.SetActive(true);
+            devideLine.SetActive(false);
+            weeklyPodium.SetActive(false);
+            text_NoRanking.text = LanguageManager.Instance.GetStringData("UI_Ranking_Empty");
         }
 
         public void Failed()
@@ -260,15 +291,22 @@ namespace Framework.UI
                 case LeaderBoardType.WAVE_WEEKLY:
                     buttons = buttons_weeks;
 
-                    if (lastRoundId == 0)
+                    if (weeklyLastRoundId == 0)
                     {
-                        lastRoundId = data.roundId;
+                        weeklyLastRoundId = data.roundId;
                         focusRoundId = data.roundId;
                     }
-                    lastId = lastRoundId;
+                    lastId = weeklyLastRoundId;
                     break;
                 case LeaderBoardType.LEAGUE:
                     buttons = buttons_League;
+
+                    if (leagueLastRoundId == 0)
+                    {
+                        leagueLastRoundId = data.roundId;
+                        focusRoundId = data.roundId;
+                    }
+                    lastId = leagueLastRoundId;
                     break;
             }
 
@@ -333,6 +371,59 @@ namespace Framework.UI
             // UI 업데이트를 프레임마다 나누어 수행
             StartCoroutine(UpdateRankUI(rankInfos, focusLeaderBoardType));
         }
+        public void SetLeaderBoardRankingData(GetBattleLeaderboardResponse data)
+        {
+            foreach (var item in activeRankinfoItems)
+                rankInfoItems.Enqueue(item);
+
+            activeRankinfoItems.Clear();
+
+            Button[] buttons = new Button[] { };
+            int lastId = 0;
+
+            buttons = buttons_League;
+
+            if (leagueLastRoundId == 0)
+            {
+                leagueLastRoundId = 0;
+                focusRoundId = 0;
+            }
+            lastId = leagueLastRoundId;
+
+            buttons[0].gameObject.SetActive(/* 1 < focusRoundId */false);
+            buttons[1].gameObject.SetActive(/* data.roundId < lastId */false);
+
+            string from = data.season.fromDate.ToString("yyyy.MM.dd");
+            string to = data.season.toDate.ToString("yyyy.MM.dd");
+            text_League.text = $"{from} ~ {to}";
+            text_LeagueNum.text = $"Season {data.season.id}";
+
+            bool isNoRank = data.leaders.Count == 0;
+
+            if (data.season.activated)
+            {
+                noRank.SetActive(isNoRank);
+                devideLine.SetActive(!isNoRank);
+                weeklyPodium.SetActive(false);
+                text_NoRanking.text = LanguageManager.Instance.GetStringData("UI_Ranking_Empty");
+            }
+            else
+            {
+                noRank.SetActive(!data.season.activated);
+                devideLine.SetActive(data.season.activated);
+                weeklyPodium.SetActive(false);
+                text_NoRanking.text = LanguageManager.Instance.GetStringData("UI_League_Ready_Desc");
+            }
+
+            scrollRect.sizeDelta = new Vector2(0, data.leaders.Count * 152);
+            viewPortRect.sizeDelta = new Vector2(0, data.leaders.Count * 152 + 2000);
+
+            foreach (var item in rankLeaderBoardInfoItems)
+                item.gameObject.SetActive(false);
+
+            // UI 업데이트를 프레임마다 나누어 수행
+            StartCoroutine(UpdateRankUI(data.leaders));
+        }
 
         private IEnumerator UpdateRankUI(LeaderBoardRankInfo[] rankInfos, LeaderBoardType type)
         {
@@ -379,6 +470,36 @@ namespace Framework.UI
             else if (type == LeaderBoardType.LEAGUE)
                 foreach (var button in buttons_League)
                     button.interactable = true;
+        }
+        private IEnumerator UpdateRankUI(List<BattleLeaderboardInfo> leaders)
+        {
+            float offsetY = -123f;
+
+            // WeeklyRanking 3위 까지 커스텀
+            for (int i = 0; i < leaders.Count; i++)
+            {
+                RankInfoItem obj = GetRankInfoItem();
+                obj.gameObject.SetActive(true);
+                obj.transform.SetParent(scrollRect, false);
+                obj.transform.localPosition = new Vector2(0, offsetY);
+                offsetY -= 151f;
+
+                activeRankinfoItems.Add(obj);
+                obj.Initialize(leaders[i], i + 1);
+
+                if (i == 2)
+                {
+                    offsetY -= 151f;
+                }
+
+                // 10개씩 UI 생성 후 한 프레임 쉬기 (렉 방지)
+                if (i % 10 == 0)
+                    yield return null;
+            }
+
+            // 버튼 활성화
+            foreach (var button in buttons_League)
+                button.interactable = true;
         }
 
         public override void Initialize()

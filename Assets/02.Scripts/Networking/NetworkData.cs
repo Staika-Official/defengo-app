@@ -14,7 +14,7 @@ namespace Framework.Network
         JOIN_IN_PROGRESS
 
     }
-    
+
     public enum NetworkBattleStatus
     {
         LOBBY,
@@ -119,6 +119,12 @@ namespace Framework.Network
         public int waveCount;
         public bool isGameOver;
         public int rank;
+        public string userId;
+        public int playId;
+        public int sessionId;
+        public int monsterKilled;
+        public bool selectedFieldBossReward;
+        public string rankTier;
     }
 
     [Serializable]
@@ -133,6 +139,7 @@ namespace Framework.Network
         public LeaderBoardRewardList[] rewardLeaderBoards;
         public DiscordConnect discord;
         public LeaderBoardRewardList[] rewardDailyLeaderBoards;
+        public LeaderBoardRewardList[] rewardLeagueLeaderBoards;
         public UserItems[] userItems;
         public ClassUpRule[] classUpRule;
     }
@@ -967,6 +974,7 @@ namespace Framework.Network
         HATCHING_ORB = 12,
         ITEM = 13,
         FRIEND_REQUEST = 14,
+        BATTLE_FRIEND_REQUEST = 15,
     }
 
     public enum InboxStatus
@@ -1414,6 +1422,179 @@ namespace Framework.Network
         PENDING,
         ACCEPTED,
         REJECTED
+    }
+    #endregion
+
+    #region Battle
+    [Serializable]
+    public class ReadyBattlePayload
+    {
+        public string roomUuid;
+        public string userId;
+
+        public ReadyBattlePayload(string r, string u)
+        {
+            roomUuid = r;
+            userId = u;
+        }
+    }
+    [Serializable]
+    public class ReadyBattleResponse
+    {
+        public string roomUuid;
+        public int sessionId;
+    }
+
+    [Serializable]
+    public class StartBattlePayload
+    {
+        public string userId;
+        public string roomUuid;
+        public string nickname;
+        public int slotNumber;
+        public int sessionId;
+
+        public StartBattlePayload(string userId, string roomUuid, string nickname, int slotNumber, int sessionId)
+        {
+            this.userId = userId;
+            this.roomUuid = roomUuid;
+            this.sessionId = sessionId;
+            this.nickname = nickname;
+            this.slotNumber = slotNumber;
+        }
+    }
+    [Serializable]
+    public class StartBattleResponse
+    {
+        public int playId;
+    }
+
+    [Serializable]
+    public class BattleRecord
+    {
+        public int sessionId;
+        public int playId;
+        public int waveNumber;
+        public int requestGo;
+        public int killedMonster;
+        public string completedMissions;
+        public int bossLevel;
+        public string characterInfo = "";
+        public object monsterInfo = null;
+    }
+
+    [Serializable]
+    public class EndBattlePayload
+    {
+        public int sessionId;
+        public int playId;
+        public string userId;
+        public int requestGo;
+        public int lastWave;
+        public int slotNumber;
+    }
+
+    [Serializable]
+    public class RankTierConfig
+    {
+        public int id;
+        public RankTierType tierType;
+        public int tierGradeType;
+        public string description;
+        public int promotionConditionMax;
+        public int promotionConditionMin;
+
+    }
+    [Serializable]
+    public enum RankTierType
+    {
+        RANKTIER_0,
+        RANKTIER_1,
+        RANKTIER_2,
+        RANKTIER_3,
+        RANKTIER_4,
+        RANKTIER_5,
+        RANKTIER_6
+    }
+
+    [Serializable]
+    public class BattleSeasonInfo
+    {
+        public int id;
+        public string clientId;
+        public DateTime fromDate;
+        public DateTime toDate;
+        public bool activated;
+    }
+
+    [Serializable]
+    public class MyBattleLeaderboardInfo
+    {
+        public int userId;
+        public int finalRank;
+        public float lp = 0;
+        public float elo = 0;
+        public int seasonId;
+        public List<int> promotionConditionNumbers;
+        public bool isPromotion;
+    }
+    [Serializable]
+    public class BattleLeaderboardInfo
+    {
+        public int userId;
+        public int finalRank;
+        public float lp;
+        public float elo;
+        public int equippedProfileId;
+        public string nickname = "";
+    }
+
+    [Serializable]
+    public class GetBattleLeaderboardResponse
+    {
+        public BattleSeasonInfo season;
+        public List<BattleLeaderboardInfo> leaders;
+    }
+
+    [Serializable]
+    public class GetBattleSummaryResponse
+    {
+        public float bonusElo;
+        public float eloDelta;
+        public float lpDelta;
+        public float oldElo;
+        public float newElo;
+        public float oldLp;
+        public float newLp;
+        public List<BattleBonusDetail> bonusDetails;
+    }
+
+    [Serializable]
+    public class FriendlyBattleInviteInfo
+    {
+        public string roomName;
+        public string roomPassword;
+    }
+
+    [Serializable]
+    public class BattleBonusDetail
+    {
+        public string bonusType;
+        public float value;
+        public string description;
+    }
+    [Serializable]
+    public enum BattleBonusType
+    {
+        EVENT_BONUS_LUNCH,
+        EVENT_BONUS_DINNER,
+        EVENT_BONUS_1ST_GREATER,
+    }
+    [Serializable]
+    public class BattleConfig
+    {
+        public bool BATTLE_OPEN;
+        public int SURRENDER_WAVE_MIN;
     }
     #endregion
 }

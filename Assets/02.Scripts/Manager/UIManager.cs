@@ -68,6 +68,7 @@ namespace Framework.Game.Defense
         public FieldBossRewardPopup fieldBossRewardPopup;
         public BattleResultPopup battleResultPopup;
         public BattleResultTablePopup battleResultTablePopup;
+        public BattleResultPromotePopup battleResultPromotePopup;
         public GameObject sellPanel;
         public Image[] image_BossCoolTime;
         public Image image_WaveCountFill;
@@ -314,11 +315,18 @@ namespace Framework.Game.Defense
                     battleResultPopup.PopUpSequence(false);
                 }
                 battleResultPopup.Initialize();
+                
+                if (!battleResultPromotePopup.gameObject.activeSelf)
+                {
+                    battleResultPromotePopup.gameObject.SetActive(true);
+                    battleResultPromotePopup.PopUpSequence(false);
+                }
+                battleResultPromotePopup.Initialize();
 
                 button_Pause.gameObject.SetActive(false);
-                button_rank.gameObject.SetActive(true);
+                button_rank.gameObject.SetActive(isBattleMode);
                 button_rank.onPointerUp = OnClick_RankButton;
-                button_giveUp.gameObject.SetActive(true);
+                button_giveUp.gameObject.SetActive(false);
                 button_giveUp.onPointerUp = OnClick_GiveUpButton;
             }
 

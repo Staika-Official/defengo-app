@@ -51,7 +51,6 @@ public class CustomListButtons : MonoBehaviour
 
     public void DefaultSet()
     {
-        selectedTab = 0;
         for (int i = 0; i < TMPs.Count; i++)
         {
             if (i == selectedTab)

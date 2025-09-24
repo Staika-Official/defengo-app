@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using Framework.GameData.Defense;
 using Framework.Network;
+using Newtonsoft.Json;
 
 namespace Framework.UI
 {
@@ -71,6 +72,56 @@ namespace Framework.UI
                 text_Rank.text = $"{myRankData.rank}";
                 text_NickName.text = myRankData.nickname;
                 string value = $"<sprite=12>{myRankData.bestWave}";
+
+                text_Go.text = value;
+                transform.DOLocalMoveY(233, 0.05f);
+            }
+        }
+        public void SetMyRank(MyBattleLeaderboardInfo myRankData)
+        {
+            Debug.Log($"Set My Rank {JsonConvert.SerializeObject(myRankData)}");
+            if (myRankData == null)
+            {
+                Debug.Log($"Set My Rank 1");
+                transform.DOLocalMoveY(0, 0.05f);
+            }
+            else
+            {
+                Debug.Log($"Set My Rank 2");
+                UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[UserInfoManager.Instance.userState.equippedProfileId];
+
+                switch (userProfileData.profileType)
+                {
+                    case ProfileType.Character:
+                        image_Profile.gameObject.SetActive(true);
+                        image_limitedProfile.gameObject.SetActive(false);
+                        image_backGround.gameObject.SetActive(true);
+                        image_Profile.sprite = userProfileData.sprite_image;
+
+                        image_backGround.color = DataManager.Instance.uiPropertyData.dic_CharacterCardInfo[userProfileData.characterGrade].color_BackGround;
+                        break;
+
+                    case ProfileType.Skin:
+                        image_Profile.gameObject.SetActive(true);
+                        image_limitedProfile.gameObject.SetActive(false);
+                        image_backGround.gameObject.SetActive(true);
+                        image_Profile.sprite = userProfileData.sprite_image;
+
+                        SkinGradeType gradeType = DataManager.Instance.SkinTableDataList.Find(a => a.id == userProfileData.profileIndex).skin_grade_type;
+                        image_backGround.color = DataManager.Instance.uiPropertyData.dic_CharacterSkinColor[gradeType].color_Profile;
+                        break;
+
+                    default:
+                        image_Profile.gameObject.SetActive(false);
+                        image_backGround.gameObject.SetActive(false);
+                        image_limitedProfile.gameObject.SetActive(true);
+                        image_limitedProfile.sprite = userProfileData.sprite_image;
+                        break;
+                }
+
+                text_Rank.text = $"{DataManager.Instance.GetRankTierConfig(myRankData.finalRank).description}";
+                text_NickName.text = UserInfoManager.Instance.nickname;
+                string value = $"<sprite=12>{(int)myRankData.lp}";
 
                 text_Go.text = value;
                 transform.DOLocalMoveY(233, 0.05f);

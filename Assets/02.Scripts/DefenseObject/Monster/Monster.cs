@@ -87,9 +87,9 @@ namespace Framework.Game.Defense
 
         public virtual void FieldBossInitialize(BossData bossData) { }
 
-        public void SetMonsterMove(SkeletonDataAsset animData, int currentArrayIdx)
+        public void SetMonsterMove(SkeletonDataAsset animData, int currentArrayIdx, MonsterType Type = MonsterType.WAVE_MONSTER)
         {
-            monsterType = MonsterType.CLONE_MONSTER;
+            monsterType = Type;
             anim.SkeletonDataAsset.Clear();
             anim.AnimationState.ClearTracks();
             anim.skeletonDataAsset = animData;
@@ -149,9 +149,9 @@ namespace Framework.Game.Defense
             Abillity();
         }
 
-        public void SetMonsterMove(SkeletonDataAsset animData)
+        public void SetMonsterMove(SkeletonDataAsset animData, MonsterType Type = MonsterType.WAVE_MONSTER)
         {
-            monsterType = MonsterType.WAVE_MONSTER;
+            monsterType = Type;
             anim.SkeletonDataAsset.Clear();
             anim.AnimationState.ClearTracks();
             anim.skeletonDataAsset = animData;

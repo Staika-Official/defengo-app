@@ -22,10 +22,14 @@ namespace Framework.UI
 
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
 
-            data.Sort((NetworkBattleData a, NetworkBattleData b) => b.waveCount.CompareTo(a.waveCount));
+            data = data
+            .OrderByDescending(x => x.waveCount)
+            .ThenByDescending(x => x.monsterKilled)
+            .ToList();
 
             for (int i = 0; i < data.Count; i++)
             {
+                data[i].rank = i + 1;
                 battleResultTableItems[i].Initialize(data[i]);
             }
 
@@ -34,7 +38,22 @@ namespace Framework.UI
 
         public override void InActivePopup()
         {
-            Debug.Log("End Game");
+            if (NetworkConnect.Instance.isFriendlyMatch)
+            {
+                Debug.Log("OnClick Home");
+                SceneLoadManager.onCompleteLoadScene = () =>
+                {
+                    SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
+                };
+                NetworkConnect.Instance.runner.Shutdown();
+                SceneLoadManager.Instance.SwitchingScene(2);
+
+                GameManager.Instance.objectPoolManager.AllClear();
+            }
+            else
+            {
+                UIManager.Instance.battleResultPromotePopup.ActivePopup();
+            }
             PopUpSequence(false);
         }
 
@@ -56,16 +75,7 @@ namespace Framework.UI
 
         public void OnClick_Home()
         {
-            Debug.Log("OnClick Home");
-            NetworkConnect.Instance.runner.Shutdown();
-            SceneLoadManager.onCompleteLoadScene = () =>
-            {
-                SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
-            };
-            NetworkConnect.Instance.runner.Shutdown();
-            SceneLoadManager.Instance.SwitchingScene(2);
-
-            GameManager.Instance.objectPoolManager.AllClear();
+            InActivePopup();
         }
     }
 }

@@ -52,7 +52,7 @@ namespace Framework.Game.Defense
             _ = NetworkManager.Instance.AbusingRecord("Cheat Upgrade");
         }
 
-        
+
         public void Initialize(CharacterData data)
         {
             characterName = data.name;
@@ -63,6 +63,7 @@ namespace Framework.Game.Defense
             levelValue = 1;
             text_LevelValue.text = levelValue.ToString();
             costValue = GetCostValue(characterIndex, isUniqueUpgrade);
+            costValue -= (int)(costValue * GameManager.Instance.upgradeCostBuffValue);
             text_CostValue.text = costValue.ToString();
             text_InactiveCostValue.text = costValue.ToString();
             SetCharacterGrade(characterGrade);
@@ -106,7 +107,7 @@ namespace Framework.Game.Defense
         public void UpgradeFailed(bool isReset)
         {
             UpgradeType type = isReset ? UpgradeType.RESET : UpgradeType.FAILED;
-            
+
             if (isReset)
             {
                 int tempCost = costValue;
@@ -114,24 +115,26 @@ namespace Framework.Game.Defense
 
                 levelValue = 1;
                 costValue = GetCostValue(characterIndex, isUniqueUpgrade);
+                costValue -= (int)(costValue * GameManager.Instance.upgradeCostBuffValue);
 
                 UIManager.Instance.ChangeValueSequnce(costValue, tempCost, text_CostValue);
                 UIManager.Instance.ChangeValueSequnce(levelValue, tempLevel, text_LevelValue);
 
                 UIManager.Instance.ChangeValueSequnce(costValue, tempCost, text_InactiveCostValue);
             }
-            
+
             UIManager.Instance.SetUpgradeAnim(characterIndex, levelValue, type);
         }
-        
+
         public void IncreaseCost()
         {
             int tempCost = costValue;
             int tempLevel = levelValue;
-            
+
             levelValue++;
             costValue = CalcCostValue(tempCost, tempLevel);
-            
+            costValue -= (int)(costValue * GameManager.Instance.upgradeCostBuffValue);
+
             UIManager.Instance.ChangeValueSequnce(costValue, tempCost, text_CostValue);
             UIManager.Instance.ChangeValueSequnce(levelValue, tempLevel, text_LevelValue);
 
@@ -139,35 +142,43 @@ namespace Framework.Game.Defense
             UIManager.Instance.SetUpgradeAnim(characterIndex, levelValue, UpgradeType.SUCCESS);
         }
 
+        public void BuffUpgradeCost()
+        {
+            int tempCost = costValue;
+            int tempLevel = levelValue;
+            costValue = CalcCostValue(tempCost, tempLevel);
+            costValue -= (int)(costValue * GameManager.Instance.upgradeCostBuffValue);
+        }
+
         public int CalcCostValue(int costValue, int levelValue)
         {
             float tempCostValue = costValue + levelValue;
-            
+
             switch (characterIndex)
             {
-                case CharacterIndex.HAMMERING :
+                case CharacterIndex.HAMMERING:
                     CharacterData characterData = DataManager.Instance.dic_CharacterData[characterIndex];
                     tempCostValue = Mathf.Floor((0.5f * Mathf.Pow(this.levelValue, 2) - 0.5f * this.levelValue + ConfigData.GEM_UPGRADE_FIRST)
-                                                * (characterData.characterUniqueValue[3] - (characterData.characterClassLevel - 1) 
+                                                * (characterData.characterUniqueValue[3] - (characterData.characterClassLevel - 1)
                                                     * characterData.classUpFactor[1]));
                     break;
             }
-            
+
             return (int)tempCostValue;
         }
-        
+
         public int GetCostValue(CharacterIndex characterIndex, bool isUniqueUpgrade)
         {
             float tempCostValue = ConfigData.GEM_UPGRADE_FIRST;
-            
+
             if (isUniqueUpgrade)
             {
                 switch (characterIndex)
                 {
-                    case CharacterIndex.HAMMERING :
+                    case CharacterIndex.HAMMERING:
                         CharacterData characterData = DataManager.Instance.dic_CharacterData[characterIndex];
                         tempCostValue = Mathf.Floor((0.5f * Mathf.Pow(levelValue, 2) - 0.5f * levelValue + ConfigData.GEM_UPGRADE_FIRST)
-                            * (characterData.characterUniqueValue[3] - (characterData.characterClassLevel - 1) 
+                            * (characterData.characterUniqueValue[3] - (characterData.characterClassLevel - 1)
                                 * characterData.classUpFactor[1]));
                         break;
                 }
@@ -216,7 +227,7 @@ namespace Framework.Game.Defense
             {
                 GameManager.Instance.UpgradeLevel(characterIndex, costValue, IncreaseCost);
             }
-            
+
             //TweeningButton();
         }
 

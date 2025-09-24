@@ -17,10 +17,14 @@ namespace Framework.Game.Defense
 
         public int rewardGroupIndex;
 
+        public int gameOverPlayerCount = 0;
+        public int rank = 0;
+
         public override void Spawned()
         {
             if (Object.HasStateAuthority)
             {
+                Debug.Log($"{gameObject.name} HasStateAuthority");
                 NetworkConnect.Instance.networkGameManager = this;
             }
         }
@@ -28,7 +32,7 @@ namespace Framework.Game.Defense
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void RpcInitializeComplete(int playerIdx)
         {
-            Debug.Log($"{playerIdx} is Initialize Complete");
+            Debug.Log($"{gameObject.name} {playerIdx} is Initialize Complete");
             NetworkConnect.Instance.InitializeCheck(playerIdx);
         }
 
@@ -39,37 +43,52 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_ReachBossWave(int roundId, string nickname, int rewardGroupIndex)
+        public void Rpc_ReachBossWave(int roundId, string nickname, int rewardGroupIndex, int bossIdx)
         {
-            Debug.Log("Boss Wave Start");
-            Debug.Log("Round Id : " + roundId);
-            Debug.Log("NickName : " + nickname);
-            Debug.Log("Current Game State: " + GameManager.Instance.gameState);
-            Debug.Log("reward Group Index : " + rewardGroupIndex);
+            Debug.Log($"{gameObject.name} Boss Wave Start");
+            Debug.Log($"{gameObject.name} Round Id : " + roundId);
+            Debug.Log($"{gameObject.name} NickName : " + nickname);
+            Debug.Log($"{gameObject.name} Current Game State: " + GameManager.Instance.gameState);
+            Debug.Log($"{gameObject.name} reward Group Index : " + rewardGroupIndex);
             this.rewardGroupIndex = rewardGroupIndex;
-            GameManager.Instance.BossWaveSeqeunce(roundId, nickname);
+            GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-        public void Rpc_WaveComplete(int playerId, int roundId)
+        public void Rpc_SpawnBoss(string nickname, float bossHealth)
+        {
+            Debug.Log($"{gameObject.name} Spawn Boss");
+            Debug.Log($"{gameObject.name} NickName : " + nickname);
+            Debug.Log($"{gameObject.name} Current Game State: " + GameManager.Instance.gameState);
+            Debug.Log($"{gameObject.name} reward Group Index : " + rewardGroupIndex);
+            if (nickname != NetworkConnect.Instance.nickname)
+                GameManager.Instance.SpawnPlasticMonster(NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount, bossHealth);
+        }
+
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled)
         {
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             // UIManager.Instance.ingameStatusMessage.SetMessage($"{nickname} : {roundId} Wave!!");
             NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
+            NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled = monsterKilled;
             UIManager.Instance.inGameRankPopup.SortPlayerData();
-            Debug.Log("Rpc Player Id :" + playerId);
-            Debug.Log("Rpc nickname :" + nickname);
-            Debug.Log("Rpc Round Id :" + roundId);
+            Debug.Log($"{gameObject.name} Rpc Player Id :" + playerId);
+            Debug.Log($"{gameObject.name} Rpc nickname :" + nickname);
+            Debug.Log($"{gameObject.name} Rpc Round Id :" + roundId);
         }
 
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
         public void Rpc_GameOver(int playerId, int roundId)
         {
+            int maxCount = NetworkConnect.Instance.dic_PlayerData.Count;
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver = true;
-            Debug.Log($"{nickname} is GameOver");
+            NetworkConnect.Instance.dic_PlayerData[playerId].rank = maxCount - gameOverPlayerCount;
+            gameOverPlayerCount += 1;
+            Debug.Log($"{gameObject.name} {nickname} is GameOver");
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"GameOver !!", nickname);
 
@@ -77,26 +96,39 @@ namespace Framework.Game.Defense
             {
                 SetRank();
             }
+        }
 
+        [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+        public void Rpc_SelectdFieldBossReward(int playerId)
+        {
+            NetworkConnect.Instance.FieldBossRewardCheck(playerId);
         }
 
         public void SetRank()
         {
-            int gameOverCount = 0;
-            int maxCount = 0;
-            foreach (var item in NetworkConnect.Instance.dic_PlayerData)
-            {
-                maxCount++;
-                if (item.Value.isGameOver) gameOverCount++;
-            }
-            Debug.Log("maxCount : " + maxCount);
-            Debug.Log("gameOverCount : " + gameOverCount);
+            int maxCount = NetworkConnect.Instance.dic_PlayerData.Count;
+            Debug.Log($"{gameObject.name} maxCount : " + maxCount);
+            Debug.Log($"{gameObject.name} gameOverCount : " + gameOverPlayerCount);
 
-            if (maxCount - gameOverCount == 1)
+            rank = maxCount - gameOverPlayerCount;
+            if (maxCount - gameOverPlayerCount == 1)
             {
-                Debug.Log("Player Win");
+                Debug.Log($"{gameObject.name} Player Win");
                 GameManager.Instance.GameOver();
             }
+            // List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
+
+            // data = data
+            // .OrderByDescending(x => x.waveCount)
+            // .ThenByDescending(x => x.monsterKilled)
+            // .ToList();
+
+            // for (int idx = 0; idx < data.Count; idx++)
+            // {
+            //     data[idx].rank = idx + 1;
+            // }
+
+            // rank = data.Find(x => x.userId == NetworkConnect.Instance.userId).rank;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
@@ -106,8 +138,8 @@ namespace Framework.Game.Defense
 
         public void AfterSpawned()
         {
-            string nickname = NetworkConnect.Instance.dic_PlayerData[Object.StateAuthority.AsIndex].nickname;
-            Debug.Log($"{nickname} object Spawned");
+            Debug.Log($"{gameObject.name} After Spawned");
+            // string nickname = NetworkConnect.Instance.dic_PlayerData[Object.StateAuthority.AsIndex].nickname;
         }
         #endregion
     }

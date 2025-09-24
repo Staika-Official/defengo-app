@@ -1303,7 +1303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7f62dca06c44214aa0e25b0763e166d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectedTab: 0
+  selectedTab: 1
   offColor: {r: 0.8392157, g: 0.89411765, b: 0.972549, a: 1}
   onColor: {r: 1, g: 0.972549, b: 0.76862746, a: 1}
   off_TMP_Positions:
@@ -6276,6 +6276,7 @@ GameObject:
   - component: {fileID: 6482084663966593651}
   - component: {fileID: 3391991830916957365}
   - component: {fileID: 271549664586378314}
+  - component: {fileID: 89769314835064255}
   m_Layer: 5
   m_Name: Image
   m_TagString: Untagged
@@ -6341,6 +6342,27 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!95 &89769314835064255
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1184701668254153970}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4c134bc0170a81c4a8bef549a8907729, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1411432760952778756
 GameObject:
   m_ObjectHideFlags: 0
@@ -30683,7 +30705,8 @@ MonoBehaviour:
   button_leagueTip: {fileID: 7151636660628070705}
   myRank: {fileID: 0}
   dailyLastRoundId: 0
-  lastRoundId: 0
+  weeklyLastRoundId: 0
+  leagueLastRoundId: 0
   focusRoundId: 0
   guideNotification: {fileID: 2717716090991998150}
   leagueObject: {fileID: 6607262945674780574}
@@ -32104,6 +32127,7 @@ GameObject:
   - component: {fileID: 6087796242441496133}
   - component: {fileID: 4165670545726521680}
   - component: {fileID: 6632950460928536647}
+  - component: {fileID: 5961038126516301440}
   m_Layer: 5
   m_Name: Text_League
   m_TagString: Untagged
@@ -32243,6 +32267,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 0
+--- !u!114 &5961038126516301440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6860257151813834608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:3d8e23a137d894fce98d785798cfb2d4
+    m_TableEntryReference:
+      m_KeyId: 371866918419869696
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &6888606201835978784
 GameObject:
   m_ObjectHideFlags: 0

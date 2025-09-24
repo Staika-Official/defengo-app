@@ -4,6 +4,7 @@ using Framework.GameData.Defense;
 using Framework.Network;
 using Framework.Sound;
 using Framework.Util;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -12,10 +13,13 @@ namespace Framework.UI
     public class StartUpSingleModePopup : PopupTemplate
     {
         public ButtonComponent button_Play;
+        public TextMeshProUGUI text_Rank;
+        public TextMeshProUGUI text_Week;
 
         public override void ActivePopup()
         {
             PopUpSequence(true);
+            LoadRankData();
         }
 
         public override void InActivePopup()
@@ -38,15 +42,21 @@ namespace Framework.UI
             };
         }
 
-
-        public void OnCompleteGameStart()
+        public async void LoadRankData()
         {
-            SceneLoadManager.Instance.SwitchingScene(3);
-        }
+            await NetworkManager.Instance.GetLeaderBoardBestWaves(LeaderBoardType.WAVE_WEEKLY, 0,
+            (json) =>
+            {
+                LeaderBoardRankInfoList data = JsonUtility.FromJson<LeaderBoardRankInfoList>(json);
+                text_Week.text = $"Week {data.roundId}";
+            }, null);
 
-        public void ReleasePlayButton(bool isInterectable)
-        {
-            button_Play.SetInterectible(isInterectable);
+            await NetworkManager.Instance.GetMyLeaderBoardRankInfo(LeaderBoardType.WAVE_WEEKLY, 0,
+            (json) =>
+            {
+                MyLeaderBoardRankData myRankData = JsonUtility.FromJson<MyLeaderBoardRankData>(json);
+                text_Rank.text = $"{myRankData.rank}";
+            }, null);
         }
     }
 }

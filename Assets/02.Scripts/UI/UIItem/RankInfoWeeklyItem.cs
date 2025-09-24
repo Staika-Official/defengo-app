@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Framework.Network;
 using Framework.GameData.Defense;
+using System.Collections.Generic;
 
 namespace Framework.UI
 {

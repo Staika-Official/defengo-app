@@ -16,6 +16,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Threading.Tasks;
+using UnityEngine.UI;
 
 namespace Framework.Game.Defense
 {
@@ -75,15 +78,23 @@ namespace Framework.Game.Defense
         public ObscuredInt interestGem;
         public ObscuredInt textGem;
         public ObscuredInt summonCost;
+        public ObscuredInt summonCostBuffValue = 0;
         public ObscuredInt summonCount;
         public ObscuredInt bossSummonCost;
         public ObscuredInt relocationCost;
-        public ObscuredFloat relocationCostDiscount = 0;
+        public ObscuredFloat relocationCostDiscount = 1;
         public ObscuredInt relocationCount;
-        public ObscuredFloat missionRewardBuffValue = 0;
-        public ObscuredFloat bossRewardBuffValue = 0;
+        public ObscuredFloat missionRewardBuffValue = 1;
+        public ObscuredFloat bossRewardBuffValue = 1;
         public ObscuredFloat monsterRewardBuffValue = 0;
         public ObscuredFloat upgradeCostBuffValue = 0;
+        public ObscuredFloat attackAllBuffValue = 1;
+        public ObscuredFloat attackRangeLessBuffValue = 1;
+        public ObscuredFloat attackRangeLessBuffTrigger = 0;
+        public ObscuredFloat attackRangeMoreBuffValue = 1;
+        public ObscuredFloat attackRangeMoreBuffTrigger = 0;
+        public ObscuredFloat attackSpeedBuffValue = 1;
+        public ObscuredFloat attackRangeBuffValue = 0;
         public bool isTestMode = false;
         public bool isGameOver = false;
         public int TotalGo = 0;
@@ -129,7 +140,7 @@ namespace Framework.Game.Defense
             .Subscribe(_ => monsterSpawner.ClearMonster());
             this.UpdateAsObservable()
                 .Where(_ => Input.GetKeyDown(KeyCode.B))
-                .Subscribe(_ => BossWaveSeqeunce(5, UserInfoManager.Instance.nickname));
+                .Subscribe(_ => BossWaveSeqeunce(5, UserInfoManager.Instance.nickname, 0));
 #endif
         }
 
@@ -203,7 +214,7 @@ namespace Framework.Game.Defense
             relocationCost = 0;
             summonCost = ConfigData.GEM_SUMMON_FIRST;
             waveReadyTimer = ConfigData.WAVE_READY_TIMER;
-            UIManager.Instance.ChangeValueSequnce(summonCost, 0, UIManager.Instance.text_SummonCharacterCost);
+            UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
         }
 
         public void BattleInitialize()
@@ -218,7 +229,7 @@ namespace Framework.Game.Defense
             relocationCost = 0;
             summonCost = ConfigData.GEM_SUMMON_FIRST;
             waveReadyTimer = ConfigData.WAVE_READY_TIMER;
-            UIManager.Instance.ChangeValueSequnce(summonCost, 0, UIManager.Instance.text_SummonCharacterCost);
+            UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
             buffManager.Initialize();
             renderSortManager.Initialized();
             NetworkConnect.Instance.networkGameManager.RpcInitializeComplete(NetworkConnect.Instance.playerIdx);
@@ -241,7 +252,7 @@ namespace Framework.Game.Defense
             relocationCost = 0;
             summonCost = ConfigData.GEM_SUMMON_FIRST;
             waveReadyTimer = ConfigData.WAVE_READY_TIMER;
-            UIManager.Instance.ChangeValueSequnce(summonCost, 0, UIManager.Instance.text_SummonCharacterCost);
+            UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
             buffManager.Initialize();
             renderSortManager.Initialized();
         }
@@ -273,6 +284,7 @@ namespace Framework.Game.Defense
                         RewardRule rewardRule = rewardRuleList.rewardRules[i];
                         dic_RewardRules.Add(rewardRule.code, rewardRule);
                     }
+                    playId = NetworkConnect.Instance.playId;
                     break;
                 default:
 
@@ -291,9 +303,9 @@ namespace Framework.Game.Defense
             }
             int value = 0;
             if (!isBoss)
-                value = (int)(data.rewards[idx].rewardValue + data.rewards[idx].rewardValue * monsterRewardBuffValue);
+                value = (int)(data.rewards[idx].rewardValue + monsterRewardBuffValue);
             else
-                value = (int)(data.rewards[idx].rewardValue + data.rewards[idx].rewardValue * bossRewardBuffValue);
+                value = (int)(data.rewards[idx].rewardValue * bossRewardBuffValue);
 
             if (isLoss)
             {
@@ -373,21 +385,19 @@ namespace Framework.Game.Defense
 
         public void DecreaseRelocationCost(float value)
         {
-            if (relocationCostDiscount == 0)
-            {
-                relocationCostDiscount = value;
-            }
-            else
-            {
-                relocationCostDiscount = relocationCostDiscount + relocationCostDiscount * value;
-            }
+            relocationCostDiscount -= relocationCostDiscount * value;
+            int temp = relocationCost;
+            int cost = ConfigData.GEM_RELOCATION * relocationCount;
+            relocationCost = (int)(cost * relocationCostDiscount);
+            UIManager.Instance.ChangeValueSequnce(relocationCost, temp, UIManager.Instance.text_RelocationCost);
+            CalcPossibleCostAction();
         }
 
         public void IncreaseRelocationCost()
         {
             int temp = relocationCost;
             int cost = ConfigData.GEM_RELOCATION * relocationCount;
-            relocationCost = (int)(cost - cost * relocationCostDiscount);
+            relocationCost = (int)(cost * relocationCostDiscount);
             UIManager.Instance.ChangeValueSequnce(relocationCost, temp, UIManager.Instance.text_RelocationCost);
             CalcPossibleCostAction();
         }
@@ -422,7 +432,7 @@ namespace Framework.Game.Defense
 
         public void UpgradeLevel(CharacterIndex characterIndex, int cost, UnityAction action)
         {
-            int upgradeCost = (int)(cost - cost * upgradeCostBuffValue);
+            int upgradeCost = cost;
             if (Gem >= upgradeCost)
             {
                 characterSpawner.UpgradeLevel(characterIndex);
@@ -505,14 +515,25 @@ namespace Framework.Game.Defense
             return type;
         }
 
-
-
         public void IncreaseSummonCost()
         {
             int temp = summonCost;
             summonCost = summonCost + summonCount + ConfigData.GEM_SUMMON_FACTOR;
-            UIManager.Instance.ChangeValueSequnce(summonCost, temp, UIManager.Instance.text_SummonCharacterCost);
+            UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, temp, UIManager.Instance.text_SummonCharacterCost);
             CalcPossibleCostAction();
+        }
+        public void BuffSummonCost(int buff)
+        {
+            summonCostBuffValue += buff;
+            UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
+        }
+        public void BuffUpgradeCost(float buff)
+        {
+            upgradeCostBuffValue += buff;
+            foreach (var itm in UIManager.Instance.buttons_Upgrade)
+            {
+                itm.BuffUpgradeCost();
+            }
         }
 
         public void ChangeGem(int changeValue)
@@ -540,7 +561,7 @@ namespace Framework.Game.Defense
 
         public void CalcPossibleCostAction()
         {
-            bool isPossibleSummon = summonCost <= Gem && GridManager.Instance.IsPossibleSummon();
+            bool isPossibleSummon = (summonCost - summonCostBuffValue) <= Gem && GridManager.Instance.IsPossibleSummon();
             UIManager.Instance.SetPossibleSummon(isPossibleSummon);
 
             bool isPossibleRelocation = relocationCost <= Gem;
@@ -576,7 +597,7 @@ namespace Framework.Game.Defense
             SoundManager.Instance.PlaySound(SoundKey.SF_MISSION_COMPLETE);
 
             int go = dic_RewardRules[$"MISSION_{missionIndex}"].rewardGo;
-            int goValue = (int)(go + go * missionRewardBuffValue);
+            int goValue = (int)(go * missionRewardBuffValue);
 
             ++missionManager.currentMissionClear;
             ++missionManager.totalMissionClear;
@@ -656,10 +677,49 @@ namespace Framework.Game.Defense
             isGameOver = true;
             gameState = GameState.GAME_OVER;
             SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
-            NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
 
-            UIManager.Instance.battleResultPopup.SetResultInfo(0, waveIdx);
+            EndBattlePayload payload = new EndBattlePayload()
+            {
+                lastWave = waveIdx,
+                playId = NetworkConnect.Instance.playId,
+                requestGo = Go,
+                sessionId = NetworkConnect.Instance.sessionId,
+                slotNumber = UserSlotManager.Instance.focusIdx,
+                userId = UserInfoManager.Instance.userId,
+            };
+            
+            if (!NetworkConnect.Instance.isFriendlyMatch)
+                CallEndBattle(payload);
+            else
+                NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+
+            //Sort
+            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
+
+            data = data
+            .OrderByDescending(x => x.waveCount)
+            .ThenByDescending(x => x.monsterKilled)
+            .ToList();
+
+            for (int idx = 0; idx < data.Count; idx++)
+            {
+                data[idx].rank = idx + 1;
+            }
+
+            UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+            NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
             Debug.Log("Battle Game Over");
+        }
+
+        async void CallEndBattle(EndBattlePayload payload)
+        {
+            await NetworkManager.Instance.EndBattle(payload, () =>
+            {
+                NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+            }, () =>
+            {
+                CallEndBattle(payload);
+            });
         }
 
         public void GameFinishedSend(int bounsWave = 0)
@@ -717,7 +777,10 @@ namespace Framework.Game.Defense
 
         public void SetCurrentRewardValue(int idx)
         {
-            currentRewardGoValue = dic_RewardRules[$"WAVE_{idx}"].rewardGo;
+            if (dic_RewardRules.ContainsKey($"WAVE_{idx}"))
+                currentRewardGoValue = dic_RewardRules[$"WAVE_{idx}"].rewardGo;
+            else
+                currentRewardGoValue = 0;
         }
 
         public void WaveStart()
@@ -814,27 +877,47 @@ namespace Framework.Game.Defense
             SpawnData spawnData = characterSpawner.currentSpawnData;
             bestAttackSpeed = (float)Math.Round(bestAttackSpeed, 2);
 
-            PlayRecord data = new()
+            if (gameMode == GameMode.SINGLE)
             {
-                waveNumber = waveIdx,
-                requestGo = reqGo + bossGo + missionGo,
-                killedMonster = monsterSpawner.killedMonsterCount,
-                completedMissions = this.completedMission,
-                bossLevel = killedBossLevel,
-                playId = this.playId,
-                attackSpeed = bestAttackSpeed,
-                attackDamage = bestAttackDamage,
-                upgrade = bestUpgrade,
-                monsterHealth = monsterSpawner.monsterHealth,
-                killedBossMonster = monsterSpawner.killedBossMonsterCount,
-                missionClear = missionManager.currentMissionClear,
-                characterSummon = spawnData.summonCharacter,
-                characterMerge = spawnData.characterMerge,
-                characterUpgrade = spawnData.characterUpgrade,
-                fourStarGrade = spawnData.fourStarGrade
-            };
+                PlayRecord data = new()
+                {
+                    waveNumber = waveIdx,
+                    requestGo = reqGo + bossGo + missionGo,
+                    killedMonster = monsterSpawner.killedMonsterCount,
+                    completedMissions = this.completedMission,
+                    bossLevel = killedBossLevel,
+                    playId = this.playId,
+                    attackSpeed = bestAttackSpeed,
+                    attackDamage = bestAttackDamage,
+                    upgrade = bestUpgrade,
+                    monsterHealth = monsterSpawner.monsterHealth,
+                    killedBossMonster = monsterSpawner.killedBossMonsterCount,
+                    missionClear = missionManager.currentMissionClear,
+                    characterSummon = spawnData.summonCharacter,
+                    characterMerge = spawnData.characterMerge,
+                    characterUpgrade = spawnData.characterUpgrade,
+                    fourStarGrade = spawnData.fourStarGrade
+                };
 
-            NetworkManager.Instance.SendPlayRecord(data);
+                NetworkManager.Instance.SendPlayRecord(data);
+            }
+            else if (gameMode == GameMode.SINGLE)
+            {
+                BattleRecord battleRecord = new()
+                {
+                    waveNumber = waveIdx,
+                    requestGo = reqGo + bossGo + missionGo,
+                    killedMonster = monsterSpawner.killedMonsterCount,
+                    completedMissions = this.completedMission,
+                    bossLevel = killedBossLevel,
+                    playId = this.playId,
+                    characterInfo = "",
+                    monsterInfo = null,
+                    sessionId = NetworkConnect.Instance.sessionId,
+                };
+
+                NetworkManager.Instance.SendBattleRecord(battleRecord);
+            }
 
             SetRecordClear();
             completedMission = "";
@@ -847,9 +930,14 @@ namespace Framework.Game.Defense
             onCompleteWave?.Invoke();
             UIManager.Instance.WaveEndSequence();
             InterestPayment();
+            UIManager.Instance.button_giveUp.gameObject.SetActive(waveIdx >= ConfigData.SURRENDER_WAVE_MIN);
             if (waveIdx != 0 && waveIdx % 5 == 0 && gameMode == GameMode.BATTLE)
             {
                 ReachBossWave();
+            }
+            else if (waveIdx > 1 && waveIdx % 5 == 1 && gameMode == GameMode.BATTLE)
+            {
+                
             }
             else
             {
@@ -871,7 +959,9 @@ namespace Framework.Game.Defense
             };
             int rewardGroupIndex = Calculator.GetIndependentTrial(rewardGroup);
             Debug.Log("rewardGroup Index : " + rewardGroupIndex);
-            NetworkConnect.Instance.networkGameManager.Rpc_ReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex);
+            var TempbossList = UIManager.Instance.bossSelectPopup.TempbossList;
+            int randomIdx = Random.Range(0, TempbossList.Length);
+            NetworkConnect.Instance.networkGameManager.Rpc_ReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
         }
         public float tempBossAddHealth;
         public float SetAddBossHealth(int roundId)
@@ -913,8 +1003,9 @@ namespace Framework.Game.Defense
         /// <summary>
         /// 보스 시퀀스 시작
         /// </summary>
-        public void BossWaveSeqeunce(int roundId, string nickname)
+        public void BossWaveSeqeunce(int roundId, string nickname, int bossIdx)
         {
+            if (isGameOver) return;
             UIManager.Instance.BossWaveItem.gameObject.SetActive(true);
             Debug.Log("BossWave Sequence wave Idx : " + roundId);
             float addhealth = SetAddBossHealth(roundId);
@@ -923,7 +1014,7 @@ namespace Framework.Game.Defense
             monsterSpawner.waveIdx = roundId;
 
             Debug.Log("AddHealth : " + addhealth);
-            UIManager.Instance.BossWaveItem.Initialize(addhealth);
+            UIManager.Instance.BossWaveItem.Initialize(addhealth, bossIdx);
             UIManager.Instance.ChangeWaveValue(roundId);
             waveIdx = roundId;
             switch (gameState)
@@ -947,6 +1038,12 @@ namespace Framework.Game.Defense
                 case GameState.GAME_OVER:
                     break;
             }
+        }
+
+        public void SpawnPlasticMonster(int remainingPlayer, float bossHealth)
+        {
+            if (isGameOver) return;
+            monsterSpawner.SpawnPlasticMonster(remainingPlayer, bossHealth);
         }
 
         public void Damaged()

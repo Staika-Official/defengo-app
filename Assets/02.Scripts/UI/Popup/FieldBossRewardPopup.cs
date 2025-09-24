@@ -5,6 +5,8 @@ using Framework.GameData.Defense;
 using Framework.Util;
 using System.Linq;
 using Framework.Network;
+using Newtonsoft.Json;
+using TMPro;
 
 
 namespace Framework.UI
@@ -18,21 +20,33 @@ namespace Framework.UI
         public FieldBossRewardItem[] fieldBossRewardItems;
         public FieldBossRewardGroupData fieldBossRewardGroupData;
         public IEnumerator countDown;
-        public Button button_refresh;
+        public ButtonComponent button_refresh;
+        public TextMeshProUGUI text_time;
+        public TextMeshProUGUI text_Refresh;
+        public Slider slider_time;
+        public Slider slider_time2;
+        public Button button_Down;
+        public Button button_Up;
+        public GameObject go_Open;
+        public GameObject go_Close;
 
         public IEnumerator SetCountDown()
         {
-            float timeCount = 6f;
+            float timeCount = ConfigData.BATTLE_REWARD_TIME_OUT;
 
             while (true)
             {
-                timeCount -= Time.deltaTime;
-                yield return null;
+                timeCount -= 1;
+                slider_time.value = timeCount / ConfigData.BATTLE_REWARD_TIME_OUT;
+                slider_time2.value = timeCount / ConfigData.BATTLE_REWARD_TIME_OUT;
+                text_time.text = $"{timeCount}";
+                yield return new WaitForSeconds(1);
 
                 if (timeCount <= 0)
                     break;
             }
 
+            fieldBossRewardItems[0].OnClick_SelectReward(fieldBossRewardItems[0].fieldBossBuffType);
 
             Debug.Log("Time Over");
         }
@@ -44,10 +58,17 @@ namespace Framework.UI
             PopUpSequence(true);
 
             openAnimation.Play();
+
+            StartCoroutine(SetCountDown());
         }
 
         public async void SetRewardItem()
         {
+            if (refreshCount <= 0)
+                return;
+            refreshCount--;
+            text_Refresh.text = $"{refreshCount}";
+            button_refresh.SetInterectible(refreshCount > 0);
             fieldBossRewardGroupData = await DataLoadManager.Instance.GetDataAsyncBinary<FieldBossRewardGroupData>("FieldBossRewardGroupData");
             int rewardGroupIndex = NetworkConnect.Instance.networkGameManager.rewardGroupIndex;
 
@@ -72,6 +93,7 @@ namespace Framework.UI
 
             for (int i = 0; i < selected.Length; i++)
             {
+                Debug.Log($"Selected rewards: {JsonConvert.SerializeObject(fieldBossRewardDatas[selected[i]])}");
                 fieldBossRewardItems[i].Initialize(fieldBossRewardDatas[selected[i]]);
             }
         }
@@ -83,9 +105,21 @@ namespace Framework.UI
 
         public override void Initialize()
         {
-            refreshCount = 2;
+            refreshCount = ConfigData.BATTLE_REWARD_REFRESH_COUNT;
+            text_Refresh.text = $"{refreshCount}";
+            button_refresh.SetInterectible(refreshCount > 0);
 
-            button_refresh.onClick.AddListener(() => Onclick_Refresh());
+            button_refresh.onPointerUp = Onclick_Refresh;
+            button_Down.onClick.AddListener(() =>
+            {
+                go_Close.gameObject.SetActive(true);
+                go_Open.gameObject.SetActive(false);
+            });
+            button_Up.onClick.AddListener(() =>
+            {
+                go_Close.gameObject.SetActive(false);
+                go_Open.gameObject.SetActive(true);
+            });
         }
 
         public void Onclick_Refresh()

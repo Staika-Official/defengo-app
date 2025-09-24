@@ -32,12 +32,12 @@ namespace Framework.Network
         {
             Debug.Log($"After Spawned {Nickname} Join Game");
 
-            MatchMakingPopup matchMakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+            // MatchMakingPopup matchMakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
             //matchMakingPopup.dic_PlayerData.Add(Object.InputAuthority, this);
             //NetworkConnect.Instance.dic_PlayerData.Add(Object.InputAuthority, this);
-            matchMakingPopup.UpdateUserInfo();
+            // matchMakingPopup.UpdateUserInfo();
 
-            NetworkConnect.Instance.CheckPlayerCount();
+            // NetworkConnect.Instance.CheckPlayerCount();
             // if(NetworkConnect.Instance.runner.SessionInfo.MaxPlayers == NetworkConnect.Instance.runner.SessionInfo.PlayerCount && IsHost)
             // {
             //     Debug.Log("Max Player");
@@ -49,26 +49,26 @@ namespace Framework.Network
         {
             Debug.Log("Spawned");
 
-            if (Object.HasStateAuthority)
-            {
-                Slot slot = UserSlotManager.Instance.GetSlotFocusIndexData();
-                for (int i = 0; i < slot.slotCharacterIds.Length; i++)
-                {
-                    DecList.Set(i, slot.slotCharacterIds[i]);
-                }
-                IsHost = NetworkConnect.Instance.isHost;
-                ProfileId = UserInfoManager.Instance.userState.equippedProfileId;
-                Nickname = UserInfoManager.Instance.nickname;
-                //this.playerRef = playerRef;
-            }
+            // if (Object.HasStateAuthority)
+            // {
+            //     Slot slot = UserSlotManager.Instance.GetSlotFocusIndexData();
+            //     for (int i = 0; i < slot.slotCharacterIds.Length; i++)
+            //     {
+            //         DecList.Set(i, slot.slotCharacterIds[i]);
+            //     }
+            //     IsHost = NetworkConnect.Instance.isHost;
+            //     ProfileId = UserInfoManager.Instance.userState.equippedProfileId;
+            //     Nickname = UserInfoManager.Instance.nickname;
+            //this.playerRef = playerRef;
+            // }
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {
             Debug.Log("Despawned");
-            MatchMakingPopup matchMakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+            // MatchMakingPopup matchMakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
             //NetworkConnect.Instance.dic_PlayerData.Remove(Object.InputAuthority);
-            matchMakingPopup.UpdateUserInfo();
+            // matchMakingPopup.UpdateUserInfo();
         }
 
         public void PlayerJoined(PlayerRef player)

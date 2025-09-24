@@ -4291,6 +4291,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5925541281589317463, guid: 26b926f97a9c8f94eae3cd417b067c7e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7218304433357414529, guid: 26b926f97a9c8f94eae3cd417b067c7e, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -14.808594
@@ -5352,6 +5356,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1705736264}
   m_CullTransparentMesh: 1
+--- !u!114 &1715967416 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3614785808233050818, guid: e77a84b5e432b41c7a2d2a4a55fc9d6f, type: 3}
+  m_PrefabInstance: {fileID: 7247807489434022024}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1737995818
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5901,6 +5916,7 @@ MonoBehaviour:
   - {fileID: 629587363}
   - {fileID: 5418848773370364550}
   text_Nickname: {fileID: 3678889859027131943}
+  text_RankTier: {fileID: 1715967416}
   text_Energy: {fileID: 5896457626028626051}
   text_Gem: {fileID: 278869896}
   text_Taika: {fileID: 1512912592}
@@ -5931,6 +5947,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1882336148 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 28763307, guid: 26b926f97a9c8f94eae3cd417b067c7e, type: 3}
+  m_PrefabInstance: {fileID: 1320306297}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e358905b49cab944eae30ad858a2155f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1882532960 stripped
@@ -9260,6 +9287,22 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2900638413347403899, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2900638413347403899, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2900638413347403899, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2900638413347403899, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4542695472228763173, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
       propertyPath: postObject
       value: 
@@ -9305,6 +9348,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1320306299}
     - target: {fileID: 4542695472228763173, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: transitionScene
+      value: 
+      objectReference: {fileID: 1882336148}
+    - target: {fileID: 4542695472228763173, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
       propertyPath: passNoticeObject
       value: 
       objectReference: {fileID: 901696116}
@@ -9340,6 +9387,22 @@ PrefabInstance:
       propertyPath: text_BattlePassPeriod
       value: 
       objectReference: {fileID: 1581890533}
+    - target: {fileID: 4725837444912462841, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4725837444912462841, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4725837444912462841, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4725837444912462841, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8374860537537963752, guid: 9d3efc62a01de4b33ada77ab95930d12, type: 3}
       propertyPath: m_Name
       value: Screen - Home

@@ -40,6 +40,7 @@ namespace Framework.UI
             text_tier.text = "1";
             text_nickname.text = data.nickname;
             text_waveCount.text = "1";
+            text_tier.text = data.rankTier;
 
             UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[data.profileId];
 

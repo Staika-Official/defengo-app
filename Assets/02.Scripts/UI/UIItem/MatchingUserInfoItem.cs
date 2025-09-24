@@ -19,12 +19,24 @@ namespace Framework.UI
         public GameObject userInfo;
         public GameObject locked;
         public GameObject matching;
+        public Button button_Invite;
+
+        void Awake()
+        {
+            button_Invite.onClick.AddListener(() =>
+            {
+                FriendPopup popup = PopupManager.Instance.GetPopUp<FriendPopup>("friend");
+                popup.ActivePopup();
+                popup.Show(true);
+            });
+        }
 
         public void UserInfoInitialize(NetworkBattleData networkBattleData)
         {
             userInfo.SetActive(true);
             locked.SetActive(false);
             matching.SetActive(false);
+            button_Invite.gameObject.SetActive(false);
 
             UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[networkBattleData.profileId];
 

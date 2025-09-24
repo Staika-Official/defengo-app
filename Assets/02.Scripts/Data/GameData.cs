@@ -156,8 +156,12 @@ namespace Framework.GameData.Defense
         INCREASE_MISSION_REWARD = 6,
         DECREASE_BOSS_COOLTIME = 7,
         INCREASE_BOSS_REWARD  = 8,
+        INCREASE_ATTACK_SPEED_ALL = 9,
+        GET_STRONGER_CHARACTER = 10,
         DECREASE_UPGRADE_COST = 11,
-        INCREASE_MONSTER_REWARD = 12
+        INCREASE_MONSTER_REWARD = 12,
+        DECREASE_SUMMON_PRICE = 13,
+        INCREASE_ATTACK_RANGE_ALL = 14,
     }
 
     public enum FieldBossMonster
@@ -563,6 +567,15 @@ namespace Framework.GameData.Defense
         public static readonly float CHARACTER_SELL_RATE = 0.4f;
         public static readonly float MONTHLY_PACKAGEREWARD_RATE = 20f;
         public static readonly float ATTACK_HIT_TIK_RATE = 0.5f;
+        public static readonly float BATTLE_BOSS_MONSTER_APPEAR = 18f;
+        public static readonly float BATTLE_BOSS_MONSTER_DEVICE = 1.5f;
+        public static readonly float BATTLE_BOSS_MONSTER_HEALTH_DEVICE = 6f;
+        public static readonly float BATTLE_BOSS_MONSTER_SPEED = 4f;
+        public static readonly float BATTLE_MODE_PLAY_COST = 0;
+        public static readonly float RANK_TIER_LP_CONDITION = 100;
+        public static readonly float SURRENDER_WAVE_MIN = 11;
+        public static readonly int BATTLE_REWARD_REFRESH_COUNT = 2;
+        public static readonly int BATTLE_REWARD_TIME_OUT = 6;
     }
 
     [Serializable]

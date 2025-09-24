@@ -31,6 +31,10 @@ namespace Framework.UI
         public GameObject goIcon;
 
         public Button button_ViewDetail;
+        
+        [SerializeField] private GameObject go_Profile;
+        [SerializeField] private Image image_Rank;
+        [SerializeField] private List<Sprite> sprite_Ranks;
 
         public int userId;
 
@@ -48,6 +52,9 @@ namespace Framework.UI
             userId = data.userId;
             UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[data.profileId];
             //CharacterData characterData = DataManager.Instance.dic_CharacterData[(CharacterIndex)data.profileId];
+
+            image_Rank.gameObject.SetActive(false);
+            go_Profile.SetActive(true);
 
             switch (userProfileData.profileType)
             {
@@ -87,6 +94,24 @@ namespace Framework.UI
 
             bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
             text_GoValue.text = $"<sprite=12>{data.bestWave}";
+            SetCellColorInfo(rank, isMine);
+        }
+        public void Initialize(BattleLeaderboardInfo data, int rank)
+        {
+            userId = data.userId;
+            //CharacterData characterData = DataManager.Instance.dic_CharacterData[(CharacterIndex)data.profileId];
+
+            image_Rank.gameObject.SetActive(true);
+            image_Rank.sprite = sprite_Ranks[DataManager.Instance.GetRankTierConfig(data.finalRank).tierGradeType];
+            go_Profile.SetActive(false);
+
+            text_Rank.text = $"{rank}";
+            text_Rank.color = Color.white;
+            string[] temp = data.nickname.Split('@');
+            text_Nickname.text = temp[0];
+
+            bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
+            text_GoValue.text = $"<sprite=12>{data.lp}";
             SetCellColorInfo(rank, isMine);
         }
 

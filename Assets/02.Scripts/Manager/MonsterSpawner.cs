@@ -193,19 +193,38 @@ namespace Framework.Game.Defense
 
         public void SetFieldBossWaveStart(BossData bossData)
         {
-            Monster monster = bossData.bossIndex switch
+            switch (bossData.bossIndex)
             {
-                FieldBossMonster.TRUSH => GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105"),
-                FieldBossMonster.SMOKER => GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101"),
-                // FieldBossMonster.SOTTY => GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3"),
-                // FieldBossMonster.LOCKY => GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4"),
-                // FieldBossMonster.PARASITE => GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5"),
-                FieldBossMonster.BOOMBER => GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6"),
-                FieldBossMonster.EMBEREON => throw new System.NotImplementedException(),
-                _ => throw new System.NotImplementedException(),
-            };
-            monster.FieldBossInitialize(bossData);
-            monsters.Add(monster);
+                case FieldBossMonster.TRUSH:
+                    NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
+                    normalBossMonster.monsterType = MonsterType.BOSS_MONSTER;
+                    normalBossMonster.isBoss = true;
+                    normalBossMonster.waveIndex = bossIdx + 1;
+                    normalBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(normalBossMonster);
+                    break;
+                case FieldBossMonster.SMOKER:
+                    CarBossMonster carBossMonster = GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101");
+                    carBossMonster.monsterType = MonsterType.BOSS_MONSTER;
+                    carBossMonster.isBoss = true;
+                    carBossMonster.waveIndex = bossIdx + 1;
+                    carBossMonster.monCloneHealth = bossData.uniqueValue[0];
+                    carBossMonster.monCloneId = 51;
+                    carBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(carBossMonster);
+                    break;
+            }
+            // Monster monster = bossData.bossIndex switch
+            // {
+            //     FieldBossMonster.SMOKER => GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101"),
+            //     // FieldBossMonster.SOTTY => GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3"),
+            //     // FieldBossMonster.LOCKY => GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4"),
+            //     // FieldBossMonster.PARASITE => GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5"),
+            //     FieldBossMonster.BOOMBER => GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6"),
+            //     // FieldBossMonster.EMBEREON => throw new System.NotImplementedException(),
+            //     _ => throw new System.NotImplementedException(),
+            // };
+            // monsters.Add(monster);
         }
 
         public void SetBossMonsterStart()
@@ -233,7 +252,6 @@ namespace Framework.Game.Defense
                     carBossMonster.monCloneHealth = data.cloneMonsterHealth;
                     carBossMonster.monCloneId = data.cloneMonsterId;
                     monsters.Add(carBossMonster);
-
                     break;
                 case 105:
                     NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
@@ -248,6 +266,11 @@ namespace Framework.Game.Defense
                     break;
             }
             bossIdx++;
+
+            if (GameManager.Instance.gameMode == GameMode.BATTLE)
+            {
+                NetworkConnect.Instance.networkGameManager.Rpc_SpawnBoss(UserInfoManager.Instance.nickname, data.bossHealth);
+            }
         }
 
         public void SetCloneMonster(float health, float speed, int cloneId, int arrayIdx)
@@ -258,8 +281,30 @@ namespace Framework.Game.Defense
             monsters.Add(monster);
             monster.speed = speed;
             monster.health = health;
-            monster.maxHealth = health;
-            monster.SetMonsterMove(asset, arrayIdx);
+            monster.SetMonsterMove(asset, arrayIdx, MonsterType.CLONE_MONSTER);
+        }
+
+        public void SpawnPlasticMonster(int remainingPlayer = 1, float casterBossHealth = 1000)
+        {
+            StartCoroutine(SpawnPlasticMonsterSequence(remainingPlayer, casterBossHealth));
+        }
+        IEnumerator SpawnPlasticMonsterSequence(int remainingPlayer, float casterBossHealth)
+        {
+            var interval = ConfigData.CREATE_MONSTER_TIME;
+            SkeletonDataAsset asset = dic_monsterAnimAsset[2];
+
+            int amount = (int)(ConfigData.BATTLE_BOSS_MONSTER_APPEAR / ConfigData.BATTLE_BOSS_MONSTER_DEVICE / remainingPlayer);
+
+            for (int i = 0; i < amount; i++)
+            {
+                Monster monster = GameManager.Instance.objectPoolManager.GetObject<Monster>("Monster");
+
+                monsters.Add(monster);
+                monster.speed = ConfigData.BATTLE_BOSS_MONSTER_SPEED;
+                monster.health = casterBossHealth / ConfigData.BATTLE_BOSS_MONSTER_HEALTH_DEVICE;
+                monster.SetMonsterMove(asset, MonsterType.CLONE_MONSTER);
+                yield return new WaitForSeconds(interval);
+            }
         }
 
         public IEnumerator TutorialMonsterSpawn()
@@ -512,7 +557,7 @@ namespace Framework.Game.Defense
                                 UIManager.Instance.ChangeWaveValue(currentWaveIdx + 1);
                                 if (GameManager.Instance.gameMode == GameMode.BATTLE)
                                 {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1);
+                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1, totalKilledMonsterCount);
                                 }
                                 GameManager.Instance.waveIdx = currentWaveIdx + 1;
                             }
@@ -522,7 +567,7 @@ namespace Framework.Game.Defense
                                 UIManager.Instance.ChangeWaveValue(idx);
                                 if (GameManager.Instance.gameMode == GameMode.BATTLE)
                                 {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, idx);
+                                    NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, idx, totalKilledMonsterCount);
                                 }
                                 GameManager.Instance.waveIdx = idx;
                             }

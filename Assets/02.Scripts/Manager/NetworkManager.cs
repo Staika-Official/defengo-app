@@ -183,6 +183,19 @@ namespace Framework.Network
         //  3: userInboxId
         //  </summary>
         public static readonly string putHandleFriendRequest = "/game/api/friend-request/{0}/?status={1}&inboxId={2}&userInboxId={3}";
+
+        //Battle 
+        public static readonly string postReadyForBattle = "/game/api/battle-play/users/{0}/ready";
+        public static readonly string postStartBattle = "/game/api/battle-play/users/{0}/sessions/{1}";
+        public static readonly string postCreateBattleRecord = "/game/api/battle-play/users/{0}/sessions/{1}/waves/{2}";
+        public static readonly string postEndBattle = "/game/api/battle-play/users/{0}/sessions/{1}/end/{2}";
+        public static readonly string getRankTierConfig = "/game/api/battle-play/rank-tier";
+        public static readonly string getMyBattleLeaderboard = "/game/api/battle-user-leader-board/users/{0}";
+        public static readonly string getBattleLeaderboard = "/game/api/battle-season/battle-user-leaderboard";
+        public static readonly string getSummaryBattle = "/game/api/battle-play/users/{0}/defengo-user-plays/{1}";
+        public static readonly string putHandleFriendlyBattleInvite = "/game/api/battle-friend/users/{0}/battle-friend-requests/{1}?inboxId={2}&userInboxId={3}";
+        public static readonly string postInviteFriendToBattle = "/game/api/battle-friend/users/{0}/friends/{1}/roomName/{2}/roomPassword/{3}";
+        public static readonly string getBattleConfig = "/game/api/battle-play/configs";
     }
 
     public enum ApplicationState
@@ -234,6 +247,7 @@ namespace Framework.Network
         public UnityAction<string> OnFailedLoadUserData;
 
         public Stack<PlayRecord> disposedPlayRecords = new();
+        public Stack<BattleRecord> disposedBattleRecords = new();
 
         private void Awake()
         {
@@ -249,7 +263,7 @@ namespace Framework.Network
 #endif
             }
         }
-        
+
 #if UNITY_EDITOR
         private void Start()
         {
@@ -325,6 +339,7 @@ namespace Framework.Network
             UserInfoManager.Instance.eventInfo.eventBoss = totalUserData.eventBoss;
             UserInfoManager.Instance.dailyRewardBoard.rewardLeaderBoard = totalUserData.rewardDailyLeaderBoards;
             UserInfoManager.Instance.weeklyRewardBoard.rewardLeaderBoard = totalUserData.rewardLeaderBoards;
+            UserInfoManager.Instance.leagueRewardBoard.rewardLeaderBoard = totalUserData.rewardLeagueLeaderBoards;
             UserInfoManager.Instance.discordConnect = totalUserData.discord;
             UserInfoManager.Instance.userItemDic = totalUserData.userItems.ToDictionary(u => u.item, u => u.quantity);
             CharacterClassManager.Instance.Initialize(totalUserData.classUpRule);
@@ -361,6 +376,8 @@ namespace Framework.Network
             onPendingInAppPurchase?.Invoke();
 
             AssetManager.Instance.AssetDownload();
+
+            DataManager.Instance.LoadRankTierConfig();
         }
 
         #endregion
@@ -379,7 +396,7 @@ namespace Framework.Network
             UserState userState = await SendToServerAsync<UserState>(
                            string.Format(Url.userState, UserInfoManager.Instance.userId, LanguageManager.Instance.nationalKey,
                                UserInfoManager.Instance.email, Application.version), SendType.GET, TokenType.ACCESSTOKEN);
-            
+
             UserInfoManager.Instance.SetUserState(userState);
         }
 
@@ -729,7 +746,7 @@ namespace Framework.Network
                         title = value["title"],
                         content = value["content"]
                     };
-                    if(!UserInfoManager.Instance.dic_BoardList.ContainsKey(boardList.boardType))
+                    if (!UserInfoManager.Instance.dic_BoardList.ContainsKey(boardList.boardType))
                     {
                         UserInfoManager.Instance.dic_BoardList.Add(boardList.boardType, boardList);
                     }
@@ -3732,11 +3749,11 @@ namespace Framework.Network
         public async UniTask PostRouletteReward(int playId, RoulettePaidType type, UnityAction<ReqRouletteRewardData> onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postRouletteReward, UserInfoManager.Instance.userId), "POST");
-            
+
             ResponeRoulettePlayId data = new();
             data.playId = playId;
             data.paidType = type.ToString();
-            
+
             string json = JsonUtility.ToJson(data);
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
             req.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -3767,7 +3784,7 @@ namespace Framework.Network
         public async UniTask GetRecommendedFriends(UnityAction<ReqRecommendedFriendsData> onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getRecommendedFriends, UserInfoManager.Instance.userId), "GET");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3795,7 +3812,7 @@ namespace Framework.Network
         public async UniTask GetListFriends(UnityAction<ReqListFriendsData> onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getListFriend, UserInfoManager.Instance.userId), "GET");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3846,7 +3863,7 @@ namespace Framework.Network
         public async UniTask SearchFriends(string friendId, UnityAction<ReqSearchFriendsData> onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getSearchFriend, UserInfoManager.Instance.userId, friendId), "GET");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3873,7 +3890,7 @@ namespace Framework.Network
         public async UniTask GetFriendProfile(string friendId, UnityAction<TotalProfileData> onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getFriendProfile, UserInfoManager.Instance.userId, friendId), "GET");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3901,7 +3918,7 @@ namespace Framework.Network
         public async UniTask SendEnergy(string friendId, UnityAction onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSendEnergy, UserInfoManager.Instance.userId, friendId), "POST");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3926,8 +3943,8 @@ namespace Framework.Network
 
         public async UniTask HandleFriendRequest(UserInbox userInbox, FriendRequestStatus friendRequestStatus, UnityAction onSuccess, UnityAction<string> onFailed)
         {
-            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.putHandleFriendRequest, userInbox.value, friendRequestStatus.ToString(), userInbox.id, userInbox.inboxId), "PUT");
-            
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.putHandleFriendRequest, userInbox.value, friendRequestStatus.ToString(), userInbox.inboxId, userInbox.id), "PUT");
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3953,7 +3970,7 @@ namespace Framework.Network
         public async UniTask DeleteFriend(string friendId, UnityAction onSuccess, UnityAction<string> onFailed)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.delDeleteFriend, UserInfoManager.Instance.userId, friendId), "DELETE");
-            
+
             req.downloadHandler = new DownloadHandlerBuffer();
             string accessToken = SecurePlayerPrefs.GetString("accessToken");
             req.SetRequestHeader(contentType, contentTypeValue);
@@ -3971,6 +3988,342 @@ namespace Framework.Network
                 Debug.Log(req.downloadHandler.text);
                 ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
                 onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask ReadyForBattle(ReadyBattlePayload payload, UnityAction<ReadyBattleResponse> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postReadyForBattle, UserInfoManager.Instance.userId), "POST");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            var json = JsonUtility.ToJson(payload);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                ReadyBattleResponse response = GetT<ReadyBattleResponse>(req.downloadHandler.text);
+                Debug.Log("ready battle success " + req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("ready battle success " + req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask StartBattle(StartBattlePayload payload, UnityAction<int> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postStartBattle, UserInfoManager.Instance.userId,
+                                NetworkConnect.Instance.sessionId), "POST");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            var json = JsonUtility.ToJson(payload);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                StartBattleResponse response = GetT<StartBattleResponse>(req.downloadHandler.text);
+                Debug.Log("Start battle success " + req.downloadHandler.text);
+                onSuccess?.Invoke(response.playId);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Start battle failed " + req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+
+        public async void SendBattleRecord(BattleRecord data)
+        {
+            disposedBattleRecords.Push(data);
+            int stackCount = disposedPlayRecords.Count;
+
+            for (int i = 0; i < stackCount; i++)
+            {
+                await CreateBattleRecord(disposedBattleRecords.Pop());
+            }
+        }
+
+        public async UniTask CreateBattleRecord(BattleRecord data)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postCreateBattleRecord,
+                                UserInfoManager.Instance.userId, NetworkConnect.Instance.sessionId, data.waveNumber), "POST");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            var json = JsonUtility.ToJson(data);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+            }
+            catch
+            {
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage serverErrorMessage = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                switch (serverErrorMessage.status)
+                {
+                    case 401:
+                        _ = RefreshToken();
+                        OnComplete_RefreshToken = () => { _ = CreateBattleRecord(data); };
+                        break;
+                    case 406:
+                        break;
+                    case 400:
+                        Debug.Log(serverErrorMessage.errorCode);
+                        _ = Logout();
+                        break;
+                    case 422:
+                        Debug.Log(serverErrorMessage.errorCode);
+                        _ = Logout();
+                        break;
+                }
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask EndBattle(EndBattlePayload payload, UnityAction onSuccess, UnityAction onFail)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postEndBattle, UserInfoManager.Instance.userId,
+                                NetworkConnect.Instance.sessionId, NetworkConnect.Instance.playId), "POST");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            var json = JsonUtility.ToJson(payload);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("End battle success " + req.downloadHandler.text);
+                onSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("End battle faild " + req.downloadHandler.text);
+                onFail?.Invoke();
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetRankTierConfig(UnityAction<List<RankTierConfig>> onSuccess)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + Url.getRankTierConfig, "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Get rank tier config success" + req.downloadHandler.text);
+                List<RankTierConfig> response = GetT<List<RankTierConfig>>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Get rank tier config failed" + req.downloadHandler.text);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetMyBattleLeaderboard(UnityAction<MyBattleLeaderboardInfo> onSuccess, UnityAction<MyBattleLeaderboardInfo> onFail)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getMyBattleLeaderboard, UserInfoManager.Instance.userId), "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Success Get my rank: " + req.downloadHandler.text);
+                MyBattleLeaderboardInfo response = GetT<MyBattleLeaderboardInfo>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Error Get my rank: " + req.downloadHandler.text);
+                MyBattleLeaderboardInfo myBattleLeaderboardInfo = new MyBattleLeaderboardInfo()
+                {
+                    elo = 0,
+                    finalRank = 0,
+                    isPromotion = false,
+                    lp = 0,
+                    promotionConditionNumbers = new List<int>(),
+                    seasonId = 0,
+                    userId = 0,
+                };
+                onFail?.Invoke(myBattleLeaderboardInfo);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetBattleLeaderboard(UnityAction<GetBattleLeaderboardResponse> onSuccess, UnityAction onFail)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + Url.getBattleLeaderboard, "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Get battle leaderboar success" + req.downloadHandler.text);
+                GetBattleLeaderboardResponse response = GetT<GetBattleLeaderboardResponse>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Get battle leaderboar failed" + req.downloadHandler.text);
+                onFail?.Invoke();
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetBattleSummary(int playId, UnityAction<GetBattleSummaryResponse> onSuccess, UnityAction onFail)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getSummaryBattle, UserInfoManager.Instance.userId, playId), "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Get battle summary success" + req.downloadHandler.text);
+                GetBattleSummaryResponse response = GetT<GetBattleSummaryResponse>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Get battle summary failed" + req.downloadHandler.text);
+                onFail?.Invoke();
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask InviteFriendToBattle(string friendId, string roomName, string roomPassword, UnityAction OnSuccess)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postInviteFriendToBattle, UserInfoManager.Instance.userId, friendId, roomName, roomPassword), "POST");
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                OnSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask HandleFriendlyBattleInvite(UserInbox userInbox, FriendRequestStatus status, UnityAction<FriendlyBattleInviteInfo> onSuccess, UnityAction<string> onFailed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.putHandleFriendlyBattleInvite, UserInfoManager.Instance.userId, userInbox.value, userInbox.inboxId, userInbox.id), "PUT");
+            Debug.Log($"Handle battle request: {req.url}");
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                FriendlyBattleInviteInfo response = GetT<FriendlyBattleInviteInfo>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+                ServerErrorMessage error = GetT<ServerErrorMessage>(req.downloadHandler.text);
+                onFailed?.Invoke(error.errorCode);
+            }
+
+            req.Dispose();
+        }
+        public async UniTask GetBattleConfig(UnityAction<BattleConfig> onSuccess)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + Url.getBattleConfig, "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Get battle config config success" + req.downloadHandler.text);
+                BattleConfig response = GetT<BattleConfig>(req.downloadHandler.text);
+                onSuccess?.Invoke(response);
+
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Get rank tier config failed" + req.downloadHandler.text);
             }
 
             req.Dispose();

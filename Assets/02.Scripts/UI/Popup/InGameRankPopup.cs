@@ -49,7 +49,10 @@ namespace Framework.UI
         {
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
 
-            data.Sort((NetworkBattleData a, NetworkBattleData b) => b.waveCount.CompareTo(a.waveCount));
+            data = data
+            .OrderByDescending(x => x.waveCount)
+            .ThenByDescending(x => x.monsterKilled)
+            .ToList();
 
             for (int idx = 0; idx < data.Count; idx++)
             {

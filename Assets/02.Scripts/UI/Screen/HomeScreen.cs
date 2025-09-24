@@ -15,6 +15,7 @@ using System;
 using System.Globalization;
 using com.adjust.sdk;
 using UnityEngine.Events;
+using DG.Tweening;
 
 
 namespace Framework.UI
@@ -50,6 +51,7 @@ namespace Framework.UI
         public GameObject questNoticeObject;
 
         public Animation anim_Transition;
+        public TransitionScene transitionScene;
 
         public GameObject networkPrefab;
 
@@ -66,7 +68,16 @@ namespace Framework.UI
         {
             button_Play.onPointerUp = () =>
             {
-                PopupManager.Instance.GetPopUp<StartUpSingleModePopup>("startUpSingleMode").ActivePopup();
+                if (!UserInfoManager.Instance.userState.finishedTutorial)
+                {
+                    button_Play.onPointerUp = null;
+                    SoundManager.Instance.PlaySound(SoundKey.SF_GAMEPLAY);
+                    RequestStartGame();
+                }
+                else
+                {
+                    PopupManager.Instance.GetPopUp<StartUpSingleModePopup>("startUpSingleMode").ActivePopup();
+                }
             };
 
             button_NetworkPlay.onPointerUp = () =>
@@ -76,7 +87,9 @@ namespace Framework.UI
 
             button_Friend.onPointerUp = () =>
             {
-                PopupManager.Instance.GetPopUp<FriendPopup>("friend").ActivePopup();
+                FriendPopup popup = PopupManager.Instance.GetPopUp<FriendPopup>("friend");
+                popup.ActivePopup();
+                popup.Show(false);
             };
 
             button_Inbox.onPointerUp = () =>
@@ -215,7 +228,6 @@ namespace Framework.UI
             };
         }
 
-
         public IEnumerator StartGameSequence(UnityAction unityAction)
         {
             anim_Transition.gameObject.SetActive(true);
@@ -235,6 +247,30 @@ namespace Framework.UI
             //     AdjustInitializer.SendEventMessage("qds6zs");
             //     SoundManager.Instance.PlaySound(SoundKey.BGM_INGAME);
             // };
+        }
+
+        public IEnumerator ShowTransitionOnly(bool show, UnityAction callback = null)
+        {
+            if (show)
+            {
+                anim_Transition.gameObject.SetActive(true);
+                anim_Transition.Play();
+
+                float length = anim_Transition["TransitionEntry"].length;
+
+                yield return new WaitForSeconds(length);
+
+                callback?.Invoke();
+            }
+            else
+            {
+                DOTween.To(() => transitionScene.dotScale, x => transitionScene.dotScale = x, 0f, 1f).OnComplete(delegate
+                {
+                    anim_Transition.gameObject.SetActive(false);
+                });
+                anim_Transition.transform.GetChild(1).DOScale(0, 1f);
+                anim_Transition.transform.GetChild(2).DOScale(0, 1f);
+            }
         }
 
         public async void RequestStartGame()
