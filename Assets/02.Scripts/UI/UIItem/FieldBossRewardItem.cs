@@ -38,6 +38,7 @@ namespace Framework.UI
         public Image image_highlight;
         public FieldBossBuffType fieldBossBuffType;
         public UnityAction SelectAction;
+        public UnityAction PopupSelectAction;
 
         bool selected = false;
 
@@ -49,10 +50,11 @@ namespace Framework.UI
             });
         }
 
-        public void Initialize(FieldBossRewardData data)
+        public void Initialize(FieldBossRewardData data, UnityAction selectCallback)
         {
             fieldBossBuffType = (FieldBossBuffType)data.buff_type;
             selected = false;
+            PopupSelectAction = selectCallback;
             
             image_grayStar.gameObject.SetActive(false);
             image_fiveStar.gameObject.SetActive(false);
@@ -242,6 +244,7 @@ namespace Framework.UI
             Debug.Log("Onclick Select Reward Type : " + fieldBossBuffType);
             selected = true;
             SelectAction?.Invoke();
+            PopupSelectAction?.Invoke();
             NetworkConnect.Instance.networkGameManager.Rpc_RequestSelectFieldBossReward(NetworkConnect.Instance.playerIdx);
             clickAnimation.Play();
         }

@@ -260,6 +260,15 @@ namespace Framework.GameData.Defense
                     rankTierConfigs.Add(c.id, c);
             });
         }
+
+        public async void LoadBattleConfig()
+        {
+            await NetworkManager.Instance.GetBattleConfig((config) =>
+            {
+                battleConfig = config;
+            });
+        }
+        
         public RankTierConfig GetRankTierConfig(int rankId)
         {
             if (rankTierConfigs.ContainsKey(rankId))

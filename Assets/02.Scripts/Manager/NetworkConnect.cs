@@ -411,18 +411,8 @@ namespace Framework.Network
                         Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
                     }
                     break;
-
                 case NetworkBattleStatus.INGAME:
-                    string nickname = dic_PlayerData[player.AsIndex].nickname;
-                    UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
-                    UIManager.Instance.ingameStatusMessage.SetMessage($"{nickname} has left the game", nickname);
-                    data.isGameOver = true;
-
-                    if (runner.ActivePlayers.Count() == 1)
-                    {
-                        Debug.Log("[NetworkConnect] Last player remaining -> Win condition.");
-                        GameManager.Instance.GameOver();
-                    }
+                    networkGameManager.Rpc_RequestGameOver(player.AsIndex, data.waveCount, true);
                     break;
             }
         }
@@ -524,7 +514,7 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] Fieldboss reward called for player {idx}.");
             dic_PlayerData[idx].selectedFieldBossReward = true;
 
-            bool allReady = dic_PlayerData.Values.All(p => (p.selectedFieldBossReward && !p.isGameOver) || p.isGameOver);
+            bool allReady = dic_PlayerData.Values.All(p => p.selectedFieldBossReward || p.isGameOver);
             if (allReady)
             {
                 Debug.Log("[NetworkConnect] All players selected reward");
@@ -676,6 +666,23 @@ namespace Framework.Network
         {
             Debug.Log("[NetworkConnect] Rpc_CountStart triggered. Starting countdown...");
             GameManager.Instance.CountStart();
+        }
+
+        public List<NetworkBattleData> GetSortedDictPlayerData()
+        {
+            //Sort
+            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
+
+            data = data
+            .OrderBy(p => p.isAbnormalExit)              // ✅ put abnormal exits last
+            .ThenByDescending(p => p.waveCount)          // ✅ higher wave better
+            .ThenByDescending(p => p.monsterKilled)      // ✅ then kills
+            .ToList();
+
+            for (int i = 0; i < data.Count; i++)
+                data[i].rank = i + 1;
+
+            return data;
         }
     }
 }

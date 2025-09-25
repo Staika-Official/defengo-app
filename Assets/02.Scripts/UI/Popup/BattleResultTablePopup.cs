@@ -20,16 +20,10 @@ namespace Framework.UI
         {
             PopUpSequence(true);
 
-            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
-
-            data = data
-            .OrderByDescending(x => x.waveCount)
-            .ThenByDescending(x => x.monsterKilled)
-            .ToList();
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
             for (int i = 0; i < data.Count; i++)
             {
-                data[i].rank = i + 1;
                 battleResultTableItems[i].Initialize(data[i]);
             }
 

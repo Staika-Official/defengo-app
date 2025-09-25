@@ -600,6 +600,7 @@ namespace Framework.Game.Defense
                         GameManager.Instance.waveIdx = idx;
                     }
                     monsters.Remove(monster);
+                    WaveEnd();
                     //Debug.Log("Field Boss!!!");
                     break;
             }

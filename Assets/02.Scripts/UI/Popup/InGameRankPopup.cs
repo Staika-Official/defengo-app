@@ -28,8 +28,8 @@ namespace Framework.UI
             {
                 PopUpSequence(false);
             });
-
-            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
+            
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
             for (int idx = 0; idx < inGameRankItems.Length; idx++)
             {
@@ -47,16 +47,10 @@ namespace Framework.UI
 
         public void SortPlayerData()
         {
-            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
-
-            data = data
-            .OrderByDescending(x => x.waveCount)
-            .ThenByDescending(x => x.monsterKilled)
-            .ToList();
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
             for (int idx = 0; idx < data.Count; idx++)
             {
-                data[idx].rank = idx + 1;
                 inGameRankItems[idx].Initialize(data[idx]);
                 inGameRankItems[idx].SetWaveCount(data[idx].waveCount);
             }

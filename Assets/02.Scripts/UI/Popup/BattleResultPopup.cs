@@ -17,8 +17,7 @@ namespace Framework.UI
 
         public void SetResultInfo(int rank, int wave, int monsterKilled)
         {
-            NetworkConnect.Instance.networkGameManager.rank = rank;
-            text_rank.text = $"{rank}";
+            text_rank.text = $"{rank}{GetRankSuffix(rank)}";
             text_wave.text = $"{wave}";
             text_monsterKilled.text = $"{monsterKilled}";
             winObj.SetActive(rank == 1);
@@ -39,10 +38,25 @@ namespace Framework.UI
 
         public override void Initialize()
         {
-            button_Close.onClick.AddListener(()=>
+            button_Close.onClick.AddListener(() =>
             {
                 InActivePopup();
-            });  
+            });
+        }
+
+        string GetRankSuffix(int rank)
+        {
+            switch (rank)
+            {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
+            }
         }
     }
 }

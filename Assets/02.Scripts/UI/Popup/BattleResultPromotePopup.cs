@@ -20,6 +20,8 @@ namespace Framework.UI
         public TextMeshProUGUI text_InGameRank;
         public TextMeshProUGUI text_Rank;
         public Slider slider_Lp;
+        public GameObject go_Promo;
+        public GameObject go_Normal;
         public TextMeshProUGUI text_LP;
         public List<Transform> trans_PromotionCheckers;
         public TextMeshProUGUI text_promoProgress;
@@ -49,9 +51,9 @@ namespace Framework.UI
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
                 NetworkConnect.Instance.runner.Shutdown();
-                SceneLoadManager.Instance.SwitchingScene(2);
 
                 GameManager.Instance.objectPoolManager.AllClear();
+                SceneLoadManager.Instance.SwitchingScene(2);
             });
         }
 
@@ -94,24 +96,30 @@ namespace Framework.UI
             }
             else
             {
-                if (!oldRank.isPromotion)
+                if (!oldRank.isPromotion && !newRank.isPromotion)
                     leagueRankStatus = LeagueRankStatus.Normal;
-                else
+                else if (newRank.isPromotion)
                 {
-                    if (oldRank.promotionConditionNumbers.Count == 5)
-                        leagueRankStatus = LeagueRankStatus.PromoFail;
-                    else if (oldRank.promotionConditionNumbers.Count == 0)
+                    if (newRank.promotionConditionNumbers.Count == 0)
                         leagueRankStatus = LeagueRankStatus.EnterPromo;
                     else
                         leagueRankStatus = LeagueRankStatus.NormalPromo;
                 }
+                else if (oldRank.isPromotion)
+                {
+                    leagueRankStatus = LeagueRankStatus.PromoFail;
+                }
             }
-            
-            text_InGameRank.text = $"{NetworkConnect.Instance.networkGameManager.rank}";
+
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+            int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
+            text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
             text_LP.text = $"{(int)newRank.lp}";
             text_Rank.text = $"{newCofig.description}";
             text_promoProgress.text = $"{newRank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
             slider_Lp.value = newRank.lp / 100f;
+            go_Promo.SetActive(newRank.isPromotion || leagueRankStatus == LeagueRankStatus.PromoSuccess || leagueRankStatus == LeagueRankStatus.PromoFail);
+            go_Normal.SetActive(!go_Promo.activeSelf);
             for (int i = 0; i < summaryData.bonusDetails.Count; i++)
             {
                 pvpBonusScoreItems[i].gameObject.SetActive(true);
@@ -125,18 +133,35 @@ namespace Framework.UI
             }
             else if (leagueRankStatus == LeagueRankStatus.PromoSuccess)
             {
-                skeleton_Current.AnimationState.SetAnimation(0, $"{(int)oldCofig.tierType}_{GetRankName(oldCofig.tierType)}To{GetRankName(oldCofig.tierType + 1)}", false);
-                skeleton_Current.AnimationState.AddAnimation(0, $"{(int)oldCofig.tierType}_{GetRankName(oldCofig.tierType + 1)}Idle", true, 0);
+                skeleton_Current.AnimationState.SetAnimation(0, $"{(int)oldCofig.tierType}_{GetRankName(oldCofig.tierType)}To{GetRankName(newCofig.tierType)}", false);
+                skeleton_Current.AnimationState.AddAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}Idle", true, 0);
             }
             else
             {
                 skeleton_Current.AnimationState.SetAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}Idle", true);
             }
 
-            for (int i = 0; i < newRank.promotionConditionNumbers.Count; i++)
+            if (newRank.isPromotion)
             {
-                trans_PromotionCheckers[i].GetChild(newRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
-                trans_PromotionCheckers[i].GetChild(1 - newRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                for (int i = 0; i < newRank.promotionConditionNumbers.Count; i++)
+                {
+                    trans_PromotionCheckers[i].gameObject.SetActive(i < newCofig.promotionConditionMax);
+                    trans_PromotionCheckers[i].GetChild(newRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
+                    trans_PromotionCheckers[i].GetChild(1 - newRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                }
+            }
+            else if (oldRank.isPromotion)
+            {
+                if (leagueRankStatus == LeagueRankStatus.PromoSuccess)
+                    oldRank.promotionConditionNumbers.Add(1);
+                else if (leagueRankStatus == LeagueRankStatus.PromoFail)
+                    oldRank.promotionConditionNumbers.Add(0);
+                for (int i = 0; i < oldRank.promotionConditionNumbers.Count; i++)
+                {
+                    trans_PromotionCheckers[i].gameObject.SetActive(i < oldCofig.promotionConditionMax);
+                    trans_PromotionCheckers[i].GetChild(oldRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
+                    trans_PromotionCheckers[i].GetChild(1 - oldRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                }
             }
 
             switch (leagueRankStatus)
@@ -193,6 +218,21 @@ namespace Framework.UI
                 _ => "Legend"
             };
             return str;
+        }
+
+        string GetRankSuffix(int rank)
+        {
+            switch (rank)
+            {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
+            }
         }
     }
 

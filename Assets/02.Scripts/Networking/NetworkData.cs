@@ -118,7 +118,8 @@ namespace Framework.Network
         public string tier;
         public int waveCount;
         public bool isGameOver;
-        public int rank;
+        public bool isAbnormalExit;
+        public int rank = 0;
         public string userId;
         public int playId;
         public int sessionId;
@@ -1508,13 +1509,13 @@ namespace Framework.Network
     [Serializable]
     public enum RankTierType
     {
-        RANKTIER_0,
-        RANKTIER_1,
-        RANKTIER_2,
-        RANKTIER_3,
-        RANKTIER_4,
-        RANKTIER_5,
-        RANKTIER_6
+        RANKTIER_0 = 0,
+        RANKTIER_1 = 1,
+        RANKTIER_2 = 2,
+        RANKTIER_3 = 3,
+        RANKTIER_4 = 4,
+        RANKTIER_5 = 5,
+        RANKTIER_6 = 6
     }
 
     [Serializable]
@@ -1595,6 +1596,12 @@ namespace Framework.Network
     {
         public bool BATTLE_OPEN;
         public int SURRENDER_WAVE_MIN;
+    }
+    [Serializable]
+    public class BattleInviteData
+    {
+        public int profileImage;
+        public string content;
     }
     #endregion
 }

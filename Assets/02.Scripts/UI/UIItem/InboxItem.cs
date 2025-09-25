@@ -26,6 +26,7 @@ namespace Framework.UI
 
         public GameObject itemInfo;
         public TextMeshProUGUI text_Title;
+        public TextMeshProUGUI text_battleInvite;
         public TextMeshProUGUI text_ExpiredDateInfo;
         public TextMeshProUGUI text_Quantity;
         public DateTime expiredDate;
@@ -38,9 +39,11 @@ namespace Framework.UI
         public ButtonComponent button_Reject;
         public ButtonComponent button_GoFriendlyBattle;
         public ButtonComponent button_RejectFriendlyBattle;
+        public Image image_userProfile;
 
         public void Initialize(UserInbox data)
         {
+            Debug.Log($"Inbox data: {JsonConvert.SerializeObject(data)}");
             inboxStatus = (InboxStatus)Enum.Parse(typeof(InboxStatus), data.status);
             expiredDate = DateTime.Parse(data.expiredDate);
             inboxId = data.inboxId;
@@ -82,6 +85,10 @@ namespace Framework.UI
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
 
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
+
                     break;
                 case InboxType.RANDOM_BOX:
                     image_Icon.sprite = DataManager.Instance.uiPropertyData.dic_InboxItemIcon[value];
@@ -98,6 +105,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.ENERGY:
                     itemInfo.SetActive(true);
@@ -111,6 +122,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.TIK:
                     itemInfo.SetActive(true);
@@ -124,6 +139,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.STIK:
                     itemInfo.SetActive(true);
@@ -137,6 +156,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.GEM:
                     itemInfo.SetActive(true);
@@ -150,6 +173,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.GO:
                     itemInfo.SetActive(true);
@@ -162,6 +189,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.PROFILE:
                     break;
@@ -176,6 +207,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.PTIK_RANDOMBOX:
                     text_Quantity.gameObject.SetActive(false);
@@ -188,6 +223,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.TIK_RANDOMBOX:
                     text_Quantity.gameObject.SetActive(false);
@@ -200,6 +239,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.PTIK:
                     itemInfo.SetActive(true);
@@ -213,6 +256,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.HATCHING_ORB:
                     itemInfo.SetActive(true);
@@ -227,6 +274,10 @@ namespace Framework.UI
                     button_Reject.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.FRIEND_REQUEST:
                     button_Accept.gameObject.SetActive(true);
@@ -237,6 +288,10 @@ namespace Framework.UI
                     button_GetItem.gameObject.SetActive(false);
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(true);
+                    image_userProfile.gameObject.SetActive(false);
+                    text_battleInvite.gameObject.SetActive(false);
                     break;
                 case InboxType.BATTLE_FRIEND_REQUEST:
                     button_GoFriendlyBattle.gameObject.SetActive(true);
@@ -245,8 +300,18 @@ namespace Framework.UI
                     text_Quantity.gameObject.SetActive(false);
                     button_Read.gameObject.SetActive(false);
                     button_GetItem.gameObject.SetActive(false);
-                    text_Quantity.gameObject.SetActive(false);
-                    button_Read.gameObject.SetActive(false);
+                    button_Accept.gameObject.SetActive(false);
+                    button_Reject.gameObject.SetActive(false);
+
+                    text_Title.gameObject.SetActive(false);
+                    image_userProfile.gameObject.SetActive(true);
+                    text_battleInvite.gameObject.SetActive(true);
+
+                    BattleInviteData battleRequestData = JsonConvert.DeserializeObject<BattleInviteData>(data.titleEn);
+                    text_battleInvite.text = battleRequestData.content;
+                    UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[battleRequestData.profileImage];
+                    image_userProfile.sprite = userProfileData.sprite_image;
+
                     break;
                 default:
                     break;

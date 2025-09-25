@@ -377,6 +377,7 @@ namespace Framework.Network
 
             AssetManager.Instance.AssetDownload();
 
+            DataManager.Instance.LoadBattleConfig();
             DataManager.Instance.LoadRankTierConfig();
         }
 

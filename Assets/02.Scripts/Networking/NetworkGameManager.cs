@@ -11,9 +11,6 @@ namespace Framework.Game.Defense
 {
     public class NetworkGameManager : NetworkBehaviour, IAfterSpawned
     {
-        [Networked]
-        public int Wave { get; private set; }
-
         public int rewardGroupIndex;
         public int gameOverPlayerCount = 0;
         public int rank = 0;
@@ -71,10 +68,11 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_RequestGameOver(int playerId, int roundId)
+        public void Rpc_RequestGameOver(int playerId, int roundId, bool isAbnormal)
         {
             if (NetworkConnect.Instance.IsCurrentHost())
-                Rpc_GameOver(playerId, roundId);
+                Rpc_GameOver(playerId, roundId, isAbnormal);
+            Rpc_RequestSelectFieldBossReward(playerId);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -102,6 +100,15 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
+        public void RpcSummaryBattle()
+        {
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+
+            UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+            NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+        }
+
+        [Rpc(RpcSources.All, RpcTargets.All)]
         public void Rpc_ReachBossWave(int roundId, string nickname, int rewardGroupIndex, int bossIdx)
         {
             Debug.Log($"{gameObject.name} Boss Wave Start");
@@ -109,6 +116,7 @@ namespace Framework.Game.Defense
             GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
+            Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId - 1);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -120,32 +128,49 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled)
+        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled = -1)
         {
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
-            NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled = monsterKilled;
+            if (monsterKilled != -1)
+                NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled = monsterKilled;
             UIManager.Instance.inGameRankPopup.SortPlayerData();
             Debug.Log($"{gameObject.name} Rpc Player Id : {playerId}");
             Debug.Log($"{gameObject.name} Rpc nickname : {nickname}");
             Debug.Log($"{gameObject.name} Rpc Round Id : {roundId}");
+
+            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+            if (remain == 1)
+            {
+                var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+                var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
+                if (!my.isGameOver && my.rank == 1)
+                {
+                    GameManager.Instance.GameOver();
+                }
+            }
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_GameOver(int playerId, int roundId)
+        public void Rpc_GameOver(int playerId, int roundId, bool isAbnormal)
         {
+            if (NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver)
+                return;
+
             int maxCount = NetworkConnect.Instance.dic_PlayerData.Count;
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver = true;
-            NetworkConnect.Instance.dic_PlayerData[playerId].rank = maxCount - gameOverPlayerCount;
+            NetworkConnect.Instance.dic_PlayerData[playerId].isAbnormalExit = isAbnormal;
             gameOverPlayerCount += 1;
 
             Debug.Log($"{gameObject.name} {nickname} is GameOver");
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"GameOver !!", nickname);
 
-            if (playerId != NetworkConnect.Instance.playerIdx)
-                SetRank();
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+
+            if (gameOverPlayerCount == maxCount)
+                RpcSummaryBattle();
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -155,21 +180,6 @@ namespace Framework.Game.Defense
         }
 
         #endregion
-
-        public void SetRank()
-        {
-            int maxCount = NetworkConnect.Instance.dic_PlayerData.Count;
-            rank = maxCount - gameOverPlayerCount;
-
-            Debug.Log($"{gameObject.name} maxCount : {maxCount}");
-            Debug.Log($"{gameObject.name} gameOverCount : {gameOverPlayerCount}");
-
-            if (rank == 1)
-            {
-                Debug.Log($"{gameObject.name} Player Win");
-                GameManager.Instance.GameOver();
-            }
-        }
 
         public override void Despawned(NetworkRunner runner, bool hasState)
         {

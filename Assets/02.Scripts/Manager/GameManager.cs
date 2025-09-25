@@ -687,27 +687,14 @@ namespace Framework.Game.Defense
                 slotNumber = UserSlotManager.Instance.focusIdx,
                 userId = UserInfoManager.Instance.userId,
             };
-            
+
             if (!NetworkConnect.Instance.isFriendlyMatch)
                 CallEndBattle(payload);
             else
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
 
-            //Sort
-            List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
-
-            data = data
-            .OrderByDescending(x => x.waveCount)
-            .ThenByDescending(x => x.monsterKilled)
-            .ToList();
-
-            for (int idx = 0; idx < data.Count; idx++)
-            {
-                data[idx].rank = idx + 1;
-            }
-
-            UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-            NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
+            // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+            // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
             Debug.Log("Battle Game Over");
         }
 
@@ -715,7 +702,7 @@ namespace Framework.Game.Defense
         {
             await NetworkManager.Instance.EndBattle(payload, () =>
             {
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx);
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
             }, () =>
             {
                 CallEndBattle(payload);
@@ -937,7 +924,7 @@ namespace Framework.Game.Defense
             }
             else if (waveIdx > 1 && waveIdx % 5 == 1 && gameMode == GameMode.BATTLE)
             {
-                
+
             }
             else
             {

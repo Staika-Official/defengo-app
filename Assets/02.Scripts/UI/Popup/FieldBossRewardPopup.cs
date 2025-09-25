@@ -30,6 +30,8 @@ namespace Framework.UI
         public GameObject go_Open;
         public GameObject go_Close;
 
+        bool selectdReward = false;
+
         public IEnumerator SetCountDown()
         {
             float timeCount = ConfigData.BATTLE_REWARD_TIME_OUT;
@@ -45,7 +47,8 @@ namespace Framework.UI
                 if (timeCount <= 0)
                     break;
             }
-
+            if (selectdReward)
+                yield break;
             fieldBossRewardItems[0].OnClick_SelectReward(fieldBossRewardItems[0].fieldBossBuffType);
 
             Debug.Log("Time Over");
@@ -62,6 +65,7 @@ namespace Framework.UI
             refreshCount = ConfigData.BATTLE_REWARD_REFRESH_COUNT;
             text_Refresh.text = $"{LanguageManager.Instance.GetStringData("UI_Refresh")} {refreshCount}";
             button_refresh.SetInterectible(refreshCount > 0);
+            selectdReward = false;
 
             StartCoroutine(SetCountDown());
         }
@@ -95,7 +99,7 @@ namespace Framework.UI
             for (int i = 0; i < selected.Length; i++)
             {
                 Debug.Log($"Selected rewards: {JsonConvert.SerializeObject(fieldBossRewardDatas[selected[i]])}");
-                fieldBossRewardItems[i].Initialize(fieldBossRewardDatas[selected[i]]);
+                fieldBossRewardItems[i].Initialize(fieldBossRewardDatas[selected[i]], OnSelectReward);
             }
         }
 
@@ -161,12 +165,10 @@ namespace Framework.UI
             return tempArr;
         }
 
-        public IEnumerator SetTimeCount()
+        void OnSelectReward()
         {
-            while (true)
-            {
-                yield return null;
-            }
+            selectdReward = true;
+            StopAllCoroutines();
         }
     }
 }
