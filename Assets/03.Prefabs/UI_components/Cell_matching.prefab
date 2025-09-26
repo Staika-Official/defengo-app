@@ -2751,6 +2751,7 @@ GameObject:
   - component: {fileID: 3537847944196181761}
   - component: {fileID: 3537847944196181763}
   - component: {fileID: 3537847944196181762}
+  - component: {fileID: 1012976994393746824}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -2775,7 +2776,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -43.9}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 365, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3537847944196181763
 CanvasRenderer:
@@ -2805,7 +2806,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC720\uC800 \uCC3E\uB294 \uC911..."
+  m_text: Waiting for other player...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: 7281773a32ea73243b9c1e24f3bd8634, type: 2}
@@ -2832,12 +2833,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 33
+  m_fontSize: 28.7
   m_fontSizeBase: 33
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 33
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -2874,6 +2875,34 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1012976994393746824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3537847944196181760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56eb0353ae6e5124bb35b17aff880f16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_StringReference:
+    m_TableReference:
+      m_TableCollectionName: GUID:3d8e23a137d894fce98d785798cfb2d4
+    m_TableEntryReference:
+      m_KeyId: 373355292439785472
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  m_FormatArguments: []
+  m_UpdateString:
+    m_PersistentCalls:
+      m_Calls: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &3560428129281196488
 GameObject:
   m_ObjectHideFlags: 0

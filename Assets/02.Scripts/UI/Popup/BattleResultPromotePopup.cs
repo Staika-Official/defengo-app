@@ -122,7 +122,7 @@ namespace Framework.UI
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
             int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
             text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
-            string txtDeleta = summaryData.lpDelta >= 0 ? $"(+{summaryData.lpDelta})" : $"({summaryData.lpDelta})";
+            string txtDeleta = (int)summaryData.lpDelta >= 0 ? $"(+{(int)summaryData.lpDelta})" : $"({(int)summaryData.lpDelta})";
             text_LP.text = $"{(int)newRank.lp}";
             text_Rank.text = $"{newCofig.description}";
             slider_Lp.value = newRank.lp / 100f;

@@ -328,10 +328,17 @@ namespace Framework.UI
 
         public async void GetMyBattleRank()
         {
-            await NetworkManager.Instance.GetMyBattleLeaderboard((data) =>
+            if (DataManager.Instance.battleConfig.BATTLE_OPEN)
             {
-                text_RankTier.text = DataManager.Instance.GetRankTierConfig(data.finalRank).description;
-            }, null);
+                await NetworkManager.Instance.GetMyBattleLeaderboard((data) =>
+                {
+                    text_RankTier.text = DataManager.Instance.GetRankTierConfig(data.finalRank).description;
+                }, null);
+            }
+            else
+            {
+                text_RankTier.text = "";
+            }
         }
 
         public void SuccessData(ResponeUserPlay data)

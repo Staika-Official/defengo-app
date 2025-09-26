@@ -603,7 +603,6 @@ namespace Framework.Network
                     SessionName = runner.SessionInfo.Name,
                     HostMigrationToken = hostMigrationToken,
                     HostMigrationResume = OnHostMigrationResume,
-                    SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
                 });
 
                 if (result.Ok)

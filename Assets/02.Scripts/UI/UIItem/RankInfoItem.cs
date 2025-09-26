@@ -111,7 +111,7 @@ namespace Framework.UI
             text_Nickname.text = temp[0];
 
             bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
-            text_GoValue.text = $"<sprite=12>{(int)data.lp}";
+            text_GoValue.text = $"{(int)data.lp} lp";
             SetCellColorInfo(rank, isMine);
         }
 
