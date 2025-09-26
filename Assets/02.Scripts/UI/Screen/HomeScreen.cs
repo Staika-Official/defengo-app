@@ -130,6 +130,8 @@ namespace Framework.UI
             DecListInit();
             NoticeInitCheck();
 
+            button_NetworkPlay.gameObject.SetActive(DataManager.Instance.battleConfig.BATTLE_OPEN);
+
             DateTime utcNow = DateTime.UtcNow;
             string date = utcNow.ToString("yyyy-MM-dd");
 

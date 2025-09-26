@@ -421,8 +421,11 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] Scene load completed, spawning player object. {runner == null} - {networkObjectPrefab == null}");
             GameManager.Instance.gameMode = Game.Defense.GameMode.BATTLE;
-            NetworkObject networkObject = runner.Spawn(networkObjectPrefab);
-            runner.SetPlayerObject(Runner.LocalPlayer, networkObject);
+            if (isHost)
+            {
+                NetworkObject networkObject = runner.Spawn(networkObjectPrefab);
+                runner.SetPlayerObject(Runner.LocalPlayer, networkObject);
+            }
         }
 
         public void OnSceneLoadStart(NetworkRunner runner)
@@ -542,7 +545,15 @@ namespace Framework.Network
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) => Debug.Log("[NetworkConnect] ConnectRequest received.");
         public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) => Debug.Log("[NetworkConnect] Custom auth response received.");
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) => Debug.LogError($"[NetworkConnect] Disconnected from server: {reason}");
-        public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) => Debug.Log("[NetworkConnect] Host migration event.");
+        public async void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
+        {
+            Debug.Log("[NetworkConnect] Host migration event.");
+        }
+        private void OnHostMigrationResume(NetworkRunner runner)
+        {
+            Debug.Log("[NetworkConnect] Migration resume callback");
+            // ✅ Reinitialize non-networked state here (UI, managers, etc.)
+        }
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }

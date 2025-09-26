@@ -1568,6 +1568,7 @@ namespace Framework.Network
         public float oldLp;
         public float newLp;
         public List<BattleBonusDetail> bonusDetails;
+        public List<UserItem> rewards;
     }
 
     [Serializable]

@@ -19,6 +19,7 @@ namespace Framework.UI
         [SerializeField] private TextMeshProUGUI text_Lp;
         [SerializeField] private TextMeshProUGUI text_BattleCost;
         [SerializeField] private TextMeshProUGUI text_Promo;
+        [SerializeField] private TextMeshProUGUI text_PromoMax;
         [SerializeField] private GameObject go_Promotion;
         [SerializeField] private Slider slider_Ribbon;
         [SerializeField] private List<Transform> trans_PromotionCheckers;
@@ -77,6 +78,29 @@ namespace Framework.UI
                 text_League.text = rankConfig.description;
                 rankAnim.AnimationState.SetAnimation(0, $"{(int)rankConfig.tierType}_{GetRankName(rankConfig.tierType)}Idle", true);
                 go_Promotion.SetActive(rank.isPromotion);
+                
+                for (int i = 0; i < trans_PromotionCheckers.Count; i++)
+                {
+                    if (i < rankConfig.promotionConditionMax)
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(true);
+                        if (i < rank.promotionConditionNumbers.Count)
+                        {
+                            trans_PromotionCheckers[i].GetChild(rank.promotionConditionNumbers[i]).gameObject.SetActive(true);
+                            trans_PromotionCheckers[i].GetChild(1 - rank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            trans_PromotionCheckers[i].GetChild(0).gameObject.SetActive(false);
+                            trans_PromotionCheckers[i].GetChild(1).gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(false);
+                    }
+                }
+
                 slider_Ribbon.gameObject.SetActive(!rank.isPromotion);
                 text_Lp.text = $"{(int)rank.lp}";
                 slider_Ribbon.value = rank.lp / ConfigData.RANK_TIER_LP_CONDITION;
@@ -87,6 +111,7 @@ namespace Framework.UI
                         trans_PromotionCheckers[i].GetChild(rank.promotionConditionNumbers[i]).gameObject.SetActive(true);
                     }
                     text_Promo.text = $"{rank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
+                    text_PromoMax.text = $"/ {rankConfig.promotionConditionMax}";
                 }
             }, (defRank) =>
             {

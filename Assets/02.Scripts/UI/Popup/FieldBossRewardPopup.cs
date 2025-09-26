@@ -72,7 +72,7 @@ namespace Framework.UI
 
         public async void SetRewardItem()
         {
-            text_Refresh.text = $"{refreshCount}";
+            text_Refresh.text = $"{LanguageManager.Instance.GetStringData("UI_Refresh")} {refreshCount}";
             button_refresh.SetInterectible(refreshCount > 0);
             fieldBossRewardGroupData = await DataLoadManager.Instance.GetDataAsyncBinary<FieldBossRewardGroupData>("FieldBossRewardGroupData");
             int rewardGroupIndex = NetworkConnect.Instance.networkGameManager.rewardGroupIndex;

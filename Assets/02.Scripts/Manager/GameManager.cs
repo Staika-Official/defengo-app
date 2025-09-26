@@ -917,7 +917,7 @@ namespace Framework.Game.Defense
             onCompleteWave?.Invoke();
             UIManager.Instance.WaveEndSequence();
             InterestPayment();
-            UIManager.Instance.button_giveUp.gameObject.SetActive(waveIdx >= ConfigData.SURRENDER_WAVE_MIN);
+            UIManager.Instance.button_giveUp.gameObject.SetActive(waveIdx >= ConfigData.SURRENDER_WAVE_MIN && gameMode == GameMode.BATTLE);
             if (waveIdx != 0 && waveIdx % 5 == 0 && gameMode == GameMode.BATTLE)
             {
                 ReachBossWave();

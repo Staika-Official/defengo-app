@@ -44,7 +44,9 @@ namespace Framework.UI
         [SerializeField] private GameObject dailyObject;
         [SerializeField] private GameObject weeklyObject;
 
-        [SerializeField] private CustomListButtons toggle;
+        private CustomListButtons toggle;
+        [SerializeField] private CustomListButtons toggle1;
+        [SerializeField] private CustomListButtons toggle2;
 
         [SerializeField] private TextMeshProUGUI text_DailyRewardPool;
         [SerializeField] private TextMeshProUGUI text_NoRanking;
@@ -537,7 +539,8 @@ namespace Framework.UI
                 PopupManager.Instance.GetPopUp<RewardGuidePopup>("rewardGuide").OpenPopup(LeaderBoardType.LEAGUE);
             });
 
-
+            toggle = DataManager.Instance.battleConfig.BATTLE_OPEN ? toggle1 : toggle2;
+            toggle.gameObject.SetActive(true);
             //todo 토글 미사용 코드 재사용전까지 주석처리 사용되면 주석 해제 후 다시 로직 구성
             // toggle.gameObject.SetActive(false);//대전모드 추가로인해 토글 추가되기전까지 액티브 꺼주는 코드 유지
             toggle.Initialize();

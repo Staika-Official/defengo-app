@@ -23,9 +23,11 @@ namespace Framework.UI
         public GameObject go_Promo;
         public GameObject go_Normal;
         public TextMeshProUGUI text_LP;
+        public TextMeshProUGUI text_MaxPromo;
         public List<Transform> trans_PromotionCheckers;
         public TextMeshProUGUI text_promoProgress;
         public List<PvpBonusScoreItem> pvpBonusScoreItems;
+        public List<RandomReward> randomRewards;
 
         public LeagueRankStatus leagueRankStatus;
 
@@ -50,7 +52,8 @@ namespace Framework.UI
                 {
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
-                NetworkConnect.Instance.runner.Shutdown();
+                if (NetworkConnect.Instance != null && NetworkConnect.Instance.runner != null)
+                    NetworkConnect.Instance.runner.Shutdown();
 
                 GameManager.Instance.objectPoolManager.AllClear();
                 SceneLoadManager.Instance.SwitchingScene(2);
@@ -80,52 +83,71 @@ namespace Framework.UI
             var oldCofig = DataManager.Instance.GetRankTierConfig(oldRank.finalRank);
             var newCofig = DataManager.Instance.GetRankTierConfig(newRank.finalRank);
 
-            if (oldRank.finalRank != newRank.finalRank)
+            if (oldRank.isPromotion && newRank.isPromotion)
             {
-                if (oldCofig.tierType == newCofig.tierType)
-                {
-                    if (oldCofig.tierGradeType < newCofig.tierGradeType)
-                        leagueRankStatus = LeagueRankStatus.TierUp;
-                    else if (oldCofig.tierGradeType > newCofig.tierGradeType)
-                        leagueRankStatus = LeagueRankStatus.TierDown;
-                }
-                else if (oldCofig.tierType < newCofig.tierType)
-                    leagueRankStatus = LeagueRankStatus.PromoSuccess;
+                leagueRankStatus = LeagueRankStatus.NormalPromo;
+            }
+            else if (oldRank.isPromotion)
+            {
+                if (newCofig.tierType == oldCofig.tierType)
+                    leagueRankStatus = LeagueRankStatus.PromoFail;
                 else
-                    leagueRankStatus = LeagueRankStatus.TierDown;
+                    leagueRankStatus = LeagueRankStatus.PromoSuccess;
+            }
+            else if (newRank.isPromotion)
+            {
+                leagueRankStatus = LeagueRankStatus.EnterPromo;
             }
             else
             {
-                if (!oldRank.isPromotion && !newRank.isPromotion)
-                    leagueRankStatus = LeagueRankStatus.Normal;
-                else if (newRank.isPromotion)
+                if (newCofig.tierType == oldCofig.tierType)
                 {
-                    if (newRank.promotionConditionNumbers.Count == 0)
-                        leagueRankStatus = LeagueRankStatus.EnterPromo;
-                    else
-                        leagueRankStatus = LeagueRankStatus.NormalPromo;
+                    if (newCofig.tierGradeType == oldCofig.tierGradeType)
+                        leagueRankStatus = LeagueRankStatus.Normal;
+                    else if (newCofig.tierGradeType > oldCofig.tierGradeType)
+                        leagueRankStatus = LeagueRankStatus.TierUp;
                 }
-                else if (oldRank.isPromotion)
+                else if (newCofig.tierType > oldCofig.tierType)
                 {
-                    leagueRankStatus = LeagueRankStatus.PromoFail;
+                    leagueRankStatus = LeagueRankStatus.PromoSuccess;
+                }
+                else
+                {
+                    leagueRankStatus = LeagueRankStatus.TierDown;
                 }
             }
+
+            Debug.Log($"League rank status {leagueRankStatus}");
 
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
             int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
             text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
-            text_LP.text = $"{(int)newRank.lp}";
+            string txtDeleta = summaryData.lpDelta >= 0 ? $"(+{summaryData.lpDelta})" : $"({summaryData.lpDelta})";
+            text_LP.text = $"{(int)newRank.lp} {txtDeleta}";
             text_Rank.text = $"{newCofig.description}";
-            text_promoProgress.text = $"{newRank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
             slider_Lp.value = newRank.lp / 100f;
-            go_Promo.SetActive(newRank.isPromotion || leagueRankStatus == LeagueRankStatus.PromoSuccess || leagueRankStatus == LeagueRankStatus.PromoFail);
-            go_Normal.SetActive(!go_Promo.activeSelf);
+            text_MaxPromo.text = $"/ {oldCofig.promotionConditionMax}";
+
             for (int i = 0; i < summaryData.bonusDetails.Count; i++)
             {
                 pvpBonusScoreItems[i].gameObject.SetActive(true);
                 pvpBonusScoreItems[i].text_Reason.text = summaryData.bonusDetails[i].bonusType.Replace('_', ' ');
                 pvpBonusScoreItems[i].text_Score.text = $"+{summaryData.bonusDetails[i].value}";
             }
+            if (summaryData.rewards != null)
+            {
+                for (int i = 0; i < summaryData.rewards.Count; i++)
+                {
+                    randomRewards[i].gameObject.SetActive(true);
+                    randomRewards[i].Initialize(summaryData.rewards[i]);
+                }
+            }
+
+            skeleton_Current.AnimationState.ClearTracks();
+            skeleton_Next.AnimationState.ClearTracks();
+            skeleton_Current.Initialize(true);
+            skeleton_Next.Initialize(true);
+
             if (leagueRankStatus == LeagueRankStatus.TierUp)
             {
                 skeleton_Current.AnimationState.SetAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}TierChange", false);
@@ -136,18 +158,69 @@ namespace Framework.UI
                 skeleton_Current.AnimationState.SetAnimation(0, $"{(int)oldCofig.tierType}_{GetRankName(oldCofig.tierType)}To{GetRankName(newCofig.tierType)}", false);
                 skeleton_Current.AnimationState.AddAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}Idle", true, 0);
             }
+            else if (leagueRankStatus == LeagueRankStatus.EnterPromo)
+            {
+                skeleton_Current.AnimationState.SetAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}Idle", true);
+                skeleton_Next.AnimationState.AddAnimation(0, $"{(int)newCofig.tierType + 1}_{GetRankName(newCofig.tierType + 1)}Idle", true, 0);
+            }
             else
             {
                 skeleton_Current.AnimationState.SetAnimation(0, $"{(int)newCofig.tierType}_{GetRankName(newCofig.tierType)}Idle", true);
             }
 
+            switch (leagueRankStatus)
+            {
+                case LeagueRankStatus.Normal:
+                    animator.SetTrigger("resultNormal");
+                    break;
+                case LeagueRankStatus.TierUp:
+                    animator.SetTrigger("resultNormal");
+                    animator.SetTrigger("tierUp");
+                    break;
+                case LeagueRankStatus.TierDown:
+                    animator.SetTrigger("resultNormal");
+                    animator.SetTrigger("tierDown");
+                    break;
+                case LeagueRankStatus.EnterPromo:
+                    animator.SetTrigger("resultNormal");
+                    animator.SetTrigger("openPromo");
+                    break;
+                case LeagueRankStatus.NormalPromo:
+                    animator.SetTrigger("resultPromo");
+                    break;
+                case LeagueRankStatus.PromoSuccess:
+                    animator.SetTrigger("resultPromo");
+                    animator.SetTrigger("promoSuccess");
+                    break;
+                case LeagueRankStatus.PromoFail:
+                    animator.SetTrigger("resultPromo");
+                    animator.SetTrigger("promoFail");
+                    break;
+            }
+
             if (newRank.isPromotion)
             {
-                for (int i = 0; i < newRank.promotionConditionNumbers.Count; i++)
+                text_promoProgress.text = $"{newRank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
+                for (int i = 0; i < trans_PromotionCheckers.Count; i++)
                 {
-                    trans_PromotionCheckers[i].gameObject.SetActive(i < newCofig.promotionConditionMax);
-                    trans_PromotionCheckers[i].GetChild(newRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
-                    trans_PromotionCheckers[i].GetChild(1 - newRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                    if (i < newCofig.promotionConditionMax)
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(true);
+                        if (i < newRank.promotionConditionNumbers.Count)
+                        {
+                            trans_PromotionCheckers[i].GetChild(newRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
+                            trans_PromotionCheckers[i].GetChild(1 - newRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            trans_PromotionCheckers[i].GetChild(0).gameObject.SetActive(false);
+                            trans_PromotionCheckers[i].GetChild(1).gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(false);
+                    }
                 }
             }
             else if (oldRank.isPromotion)
@@ -156,52 +229,39 @@ namespace Framework.UI
                     oldRank.promotionConditionNumbers.Add(1);
                 else if (leagueRankStatus == LeagueRankStatus.PromoFail)
                     oldRank.promotionConditionNumbers.Add(0);
-                for (int i = 0; i < oldRank.promotionConditionNumbers.Count; i++)
+                text_promoProgress.text = $"{oldRank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
+                for (int i = 0; i < trans_PromotionCheckers.Count; i++)
                 {
-                    trans_PromotionCheckers[i].gameObject.SetActive(i < oldCofig.promotionConditionMax);
-                    trans_PromotionCheckers[i].GetChild(oldRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
-                    trans_PromotionCheckers[i].GetChild(1 - oldRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                    if (i < oldCofig.promotionConditionMax)
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(true);
+                        if (i < oldRank.promotionConditionNumbers.Count)
+                        {
+                            trans_PromotionCheckers[i].GetChild(oldRank.promotionConditionNumbers[i]).gameObject.SetActive(true);
+                            trans_PromotionCheckers[i].GetChild(1 - oldRank.promotionConditionNumbers[i]).gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            trans_PromotionCheckers[i].GetChild(0).gameObject.SetActive(false);
+                            trans_PromotionCheckers[i].GetChild(1).gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        trans_PromotionCheckers[i].gameObject.SetActive(false);
+                    }
                 }
             }
-
-            switch (leagueRankStatus)
+            else
             {
-                case LeagueRankStatus.Normal:
-                    animator.SetTrigger("resultNormal");
-                    yield return new WaitForSeconds(0.8f);
-                    break;
-                case LeagueRankStatus.TierUp:
-                    animator.SetTrigger("resultNormal");
-                    yield return new WaitForSeconds(0.8f);
-                    animator.SetTrigger("tierUp");
-                    break;
-                case LeagueRankStatus.TierDown:
-                    animator.SetTrigger("resultNormal");
-                    yield return new WaitForSeconds(0.8f);
-                    animator.SetTrigger("tierDown");
-                    break;
-                case LeagueRankStatus.EnterPromo:
-                    animator.SetTrigger("resultNormal");
-                    yield return new WaitForSeconds(0.8f);
-                    animator.SetTrigger("tierUp");
-                    yield return new WaitForSeconds(0.35f);
-                    animator.SetTrigger("enterPromo");
-                    break;
-                case LeagueRankStatus.NormalPromo:
-                    animator.SetTrigger("resultPromo");
-                    yield return new WaitForSeconds(0.3f);
-                    break;
-                case LeagueRankStatus.PromoSuccess:
-                    animator.SetTrigger("resultPromo");
-                    yield return new WaitForSeconds(0.3f);
-                    animator.SetTrigger("promoSuccess");
-                    break;
-                case LeagueRankStatus.PromoFail:
-                    animator.SetTrigger("resultPromo");
-                    yield return new WaitForSeconds(0.3f);
-                    animator.SetTrigger("promoFail");
-                    break;
+                for (int i = 0; i < trans_PromotionCheckers.Count; i++)
+                {
+                    trans_PromotionCheckers[i].gameObject.SetActive(false);
+                }
+                text_promoProgress.text = "";
+                text_MaxPromo.text = "";
             }
+            yield return null;
         }
 
         string GetRankName(RankTierType tierType)
