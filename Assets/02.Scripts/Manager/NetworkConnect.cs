@@ -18,6 +18,7 @@ namespace Framework.Network
     /// <summary>
     /// Handles network connection logic for matchmaking, session management,
     /// and gameplay state synchronization using Photon Fusion.
+    /// Refactored to properly use Fusion 1.1.0 built-in Host Migration.
     /// </summary>
     public class NetworkConnect : SimulationBehaviour, INetworkRunnerCallbacks
     {
@@ -48,6 +49,9 @@ namespace Framework.Network
         public NetworkGameManager networkGameManager;
 
         public MyBattleLeaderboardInfo myCurrentRank;
+
+        // Host migration token storage
+        private HostMigrationToken _hostMigrationToken;
 
         public bool IsCurrentHost()
         {
@@ -375,31 +379,23 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] Player left: {player.AsIndex}");
 
-            // Host migration logic...
-            NetworkBattleData data = dic_PlayerData[player.AsIndex];
-            if (data.isHost)
-            {
-                Debug.Log("[NetworkConnect] Host left, reassigning...");
-                var playerIndexes = dic_PlayerData.Values
-                                                  .Where(x => x.playerIdx != data.playerIdx)
-                                                  .Select(x => x.playerIdx)
-                                                  .OrderBy(x => x)
-                                                  .ToList();
-
-                if (playerIdx == playerIndexes.FirstOrDefault())
-                {
-                    isHost = true;
-                    Rpc_SetHost(runner, playerIdx);
-                    Debug.Log("[NetworkConnect] I am the new host!");
-                }
-            }
+            // NOTE: removed manual host reassignment here to avoid conflict with Fusion Host Migration.
+            // Let Fusion fire OnHostMigration and elect the migration candidate.
 
             // Handle lobby vs in-game logic
+            NetworkBattleData data = null;
+            if (dic_PlayerData.ContainsKey(player.AsIndex))
+            {
+                data = dic_PlayerData[player.AsIndex];
+            }
+
             switch (networkBattleStatus)
             {
                 case NetworkBattleStatus.LOBBY:
                     Debug.Log("[NetworkConnect] Updating lobby UI after player left.");
-                    dic_PlayerData.Remove(player.AsIndex);
+                    if (dic_PlayerData.ContainsKey(player.AsIndex))
+                        dic_PlayerData.Remove(player.AsIndex);
+
                     PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
 
                     if (Instance.dic_PlayerData.Count <= 1)
@@ -412,7 +408,10 @@ namespace Framework.Network
                     }
                     break;
                 case NetworkBattleStatus.INGAME:
-                    networkGameManager.Rpc_RequestGameOver(player.AsIndex, data.waveCount, true);
+                    if (data != null)
+                    {
+                        networkGameManager.Rpc_RequestGameOver(player.AsIndex, data.waveCount, true);
+                    }
                     break;
             }
         }
@@ -421,6 +420,8 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] Scene load completed, spawning player object. {runner == null} - {networkObjectPrefab == null}");
             GameManager.Instance.gameMode = Game.Defense.GameMode.BATTLE;
+
+            // Only host (state authority) spawns player objects.
             if (isHost)
             {
                 NetworkObject networkObject = runner.Spawn(networkObjectPrefab);
@@ -493,6 +494,32 @@ namespace Framework.Network
         public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
         {
             Debug.LogWarning($"[NetworkConnect] Runner shutdown. Reason={shutdownReason}");
+            switch (shutdownReason)
+            {
+                case ShutdownReason.Ok:
+                    Debug.Log("[NetworkConnect] Normal shutdown.");
+                    break;
+
+                case ShutdownReason.OperationCanceled:
+                    Debug.LogWarning("[NetworkConnect] Disconnected by Operation Canceled");
+                    break;
+
+                case ShutdownReason.DisconnectedByPluginLogic:
+                    Debug.LogError("[NetworkConnect] Disconnected by plugin logic.");
+                    var data = GetSortedDictPlayerData();
+                    foreach (var dat in data)
+                        dat.isGameOver = true;
+                    GameManager.Instance.GameOver();
+                    break;
+
+                case ShutdownReason.Error:
+                    Debug.LogError("[NetworkConnect] Disconnected due to an error.");
+                    break;
+
+                default:
+                    Debug.LogError("[NetworkConnect] Shutdown: " + shutdownReason);
+                    break;
+            }
         }
 
         public void InitializeCheck(int idx)
@@ -545,15 +572,93 @@ namespace Framework.Network
         public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) => Debug.Log("[NetworkConnect] ConnectRequest received.");
         public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) => Debug.Log("[NetworkConnect] Custom auth response received.");
         public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason) => Debug.LogError($"[NetworkConnect] Disconnected from server: {reason}");
+
+        /// <summary>
+        /// Called on clients that are candidates when host disappears.
+        /// We store the token and the elected candidate attempts to resume.
+        /// </summary>
         public async void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
         {
             Debug.Log("[NetworkConnect] Host migration event.");
+
+            // store token for potential resume
+            _hostMigrationToken = hostMigrationToken;
+
+            // pick candidate deterministically: smallest PlayerRef.AsInt (lowest index)
+            var ordered = runner.ActivePlayers.OrderBy(p => p.AsIndex).ToList();
+            if (ordered.Count == 0)
+            {
+                Debug.LogWarning("[NetworkConnect] No active players to become candidate for migration.");
+                return;
+            }
+
+            var candidate = ordered.First();
+            if (runner.LocalPlayer == candidate)
+            {
+                Debug.Log("[NetworkConnect] I am the chosen candidate to resume host. Attempting resume...");
+
+                var result = await runner.StartGame(new StartGameArgs()
+                {
+                    GameMode = Fusion.GameMode.Host,
+                    SessionName = runner.SessionInfo.Name,
+                    HostMigrationToken = hostMigrationToken,
+                    HostMigrationResume = OnHostMigrationResume,
+                    SceneManager = runner.GetComponent<NetworkSceneManagerDefault>()
+                });
+
+                if (result.Ok)
+                    Debug.Log("[NetworkConnect] Migration resumed and StartGame returned Ok.");
+                else
+                    Debug.LogError("[NetworkConnect] Migration resume failed: " + result.ShutdownReason);
+            }
+            else
+            {
+                Debug.Log("[NetworkConnect] Not the chosen candidate. Waiting for migration to complete on other client.");
+            }
         }
+
+        /// <summary>
+        /// Called by Fusion after StartGame(... HostMigrationResume = OnHostMigrationResume) completes.
+        /// Reinitialize non-networked state and mark host flags.
+        /// </summary>
         private void OnHostMigrationResume(NetworkRunner runner)
         {
             Debug.Log("[NetworkConnect] Migration resume callback");
-            // ✅ Reinitialize non-networked state here (UI, managers, etc.)
+
+            // If we are server now, mark ourselves as host and inform others via RPC
+            isHost = runner.IsServer;
+            if (isHost)
+            {
+                hostIdx = runner.LocalPlayer.AsIndex;
+                Debug.Log($"[NetworkConnect] I am new Host after migration. LocalIndex={hostIdx}");
+
+                // mark local player's dic entry if it exists
+                if (dic_PlayerData.ContainsKey(runner.LocalPlayer.AsIndex))
+                    dic_PlayerData[runner.LocalPlayer.AsIndex].isHost = true;
+
+                // Inform others
+                try
+                {
+                    Rpc_SetHost(runner, runner.LocalPlayer.AsIndex);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("[NetworkConnect] Rpc_SetHost failed in OnHostMigrationResume: " + ex.Message);
+                }
+            }
+            else
+            {
+                Debug.Log("[NetworkConnect] Migration resume but this client is not server.");
+            }
+
+            // Reinitialize UI/managers as needed
+            try
+            {
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking")?.UpdateUserInfo();
+            }
+            catch { /* ignore if UI not present */ }
         }
+
         public void OnInput(NetworkRunner runner, NetworkInput input) { }
         public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
         public void OnObjectEnterAOI(NetworkRunner runner, NetworkObject obj, PlayerRef player) { }

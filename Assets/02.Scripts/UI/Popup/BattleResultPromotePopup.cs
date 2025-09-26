@@ -123,10 +123,16 @@ namespace Framework.UI
             int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
             text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
             string txtDeleta = summaryData.lpDelta >= 0 ? $"(+{summaryData.lpDelta})" : $"({summaryData.lpDelta})";
-            text_LP.text = $"{(int)newRank.lp} {txtDeleta}";
+            text_LP.text = $"{(int)newRank.lp}";
             text_Rank.text = $"{newCofig.description}";
             slider_Lp.value = newRank.lp / 100f;
             text_MaxPromo.text = $"/ {oldCofig.promotionConditionMax}";
+
+            summaryData.bonusDetails.Add(new BattleBonusDetail()
+            {
+                bonusType = "BATTLE RESULT",
+                value = summaryData.lpDelta
+            });
 
             for (int i = 0; i < summaryData.bonusDetails.Count; i++)
             {

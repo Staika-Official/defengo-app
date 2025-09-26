@@ -289,9 +289,14 @@ namespace Framework.UI
                     button_GoFriendlyBattle.gameObject.SetActive(false);
                     button_RejectFriendlyBattle.gameObject.SetActive(false);
 
-                    text_Title.gameObject.SetActive(true);
-                    image_userProfile.gameObject.SetActive(false);
-                    text_battleInvite.gameObject.SetActive(false);
+                    text_Title.gameObject.SetActive(false);
+                    image_userProfile.gameObject.SetActive(true);
+                    text_battleInvite.gameObject.SetActive(true);
+
+                    BattleInviteData friendRequestData = JsonUtility.FromJson<BattleInviteData>(data.titleEn);
+                    text_battleInvite.text = friendRequestData.content.Replace('[', ' ').Replace(']', ' ');
+                    UserProfileData friendUserProfileData = DataManager.Instance.dic_userProfileData[friendRequestData.profileImage];
+                    image_userProfile.sprite = friendUserProfileData.sprite_image;
                     break;
                 case InboxType.BATTLE_FRIEND_REQUEST:
                     button_GoFriendlyBattle.gameObject.SetActive(true);
@@ -307,10 +312,10 @@ namespace Framework.UI
                     image_userProfile.gameObject.SetActive(true);
                     text_battleInvite.gameObject.SetActive(true);
 
-                    BattleInviteData battleRequestData = JsonConvert.DeserializeObject<BattleInviteData>(data.titleEn);
-                    text_battleInvite.text = battleRequestData.content;
-                    UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[battleRequestData.profileImage];
-                    image_userProfile.sprite = userProfileData.sprite_image;
+                    BattleInviteData battleRequestData = JsonUtility.FromJson<BattleInviteData>(data.titleEn);
+                    text_battleInvite.text = battleRequestData.content.Replace('[', ' ').Replace(']', ' ');
+                    UserProfileData battleUserProfileData = DataManager.Instance.dic_userProfileData[battleRequestData.profileImage];
+                    image_userProfile.sprite = battleUserProfileData.sprite_image;
 
                     break;
                 default:

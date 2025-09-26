@@ -102,7 +102,7 @@ namespace Framework.UI
             //CharacterData characterData = DataManager.Instance.dic_CharacterData[(CharacterIndex)data.profileId];
 
             image_Rank.gameObject.SetActive(true);
-            image_Rank.sprite = sprite_Ranks[DataManager.Instance.GetRankTierConfig(data.finalRank).tierGradeType];
+            image_Rank.sprite = sprite_Ranks[(int)DataManager.Instance.GetRankTierConfig(data.finalRank).tierType];
             go_Profile.SetActive(false);
 
             text_Rank.text = $"{rank}";
