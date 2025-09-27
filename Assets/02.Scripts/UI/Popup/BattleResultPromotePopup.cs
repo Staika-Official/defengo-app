@@ -122,7 +122,6 @@ namespace Framework.UI
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
             int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
             text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
-            string txtDeleta = (int)summaryData.lpDelta >= 0 ? $"(+{(int)summaryData.lpDelta})" : $"({(int)summaryData.lpDelta})";
             text_LP.text = $"{(int)newRank.lp}";
             text_Rank.text = $"{newCofig.description}";
             slider_Lp.value = newRank.lp / 100f;
@@ -131,14 +130,15 @@ namespace Framework.UI
             summaryData.bonusDetails.Add(new BattleBonusDetail()
             {
                 bonusType = "BATTLE RESULT",
-                value = summaryData.lpDelta
+                value = (int)summaryData.lpDelta
             });
 
             for (int i = 0; i < summaryData.bonusDetails.Count; i++)
             {
                 pvpBonusScoreItems[i].gameObject.SetActive(true);
                 pvpBonusScoreItems[i].text_Reason.text = summaryData.bonusDetails[i].bonusType.Replace('_', ' ');
-                pvpBonusScoreItems[i].text_Score.text = $"+{summaryData.bonusDetails[i].value}";
+                string txtLP = (int)summaryData.bonusDetails[i].value >= 0 ? $"(+{(int)summaryData.bonusDetails[i].value})" : $"({(int)summaryData.bonusDetails[i].value})";
+                pvpBonusScoreItems[i].text_Score.text = $"{txtLP}";
             }
             if (summaryData.rewards != null)
             {

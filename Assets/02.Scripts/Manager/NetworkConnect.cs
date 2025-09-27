@@ -141,7 +141,7 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -179,7 +179,7 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -225,7 +225,7 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to create session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -274,7 +274,7 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to create session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").InActivePopup();
+                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -502,24 +502,38 @@ namespace Framework.Network
 
                 case ShutdownReason.OperationCanceled:
                     Debug.LogWarning("[NetworkConnect] Disconnected by Operation Canceled");
+                    OnAbnormalShutdown();
                     break;
 
                 case ShutdownReason.DisconnectedByPluginLogic:
                     Debug.LogError("[NetworkConnect] Disconnected by plugin logic.");
-                    var data = GetSortedDictPlayerData();
-                    foreach (var dat in data)
-                        dat.isGameOver = true;
-                    GameManager.Instance.GameOver();
+                    OnAbnormalShutdown();
                     break;
 
                 case ShutdownReason.Error:
                     Debug.LogError("[NetworkConnect] Disconnected due to an error.");
+                    OnAbnormalShutdown();
                     break;
 
                 default:
                     Debug.LogError("[NetworkConnect] Shutdown: " + shutdownReason);
                     break;
             }
+        }
+
+        void OnAbnormalShutdown()
+        {
+            if (networkBattleStatus == NetworkBattleStatus.INGAME)
+            {
+                GameManager.Instance.GameOver();
+                if (runner != null)
+                    runner.Shutdown();
+
+                GameManager.Instance.objectPoolManager.AllClear();
+                SceneLoadManager.Instance.SwitchingScene(2);
+            }
+            PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"));
+            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
         }
 
         public void InitializeCheck(int idx)
