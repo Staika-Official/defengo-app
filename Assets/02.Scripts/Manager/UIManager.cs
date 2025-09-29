@@ -278,7 +278,7 @@ namespace Framework.Game.Defense
         public void Initialize(bool isBattleMode)
         {
             IsBattleMode = isBattleMode;
-            
+
             if (IsBattleMode)
             {
                 if (!inGameRankPopup.gameObject.activeSelf)
@@ -315,7 +315,7 @@ namespace Framework.Game.Defense
                     battleResultPopup.PopUpSequence(false);
                 }
                 battleResultPopup.Initialize();
-                
+
                 if (!battleResultPromotePopup.gameObject.activeSelf)
                 {
                     battleResultPromotePopup.gameObject.SetActive(true);
@@ -328,9 +328,9 @@ namespace Framework.Game.Defense
                 button_rank.onPointerUp = OnClick_RankButton;
                 button_giveUp.gameObject.SetActive(false);
                 button_giveUp.onPointerUp = OnClick_GiveUpButton;
-            }
 
-            goScorePanel.gameObject.SetActive(!NetworkConnect.Instance.isFriendlyMatch);
+                goScorePanel.gameObject.SetActive(!NetworkConnect.Instance.isFriendlyMatch);
+            }
 
             // button_SummonCharacter.onPointerUp = () =>
             // {

@@ -32,14 +32,15 @@ namespace Framework.UI
 
         public override void InActivePopup()
         {
-            if (NetworkConnect.Instance.isFriendlyMatch)
+            if (NetworkConnect.Instance == null || NetworkConnect.Instance.isFriendlyMatch)
             {
                 Debug.Log("OnClick Home");
                 SceneLoadManager.onCompleteLoadScene = () =>
                 {
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
-                NetworkConnect.Instance.runner.Shutdown();
+                if (NetworkConnect.Instance != null && NetworkConnect.Instance.runner != null)
+                    NetworkConnect.Instance.runner.Shutdown();
                 SceneLoadManager.Instance.SwitchingScene(2);
 
                 GameManager.Instance.objectPoolManager.AllClear();

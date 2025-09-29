@@ -127,22 +127,22 @@ namespace Framework.UI
             slider_Lp.value = newRank.lp / 100f;
             text_MaxPromo.text = $"/ {oldCofig.promotionConditionMax}";
 
-            int battleLp = (int)Mathf.Floor(summaryData.lpDelta);
+            float battle = summaryData.lpDelta;
             foreach (var itm in summaryData.bonusDetails)
             {
-                battleLp -= (int)Mathf.Floor(itm.value);
+                battle -= itm.value;
             }
             summaryData.bonusDetails.Add(new BattleBonusDetail()
             {
                 bonusType = "BATTLE RESULT",
-                value = (int)Mathf.Floor(battleLp)
+                value = battle
             });
 
             for (int i = 0; i < summaryData.bonusDetails.Count; i++)
             {
                 pvpBonusScoreItems[i].gameObject.SetActive(true);
                 pvpBonusScoreItems[i].text_Reason.text = summaryData.bonusDetails[i].bonusType.Replace('_', ' ');
-                string txtLP = (int)Mathf.Floor(summaryData.bonusDetails[i].value) >= 0 ? $"(+{(int)Mathf.Floor(summaryData.bonusDetails[i].value)})" : $"({(int)Mathf.Floor(summaryData.bonusDetails[i].value)})";
+                string txtLP = summaryData.bonusDetails[i].value >= 0 ? $"(+{summaryData.bonusDetails[i].value})" : $"({summaryData.bonusDetails[i].value})";
                 pvpBonusScoreItems[i].text_Score.text = $"{txtLP}";
             }
             if (summaryData.rewards != null)
