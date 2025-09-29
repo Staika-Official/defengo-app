@@ -33,10 +33,11 @@ namespace Framework.Game.Defense
         #region Client → Host Requests
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_RequestInitializeComplete(int playerIdx)
+        public void Rpc_RequestInitializeComplete(int playerIdx, string json)
         {
+            Debug.Log($"Request initialize");
             if (NetworkConnect.Instance.IsCurrentHost())
-                RpcInitializeComplete(playerIdx);
+                RpcInitializeComplete(playerIdx, json);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -87,10 +88,10 @@ namespace Framework.Game.Defense
         #region Host → All Broadcasts
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RpcInitializeComplete(int playerIdx)
+        public void RpcInitializeComplete(int playerIdx, string json)
         {
-            Debug.Log($"{gameObject.name} {playerIdx} is Initialize Complete");
-            NetworkConnect.Instance.InitializeCheck(playerIdx);
+            Debug.Log($"{gameObject.name} {playerIdx} is Initialize Complete \n ");
+            NetworkConnect.Instance.InitializeCheck(playerIdx, json);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -154,7 +155,7 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_GameOver(int playerId, int roundId, bool isAbnormal)
+        public async void Rpc_GameOver(int playerId, int roundId, bool isAbnormal)
         {
             if (NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver)
                 return;
@@ -164,6 +165,17 @@ namespace Framework.Game.Defense
             NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver = true;
             NetworkConnect.Instance.dic_PlayerData[playerId].isAbnormalExit = isAbnormal;
             gameOverPlayerCount += 1;
+
+            if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)
+            {
+                SurrenderBattlePayload payload = new SurrenderBattlePayload()
+                {
+                    sessionId = NetworkConnect.Instance.dic_PlayerData[playerId].sessionId,
+                    leavePlayId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
+                    leaveUserId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
+                };
+                await NetworkManager.Instance.SurrenderBattle(payload, null, null);
+            }
 
             Debug.Log($"{gameObject.name} {nickname} is GameOver");
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);

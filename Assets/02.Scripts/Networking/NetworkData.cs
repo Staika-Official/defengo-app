@@ -1497,6 +1497,14 @@ namespace Framework.Network
     }
 
     [Serializable]
+    public class SurrenderBattlePayload
+    {
+        public string leaveUserId;
+        public int leavePlayId;
+        public int sessionId;
+    }
+
+    [Serializable]
     public class RankTierConfig
     {
         public int id;

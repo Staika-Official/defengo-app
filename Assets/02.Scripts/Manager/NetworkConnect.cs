@@ -136,6 +136,7 @@ namespace Framework.Network
                 await NetworkManager.Instance.ReadyForBattle(new ReadyBattlePayload(roomUuid, UserInfoManager.Instance.userId), (response) =>
                 {
                     sessionId = response.sessionId;
+                    dic_PlayerData[playerIdx].sessionId = sessionId;
                 }, null);
             }
             else
@@ -288,7 +289,11 @@ namespace Framework.Network
             if (!Instance.isFriendlyMatch)
             {
                 StartBattlePayload payload = new StartBattlePayload(Instance.userId, Instance.roomUuid, Instance.nickname, UserSlotManager.Instance.focusIdx, Instance.sessionId);
-                await NetworkManager.Instance.StartBattle(payload, (playId) => Instance.playId = playId, null);
+                await NetworkManager.Instance.StartBattle(payload, (playId) =>
+                {
+                    Instance.playId = playId;
+                    Instance.dic_PlayerData[Instance.playerIdx].playId = playId;
+                }, null);
             }
 
             Instance.StartCoroutine(HomeScreen.Instance.StartGameSequence(Instance.GameStartSequence));
@@ -366,6 +371,7 @@ namespace Framework.Network
                         nickname = UserInfoManager.Instance.nickname,
                         playerIdx = runner.LocalPlayer.AsIndex,
                         decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
+                        userId = UserInfoManager.Instance.userId,
                         isGameOver = false,
                         rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
                     };
@@ -397,14 +403,21 @@ namespace Framework.Network
                         dic_PlayerData.Remove(player.AsIndex);
 
                     PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
-
-                    if (Instance.dic_PlayerData.Count <= 1)
+                    if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
                     {
                         if (Instance.ICountMatchingTimeOut != null)
                             Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
                         if (Instance.ICountTimeStart != null)
                             Instance.StopCoroutine(Instance.ICountTimeStart);
-                        Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
+                        Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountTimeStart());
+                    }
+                    else
+                    {
+                        if (Instance.ICountTimeStart != null)
+                            Instance.StopCoroutine(Instance.ICountTimeStart);
+                        if (Instance.ICountMatchingTimeOut != null)
+                            Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                        Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
                     }
                     break;
                 case NetworkBattleStatus.INGAME:
@@ -538,10 +551,13 @@ namespace Framework.Network
             }
         }
 
-        public void InitializeCheck(int idx)
+        public void InitializeCheck(int idx, string json)
         {
             Debug.Log($"[NetworkConnect] InitializeCheck called for player {idx}.");
+            NetworkBattleData data = JsonUtility.FromJson<NetworkBattleData>(json);
             dic_PlayerData[idx].isInitialize = true;
+            dic_PlayerData[idx].sessionId = data.sessionId;
+            dic_PlayerData[idx].playId = data.playId;
 
             if (isHost)
             {
@@ -698,12 +714,15 @@ namespace Framework.Network
         {
             Debug.Log("[NetworkConnect] Rpc_JoinGame (all players).");
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
-            Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+            if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
+                Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+            else
+                Instance.dic_PlayerData[battleData.playerIdx] = battleData;
 
             var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
             popup.UpdateUserInfo();
 
-            if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
+            /* if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
             {
                 if (Instance.ICountMatchingTimeOut != null)
                     Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
@@ -712,7 +731,8 @@ namespace Framework.Network
                 Debug.Log("[NetworkConnect] All players joined, starting game.");
                 Instance.StartCoroutine(Instance.GameStart());
             }
-            else if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
+            else  */
+            if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
             {
                 if (Instance.ICountMatchingTimeOut != null)
                     Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
@@ -722,6 +742,8 @@ namespace Framework.Network
             }
             else
             {
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
                 if (Instance.ICountMatchingTimeOut != null)
                     Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
                 Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
@@ -729,6 +751,47 @@ namespace Framework.Network
 
             foreach (var item in Instance.dic_PlayerData.Values)
                 item.isInitialize = false;
+        }
+
+        [Rpc]
+        public static void Rpc_JoinGame(NetworkRunner runner, [RpcTarget] PlayerRef playerRef, string data)
+        {
+            Debug.Log("[NetworkConnect] Rpc_JoinGame (targeted).");
+            NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
+            if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
+                Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+            else
+                Instance.dic_PlayerData[battleData.playerIdx] = battleData;
+
+            /* if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                Debug.Log("[NetworkConnect] All players joined, starting game.");
+                Instance.StartCoroutine(Instance.GameStart());
+            }
+            else  */
+            if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
+            {
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountTimeStart());
+            }
+            else
+            {
+                if (Instance.ICountTimeStart != null)
+                    Instance.StopCoroutine(Instance.ICountTimeStart);
+                if (Instance.ICountMatchingTimeOut != null)
+                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
+                Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
+            }
+
+            var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+            popup.UpdateUserInfo();
         }
 
         Coroutine ICountMatchingTimeOut;
@@ -756,41 +819,6 @@ namespace Framework.Network
             popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Battle_Terminated"));
             PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
             StopAllCoroutines();
-        }
-
-        [Rpc]
-        public static void Rpc_JoinGame(NetworkRunner runner, [RpcTarget] PlayerRef playerRef, string data)
-        {
-            Debug.Log("[NetworkConnect] Rpc_JoinGame (targeted).");
-            NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
-            Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
-
-            if (Instance.dic_PlayerData.Count == runner.SessionInfo.MaxPlayers)
-            {
-                if (Instance.ICountMatchingTimeOut != null)
-                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
-                if (Instance.ICountTimeStart != null)
-                    Instance.StopCoroutine(Instance.ICountTimeStart);
-                Debug.Log("[NetworkConnect] All players joined, starting game.");
-                Instance.StartCoroutine(Instance.GameStart());
-            }
-            else if (Instance.dic_PlayerData.Count >= Instance.minPlayerCount)
-            {
-                if (Instance.ICountMatchingTimeOut != null)
-                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
-                if (Instance.ICountTimeStart != null)
-                    Instance.StopCoroutine(Instance.ICountTimeStart);
-                Instance.ICountTimeStart = Instance.StartCoroutine(Instance.CountTimeStart());
-            }
-            else
-            {
-                if (Instance.ICountMatchingTimeOut != null)
-                    Instance.StopCoroutine(Instance.ICountMatchingTimeOut);
-                Instance.ICountMatchingTimeOut = Instance.StartCoroutine(Instance.CountMatchingTimeOut());
-            }
-
-            var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-            popup.UpdateUserInfo();
         }
 
         [Rpc]

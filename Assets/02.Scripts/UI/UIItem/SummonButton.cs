@@ -24,6 +24,9 @@ namespace Framework.UI
         public bool isFixedSummon;
         public UnityAction SummonFixedCharacter;
 
+        public int testStarGrade;
+        public CharacterIndex testCharacterIndex;
+
         public void Initilize()
         {
             button_summonCharacter.onPointerUp = OnClick_SummonCharacter;

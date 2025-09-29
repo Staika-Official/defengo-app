@@ -74,7 +74,7 @@ namespace Framework.UI
         {
             text_Refresh.text = $"{LanguageManager.Instance.GetStringData("UI_Refresh")} {refreshCount}";
             button_refresh.SetInterectible(refreshCount > 0);
-            fieldBossRewardGroupData = await DataLoadManager.Instance.GetDataAsyncBinary<FieldBossRewardGroupData>("FieldBossRewardGroupData");
+            fieldBossRewardGroupData = await DataLoadManager.Instance.GetDataAsyncBinary<FieldBossRewardGroupData>("FieldBossRewardGroupData1");
             int rewardGroupIndex = NetworkConnect.Instance.networkGameManager.rewardGroupIndex;
 
             var linqResult = from data in fieldBossRewardGroupData.data

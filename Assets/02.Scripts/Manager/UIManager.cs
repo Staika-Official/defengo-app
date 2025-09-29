@@ -6,6 +6,7 @@ using Framework.GameData.Defense;
 using Framework.Network;
 using Framework.Sound;
 using Framework.UI;
+using Framework.Util;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -539,7 +540,8 @@ namespace Framework.Game.Defense
         }
         public void OnClick_GiveUpButton()
         {
-            GameManager.Instance.GameOver();
+            SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+            popup.SetYesNoPopupMessage(LanguageManager.Instance.GetStringData("MSG_Surrender"), () => GameManager.Instance.SurrenderBattle());
         }
 
         public void OnClick_Relocation()

@@ -189,6 +189,7 @@ namespace Framework.Network
         public static readonly string postStartBattle = "/game/api/battle-play/users/{0}/sessions/{1}";
         public static readonly string postCreateBattleRecord = "/game/api/battle-play/users/{0}/sessions/{1}/waves/{2}";
         public static readonly string postEndBattle = "/game/api/battle-play/users/{0}/sessions/{1}/end/{2}";
+        public static readonly string postSurrenderBattle = "/game/api/battle-play/users/{0}/sessions/{1}/leave/{2}";
         public static readonly string getRankTierConfig = "/game/api/battle-play/rank-tier";
         public static readonly string getMyBattleLeaderboard = "/game/api/battle-user-leader-board/users/{0}";
         public static readonly string getBattleLeaderboard = "/game/api/battle-season/battle-user-leaderboard";
@@ -4133,6 +4134,35 @@ namespace Framework.Network
             {
                 ErrorMessage(req.responseCode.ToString());
                 Debug.Log("End battle faild " + req.downloadHandler.text);
+                onFail?.Invoke();
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask SurrenderBattle(SurrenderBattlePayload payload, UnityAction onSuccess, UnityAction onFail)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSurrenderBattle, UserInfoManager.Instance.userId,
+                                NetworkConnect.Instance.sessionId, NetworkConnect.Instance.playId), "POST");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            var json = JsonUtility.ToJson(payload);
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            req.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            string accessToken = SecurePlayerPrefs.GetString("accessToken");
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log("Surrender battle success " + req.downloadHandler.text);
+                onSuccess?.Invoke();
+            }
+            catch
+            {
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log("Surrender battle faild " + req.downloadHandler.text);
                 onFail?.Invoke();
             }
 

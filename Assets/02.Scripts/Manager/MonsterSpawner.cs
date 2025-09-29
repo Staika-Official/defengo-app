@@ -232,10 +232,13 @@ namespace Framework.Game.Defense
             IsGameOver = true;
             isWaveStart = true;
 
+            if (GameManager.Instance.isGameOver)
+                return;
+
             if (bossIdx >= bossData.bossMonsters.Length - 1)
-            {
-                bossIdx = bossData.bossMonsters.Length - 1;
-            }
+                {
+                    bossIdx = bossData.bossMonsters.Length - 1;
+                }
 
             BossMonster data = bossData.bossMonsters[bossIdx];
             switch (data.monsterId)

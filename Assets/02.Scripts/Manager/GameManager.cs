@@ -232,7 +232,8 @@ namespace Framework.Game.Defense
             UIManager.Instance.ChangeValueSequnce(summonCost - summonCostBuffValue, 0, UIManager.Instance.text_SummonCharacterCost);
             buffManager.Initialize();
             renderSortManager.Initialized();
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestInitializeComplete(NetworkConnect.Instance.playerIdx);
+            string json = JsonUtility.ToJson(NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx]);
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestInitializeComplete(NetworkConnect.Instance.playerIdx, json);
         }
 
         public void Initialize()
@@ -644,6 +645,30 @@ namespace Framework.Game.Defense
             }
         }
 
+        public void SurrenderBattle()
+        {
+            if (isGameOver) return;
+            isGameOver = true;
+            gameState = GameState.GAME_OVER;
+            SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
+
+            SurrenderBattlePayload payload = new SurrenderBattlePayload()
+            {
+                sessionId = NetworkConnect.Instance.sessionId,
+                leavePlayId = NetworkConnect.Instance.playId,
+                leaveUserId = UserInfoManager.Instance.userId
+            };
+
+            if (!NetworkConnect.Instance.isFriendlyMatch)
+                CallSurrenderBattle(payload);
+            else
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+
+            // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+            // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
+            Debug.Log("Battle Game Over");
+        }
+
         public void SingleGameOver()
         {
             if (isGameOver) return;
@@ -706,6 +731,17 @@ namespace Framework.Game.Defense
             }, () =>
             {
                 CallEndBattle(payload);
+            });
+        }
+
+        async void CallSurrenderBattle(SurrenderBattlePayload payload)
+        {
+            await NetworkManager.Instance.SurrenderBattle(payload, () =>
+            {
+                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+            }, () =>
+            {
+                CallSurrenderBattle(payload);
             });
         }
 

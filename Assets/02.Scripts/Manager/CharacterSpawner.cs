@@ -767,6 +767,10 @@ namespace Framework.Game.Defense
                 CharacterIndex.YURI => objectPoolManager.GetObject<CharacterYuri>("Yuri"),
                 CharacterIndex.OWLRUS => objectPoolManager.GetObject<CharacterOwlrus>("Owlrus"),
                 CharacterIndex.FLORA => objectPoolManager.GetObject<CharacterFlora>("Flora"),
+                CharacterIndex.VEGAS => objectPoolManager.GetObject<CharacterVegas>("Vegas"),
+                CharacterIndex.HAMMERING => objectPoolManager.GetObject<CharacterHammering>("Hammering"),
+                CharacterIndex.RIO => objectPoolManager.GetObject<CharacterRio>("Rio"),
+                CharacterIndex.CHAMY => objectPoolManager.GetObject<CharacterChamy>("Chamy"),
                 _ => null,
             };
 
