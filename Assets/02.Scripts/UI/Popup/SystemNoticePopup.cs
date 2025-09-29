@@ -21,11 +21,13 @@ namespace Framework.UI
         public Button m_BtnNo;
 
         private UnityAction mCallbackYes;
+        private UnityAction mCallbackOK;
 
-        public void SetNoticeMessage(string notice)
+        public void SetNoticeMessage(string notice, UnityAction callback = null)
         {
             text_NoticeMessage.text = LanguageManager.Instance.GetStringData(notice);
             mCallbackYes = null;
+            mCallbackOK = callback;
 
             m_OneButton.SetActive(true);
             m_TwoButton.SetActive(false);
@@ -33,10 +35,11 @@ namespace Framework.UI
             ActivePopup();
         }
 
-        public void SetNoticeText(string text)
+        public void SetNoticeText(string text, UnityAction callback = null)
         {
             text_NoticeMessage.text = text;
             mCallbackYes = null;
+            mCallbackOK = callback;
 
             m_OneButton.SetActive(true);
             m_TwoButton.SetActive(false);
@@ -87,6 +90,7 @@ namespace Framework.UI
             button_Close.onClick.AddListener(() =>
             {
                 InActivePopup();
+                mCallbackOK?.Invoke();
             });
 
             m_BtnYes.onClick.AddListener(() =>

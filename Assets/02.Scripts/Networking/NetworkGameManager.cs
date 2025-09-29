@@ -169,6 +169,16 @@ namespace Framework.Game.Defense
 
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
+            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+            if (remain == 1)
+            {
+                var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
+                if (!my.isGameOver && my.rank == 1)
+                {
+                    GameManager.Instance.GameOver();
+                }
+            }
+
             if (gameOverPlayerCount == maxCount)
                 RpcSummaryBattle();
         }

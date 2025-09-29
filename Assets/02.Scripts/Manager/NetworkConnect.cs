@@ -523,17 +523,19 @@ namespace Framework.Network
 
         void OnAbnormalShutdown()
         {
-            if (networkBattleStatus == NetworkBattleStatus.INGAME)
+            if (networkBattleStatus == NetworkBattleStatus.INGAME && !GameManager.Instance.isGameOver)
             {
                 GameManager.Instance.GameOver();
                 if (runner != null)
                     runner.Shutdown();
-
-                GameManager.Instance.objectPoolManager.AllClear();
-                SceneLoadManager.Instance.SwitchingScene(2);
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    runner.Shutdown();
+                    GameManager.Instance.objectPoolManager.AllClear();
+                    SceneLoadManager.Instance.SwitchingScene(2);
+                });
             }
-            PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"));
-            PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
         }
 
         public void InitializeCheck(int idx)
@@ -753,6 +755,7 @@ namespace Framework.Network
             SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
             popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Battle_Terminated"));
             PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+            StopAllCoroutines();
         }
 
         [Rpc]
