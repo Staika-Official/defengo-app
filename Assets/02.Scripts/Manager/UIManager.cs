@@ -330,6 +330,8 @@ namespace Framework.Game.Defense
                 button_giveUp.onPointerUp = OnClick_GiveUpButton;
             }
 
+            goScorePanel.gameObject.SetActive(!NetworkConnect.Instance.isFriendlyMatch);
+
             // button_SummonCharacter.onPointerUp = () =>
             // {
             //     OnClick_SummonCharacter();

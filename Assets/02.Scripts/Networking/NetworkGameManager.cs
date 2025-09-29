@@ -61,7 +61,7 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_RequestWaveComplete(int playerId, int roundId, int monsterKilled)
+        public void Rpc_RequestWaveComplete(int playerId, int roundId, int monsterKilled, int monsterBossKilled)
         {
             if (NetworkConnect.Instance.IsCurrentHost())
                 Rpc_WaveComplete(playerId, roundId, monsterKilled);
@@ -116,7 +116,7 @@ namespace Framework.Game.Defense
             GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
-            Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId - 1);
+            Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId);
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -128,12 +128,14 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled = -1)
+        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled = -1, int monsterBossKilled = -1)
         {
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
             if (monsterKilled != -1)
                 NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled = monsterKilled;
+            if (monsterBossKilled != -1)
+                NetworkConnect.Instance.dic_PlayerData[playerId].monsterBossKilled = monsterBossKilled;
             UIManager.Instance.inGameRankPopup.SortPlayerData();
             Debug.Log($"{gameObject.name} Rpc Player Id : {playerId}");
             Debug.Log($"{gameObject.name} Rpc nickname : {nickname}");

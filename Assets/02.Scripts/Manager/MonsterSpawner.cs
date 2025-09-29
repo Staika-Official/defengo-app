@@ -557,7 +557,7 @@ namespace Framework.Game.Defense
                                 UIManager.Instance.ChangeWaveValue(currentWaveIdx + 1);
                                 if (GameManager.Instance.gameMode == GameMode.BATTLE)
                                 {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1, totalKilledMonsterCount);
+                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1, totalKilledMonsterCount, totalKilledBossMonsterCount);
                                 }
                                 GameManager.Instance.waveIdx = currentWaveIdx + 1;
                             }
@@ -567,7 +567,7 @@ namespace Framework.Game.Defense
                                 UIManager.Instance.ChangeWaveValue(idx);
                                 if (GameManager.Instance.gameMode == GameMode.BATTLE)
                                 {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, idx, totalKilledMonsterCount);
+                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, idx, totalKilledMonsterCount, totalKilledBossMonsterCount);
                                 }
                                 GameManager.Instance.waveIdx = idx;
                             }

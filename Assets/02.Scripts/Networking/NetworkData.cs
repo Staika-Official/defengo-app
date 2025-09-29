@@ -124,6 +124,7 @@ namespace Framework.Network
         public int playId;
         public int sessionId;
         public int monsterKilled;
+        public int monsterBossKilled;
         public bool selectedFieldBossReward;
         public string rankTier;
     }

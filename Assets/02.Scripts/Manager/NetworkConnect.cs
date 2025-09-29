@@ -808,6 +808,7 @@ namespace Framework.Network
             data = data
             .OrderBy(p => p.isAbnormalExit)              // ✅ put abnormal exits last
             .ThenByDescending(p => p.waveCount)          // ✅ higher wave better
+            .ThenByDescending(p => p.monsterBossKilled)  // ✅ then boss kills
             .ThenByDescending(p => p.monsterKilled)      // ✅ then kills
             .ToList();
 
