@@ -20,7 +20,7 @@ namespace Framework.UI
         {
             PopUpSequence(true);
 
-            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+            var data = UIManager.Instance.battleResultPopup.GetSortedDictPlayerData();
 
             for (int i = 0; i < data.Count; i++)
             {
@@ -32,7 +32,7 @@ namespace Framework.UI
 
         public override void InActivePopup()
         {
-            if (NetworkConnect.Instance == null || NetworkConnect.Instance.isFriendlyMatch)
+            if (UIManager.Instance.battleResultPopup.dic_PlayerData == null || UIManager.Instance.battleResultPopup.isFriendlyMatch)
             {
                 Debug.Log("OnClick Home");
                 SceneLoadManager.onCompleteLoadScene = () =>

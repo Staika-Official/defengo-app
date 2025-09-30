@@ -79,7 +79,7 @@ namespace Framework.UI
         IEnumerator ShowSequence(GetBattleSummaryResponse summaryData, MyBattleLeaderboardInfo newRank)
         {
             Debug.Log($"{gameObject.name} Show sequence");
-            var oldRank = NetworkConnect.Instance.myCurrentRank;
+            var oldRank = UIManager.Instance.battleResultPopup.currentRank;
             var oldCofig = DataManager.Instance.GetRankTierConfig(oldRank.finalRank);
             var newCofig = DataManager.Instance.GetRankTierConfig(newRank.finalRank);
 
@@ -119,8 +119,8 @@ namespace Framework.UI
 
             Debug.Log($"League rank status {leagueRankStatus}");
 
-            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
-            int ingameRank = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank;
+            var data = UIManager.Instance.battleResultPopup.GetSortedDictPlayerData();
+            int ingameRank = data.Find(x => x.playerIdx == UIManager.Instance.battleResultPopup.playerIdx).rank;
             text_InGameRank.text = $"{ingameRank}{GetRankSuffix(ingameRank)}";
             text_LP.text = $"{(int)newRank.lp}";
             text_Rank.text = $"{newCofig.description}";

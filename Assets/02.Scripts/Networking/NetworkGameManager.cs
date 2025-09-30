@@ -71,6 +71,7 @@ namespace Framework.Game.Defense
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void Rpc_RequestGameOver(int playerId, int roundId, bool isAbnormal)
         {
+            Debug.Log($"{gameObject.name} {NetworkConnect.Instance.dic_PlayerData[playerId].nickname} id: {playerId} request game over \n ");
             if (NetworkConnect.Instance.IsCurrentHost())
                 Rpc_GameOver(playerId, roundId, isAbnormal);
             Rpc_RequestSelectFieldBossReward(playerId);
@@ -153,6 +154,14 @@ namespace Framework.Game.Defense
                 if (!my.isGameOver && my.rank == 1)
                 {
                     GameManager.Instance.GameOver();
+                    if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
+                    {
+                        var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
+
+                        UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+                        NetworkConnect.Instance.runner.Shutdown();
+                    }
                 }
             }
         }
@@ -160,6 +169,7 @@ namespace Framework.Game.Defense
         [Rpc(RpcSources.All, RpcTargets.All)]
         public async void Rpc_GameOver(int playerId, int roundId, bool isAbnormal)
         {
+            Debug.Log($"{gameObject.name} {NetworkConnect.Instance.dic_PlayerData[playerId].nickname} id: {playerId} game over \n ");
             if (NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver)
                 return;
 
@@ -171,13 +181,13 @@ namespace Framework.Game.Defense
 
             if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)
             {
-                SurrenderBattlePayload payload = new SurrenderBattlePayload()
+                EndBattlePayload payload = new EndBattlePayload()
                 {
                     sessionId = NetworkConnect.Instance.dic_PlayerData[playerId].sessionId,
-                    leavePlayId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
-                    leaveUserId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
+                    playId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
+                    userId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
                 };
-                await NetworkManager.Instance.SurrenderBattle(payload, null, null);
+                await NetworkManager.Instance.EndBattle(payload, null, null);
             }
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"GameOver !!", nickname);
@@ -194,6 +204,14 @@ namespace Framework.Game.Defense
                 if (!my.isGameOver && my.rank == 1)
                 {
                     GameManager.Instance.GameOver();
+                    if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
+                    {
+                        var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
+
+                        UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+                        await NetworkConnect.Instance.runner.Shutdown();
+                    }
                 }
             }
 

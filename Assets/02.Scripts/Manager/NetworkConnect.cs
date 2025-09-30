@@ -72,21 +72,6 @@ namespace Framework.Network
         }
 
         /// <summary>
-        /// Called only by host to check if room is full, then start the game.
-        /// </summary>
-        public void CheckPlayerCount()
-        {
-            Debug.Log($"[NetworkConnect] Checking player count... Host={isHost}, " +
-                      $"MaxPlayers={runner?.SessionInfo.MaxPlayers}, Current={runner?.SessionInfo.PlayerCount}");
-
-            if (isHost && runner.SessionInfo.MaxPlayers == runner.SessionInfo.PlayerCount)
-            {
-                Debug.Log("[NetworkConnect] All players joined, starting game...");
-                StartCoroutine(GameStart());
-            }
-        }
-
-        /// <summary>
         /// Connects to the shared lobby to list/join/create sessions.
         /// </summary>
         public async void ConnectToLobby(bool isFriendlyMatch, string roomName = "", string roomPassword = "")

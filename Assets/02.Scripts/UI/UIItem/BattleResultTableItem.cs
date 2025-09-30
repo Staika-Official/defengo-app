@@ -6,6 +6,7 @@ using TMPro;
 using Framework.Network;
 using Framework.GameData.Defense;
 using UnityEngine.UI.Extensions;
+using Framework.Game.Defense;
 
 namespace Framework.UI
 {
@@ -69,7 +70,7 @@ namespace Framework.UI
                 characterCards[i].InitializeFriendly(characterData);
             }
 
-            bool isMine = data.playerIdx == NetworkConnect.Instance.playerIdx;
+            bool isMine = data.playerIdx == UIManager.Instance.battleResultPopup.playerIdx;
             string startColorKey = isMine ? "#FFF4B2" : "#C1E9FF";
             string endColorKey = isMine ? "#FFF2D7" : "#98D7FA";
             ColorUtility.TryParseHtmlString(startColorKey, out Color startColor);
