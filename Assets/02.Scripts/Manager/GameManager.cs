@@ -645,30 +645,6 @@ namespace Framework.Game.Defense
             }
         }
 
-        public void SurrenderBattle()
-        {
-            if (isGameOver) return;
-            isGameOver = true;
-            gameState = GameState.GAME_OVER;
-            SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
-
-            SurrenderBattlePayload payload = new SurrenderBattlePayload()
-            {
-                sessionId = NetworkConnect.Instance.sessionId,
-                leavePlayId = NetworkConnect.Instance.playId,
-                leaveUserId = UserInfoManager.Instance.userId
-            };
-
-            if (!NetworkConnect.Instance.isFriendlyMatch)
-                CallSurrenderBattle(payload);
-            else
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
-
-            // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-            // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
-            Debug.Log("Battle Game Over");
-        }
-
         public void SingleGameOver()
         {
             if (isGameOver) return;
@@ -715,19 +691,45 @@ namespace Framework.Game.Defense
 
             if (!NetworkConnect.Instance.isFriendlyMatch)
                 CallEndBattle(payload);
-            else
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
 
             // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
             // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
             Debug.Log("Battle Game Over");
         }
 
+        // public void SurrenderBattle()
+        // {
+        //     if (isGameOver) return;
+        //     isGameOver = true;
+        //     gameState = GameState.GAME_OVER;
+        //     SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
+
+        //     SurrenderBattlePayload payload = new SurrenderBattlePayload()
+        //     {
+        //         sessionId = NetworkConnect.Instance.sessionId,
+        //         leavePlayId = NetworkConnect.Instance.playId,
+        //         leaveUserId = UserInfoManager.Instance.userId
+        //     };
+
+        //     if (!NetworkConnect.Instance.isFriendlyMatch)
+        //     {
+        //         CallSurrenderBattle(payload);
+        //     }
+
+        //     NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, true);
+
+        //     // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+        //     // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
+        //     Debug.Log("Battle Game Surrender");
+        // }
+
         async void CallEndBattle(EndBattlePayload payload)
         {
             await NetworkManager.Instance.EndBattle(payload, () =>
             {
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+
             }, () =>
             {
                 CallEndBattle(payload);
@@ -738,7 +740,7 @@ namespace Framework.Game.Defense
         {
             await NetworkManager.Instance.SurrenderBattle(payload, () =>
             {
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+
             }, () =>
             {
                 CallSurrenderBattle(payload);

@@ -113,11 +113,14 @@ namespace Framework.Game.Defense
         public void Rpc_ReachBossWave(int roundId, string nickname, int rewardGroupIndex, int bossIdx)
         {
             Debug.Log($"{gameObject.name} Boss Wave Start");
-            this.rewardGroupIndex = rewardGroupIndex;
-            GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
-            UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
-            UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
-            Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId);
+            if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
+            {
+                this.rewardGroupIndex = rewardGroupIndex;
+                GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
+                UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
+                UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
+                Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId);
+            }
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -176,14 +179,15 @@ namespace Framework.Game.Defense
                 };
                 await NetworkManager.Instance.SurrenderBattle(payload, null, null);
             }
-
-            Debug.Log($"{gameObject.name} {nickname} is GameOver");
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"GameOver !!", nickname);
 
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
             int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+
+            Debug.Log($"{gameObject.name} {nickname} is GameOver ~ remain player: {remain} (total: {NetworkConnect.Instance.dic_PlayerData.Count} / died: {gameOverPlayerCount}) \n data : {JsonUtility.ToJson(data)}");
+
             if (remain == 1)
             {
                 var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
@@ -193,7 +197,7 @@ namespace Framework.Game.Defense
                 }
             }
 
-            if (gameOverPlayerCount == maxCount)
+            if (gameOverPlayerCount == maxCount || remain == 0)
                 RpcSummaryBattle();
         }
 

@@ -577,7 +577,7 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] Fieldboss reward called for player {idx}.");
             dic_PlayerData[idx].selectedFieldBossReward = true;
 
-            bool allReady = dic_PlayerData.Values.All(p => p.selectedFieldBossReward || p.isGameOver);
+            bool allReady = dic_PlayerData.Values.All(p => p.selectedFieldBossReward || p.isGameOver || p.isAbnormalExit);
             if (allReady)
             {
                 Debug.Log("[NetworkConnect] All players selected reward");
@@ -835,8 +835,8 @@ namespace Framework.Network
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
 
             data = data
-            .OrderBy(p => p.isAbnormalExit)              // ✅ put abnormal exits last
-            .ThenByDescending(p => p.waveCount)          // ✅ higher wave better
+            // .OrderBy(p => p.isGameOver)              // ✅ put abnormal exits last
+            .OrderByDescending(p => p.waveCount)          // ✅ higher wave better
             .ThenByDescending(p => p.monsterBossKilled)  // ✅ then boss kills
             .ThenByDescending(p => p.monsterKilled)      // ✅ then kills
             .ToList();
