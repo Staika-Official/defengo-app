@@ -362,21 +362,22 @@ namespace Framework.Network
             else
             {
                 Debug.Log($"[NetworkConnect] Syncing player data for new player {player.AsIndex}.");
-                if (player.AsIndex > runner.LocalPlayer.AsIndex)
+                NetworkBattleData data = new()
                 {
-                    NetworkBattleData data = new()
-                    {
-                        profileId = UserInfoManager.Instance.userState.equippedProfileId,
-                        isHost = isHost,
-                        nickname = UserInfoManager.Instance.nickname,
-                        playerIdx = runner.LocalPlayer.AsIndex,
-                        decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
-                        userId = UserInfoManager.Instance.userId,
-                        isGameOver = false,
-                        rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
-                    };
+                    profileId = UserInfoManager.Instance.userState.equippedProfileId,
+                    isHost = isHost,
+                    nickname = UserInfoManager.Instance.nickname,
+                    playerIdx = runner.LocalPlayer.AsIndex,
+                    decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds,
+                    userId = UserInfoManager.Instance.userId,
+                    isGameOver = false,
+                    rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
+                };
 
-                    Rpc_JoinGame(this.runner, player, JsonUtility.ToJson(data));
+                foreach (var value in dic_PlayerData.Values)
+                {
+                    if (value.playerIdx != player.AsIndex)
+                        Rpc_JoinGame(this.runner, player, JsonUtility.ToJson(value));
                 }
             }
         }
@@ -756,7 +757,7 @@ namespace Framework.Network
         [Rpc]
         public static void Rpc_JoinGame(NetworkRunner runner, [RpcTarget] PlayerRef playerRef, string data)
         {
-            Debug.Log("[NetworkConnect] Rpc_JoinGame (targeted).");
+            Debug.Log($"[NetworkConnect] Rpc_JoinGame (targeted). {data}");
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
             if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
                 Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);

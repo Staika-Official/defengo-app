@@ -84,19 +84,26 @@ namespace Framework.UI
             bool isFriendlyMatch = NetworkConnect.Instance.isFriendlyMatch;
             int maxPlayerCount = NetworkConnect.Instance.maxPlayerCount;
 
-            foreach (var item in NetworkConnect.Instance.dic_PlayerData)
+            foreach (var item in NetworkConnect.Instance.dic_PlayerData.Values)
             {
-                if (item.Value.playerIdx == NetworkConnect.Instance.playerIdx)
+                int slotIndex = (item.playerIdx == NetworkConnect.Instance.playerIdx) ? 0 : idx;
+
+                if (slotIndex < matchingUserInfoItems.Count)
                 {
-                    matchingUserInfoItems[0].UserInfoInitialize(item.Value);
+                    matchingUserInfoItems[slotIndex].UserInfoInitialize(item);
                 }
                 else
                 {
-                    matchingUserInfoItems[idx].UserInfoInitialize(item.Value);
-                    idx++;
+                    Debug.LogWarning(
+                        $"[UpdateUserInfo] Not enough slots for playerIdx={item.playerIdx}. " +
+                        $"slotIndex={slotIndex}, totalSlots={matchingUserInfoItems.Count}"
+                    );
                 }
+
+                if (slotIndex != 0) idx++;
             }
 
+            // Fill empty slots or lock slots if beyond max players
             for (int i = NetworkConnect.Instance.dic_PlayerData.Count; i < matchingUserInfoItems.Count; i++)
             {
                 if (i < maxPlayerCount)
