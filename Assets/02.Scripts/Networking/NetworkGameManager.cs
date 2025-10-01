@@ -138,9 +138,9 @@ namespace Framework.Game.Defense
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
             if (monsterKilled != -1)
-                NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled = monsterKilled;
+                NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled += monsterKilled;
             if (monsterBossKilled != -1)
-                NetworkConnect.Instance.dic_PlayerData[playerId].monsterBossKilled = monsterBossKilled;
+                NetworkConnect.Instance.dic_PlayerData[playerId].monsterBossKilled += monsterBossKilled;
             UIManager.Instance.inGameRankPopup.SortPlayerData();
             Debug.Log($"{gameObject.name} Rpc Player Id : {playerId}");
             Debug.Log($"{gameObject.name} Rpc nickname : {nickname}");

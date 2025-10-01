@@ -1407,7 +1407,6 @@ namespace Framework.Network
         public string userId;
         public string nickname;
         public int equippedProfileId;
-        public DateTime lastAccessDate;
         public DateTime? blockSendEnergyDate;
     }
     [Serializable]

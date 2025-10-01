@@ -246,7 +246,7 @@ namespace Framework.UI
                     SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
                     popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
                     button_AddFriend.gameObject.SetActive(false);
-                    friendItem.gameObject.SetActive(false);
+                    PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendFriendRequest(friendItem.friendData.userId);
                 }, null);
             });
 
@@ -257,7 +257,7 @@ namespace Framework.UI
                 {
                     button_DeleteFriend.gameObject.SetActive(false);
                     button_AddFriend.gameObject.SetActive(true);
-                    friendItem.gameObject.SetActive(false);
+                    PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnDeleteFriend(friendItem.friendData.userId);
                 }, null);
             });
 

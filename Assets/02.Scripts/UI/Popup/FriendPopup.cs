@@ -25,11 +25,15 @@ namespace Framework.UI
         public GameObject goListFriend;
         public ScrollRect scrollFriends;
         public FriendItem friendItem;
+        public TextMeshProUGUI text_FriendCount;
 
         public GameObject goRecommendedFriend;
         public Button button_RefreshRecommend;
         public Transform recommendParent;
         public FriendItem recommendFriendItem;
+
+        public List<FriendItem> listFriendItems = new();
+        public List<FriendItem> listRecommendedFriendItems = new();
 
         bool isBattleInvite = false;
 
@@ -78,20 +82,23 @@ namespace Framework.UI
                 {
                     Destroy(child.gameObject);
                 }
+                listRecommendedFriendItems.Clear();
                 await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
             });
         }
 
         async void LoadData()
         {
-            foreach (Transform child in recommendParent)
-            {
-                Destroy(child.gameObject);
-            }
             foreach (Transform child in scrollFriends.content)
             {
                 Destroy(child.gameObject);
             }
+            listFriendItems.Clear();
+            foreach (Transform child in recommendParent)
+            {
+                Destroy(child.gameObject);
+            }
+            listRecommendedFriendItems.Clear();
             await NetworkManager.Instance.GetListFriends(SuccessGetListFriend, FailedGetListFriend);
             if (!isBattleInvite)
                 await NetworkManager.Instance.GetRecommendedFriends(SuccessGetRecommendedFriends, FailedGetRecommendedFriends);
@@ -131,12 +138,22 @@ namespace Framework.UI
             goListFriend.gameObject.SetActive(friendDatas.Count > 0);
             goRecommendedFriend.gameObject.SetActive(friendDatas.Count == 0);
 
-            foreach (var friend in friendDatas)
+            for (int i = 0; i < friendDatas.Count; i++)
             {
-                FriendItem itm = Instantiate(friendItem, scrollFriends.content);
-                itm.gameObject.SetActive(true);
-                itm.SetFriendData(friend, true, isBattleInvite);
+                if (i < listFriendItems.Count)
+                {
+                    listFriendItems[i].gameObject.SetActive(true);
+                    listFriendItems[i].SetFriendData(friendDatas[i], true, isBattleInvite);
+                }
+                else
+                {
+                    FriendItem itm = Instantiate(friendItem, scrollFriends.content);
+                    itm.gameObject.SetActive(true);
+                    itm.SetFriendData(friendDatas[i], true, isBattleInvite);
+                    listFriendItems.Add(itm);
+                }
             }
+            text_FriendCount.text = $"{listFriendItems.Count}/30";
         }
         void FailedGetListFriend(string error)
         {
@@ -146,16 +163,51 @@ namespace Framework.UI
         {
             recommendedFriendDatas = data.players;
 
-            foreach (var recommend in recommendedFriendDatas)
+            for (int i = 0; i < recommendedFriendDatas.Count; i++)
             {
-                FriendItem itm = Instantiate(recommendFriendItem, recommendParent);
-                itm.gameObject.SetActive(true);
-                itm.SetFriendData(recommend, false, isBattleInvite);
+                if (i < listRecommendedFriendItems.Count)
+                {
+                    listRecommendedFriendItems[i].gameObject.SetActive(true);
+                    listRecommendedFriendItems[i].SetFriendData(recommendedFriendDatas[i], true, isBattleInvite);
+                }
+                else
+                {
+                    FriendItem itm = Instantiate(recommendFriendItem, recommendParent);
+                    itm.gameObject.SetActive(true);
+                    itm.SetFriendData(recommendedFriendDatas[i], false, isBattleInvite);
+                    listRecommendedFriendItems.Add(itm);
+                }
             }
         }
         void FailedGetRecommendedFriends(string error)
         {
             Debug.Log($"Error Recommended Friends: {error}");
+        }
+
+        public void OnSendEnergy(string userId)
+        {
+            var itm = listFriendItems.Find(x => x.friendData.userId == userId);
+            if (itm != null)
+                itm.button_sendEnergy.SetInterectible(false);
+        }
+        public void OnSendFriendRequest(string userId)
+        {
+            var itm = listRecommendedFriendItems.Find(x => x.friendData.userId == userId);
+            if (itm != null)
+            {
+                listRecommendedFriendItems.Remove(itm);
+                Destroy(itm.gameObject);
+            }
+        }
+        public void OnDeleteFriend(string userId)
+        {
+            var itm = listFriendItems.Find(x => x.friendData.userId == userId);
+            if (itm != null)
+            {
+                listFriendItems.Remove(itm);
+                Destroy(itm.gameObject);
+            }
+            text_FriendCount.text = $"{listFriendItems.Count}/30";
         }
     }
 }

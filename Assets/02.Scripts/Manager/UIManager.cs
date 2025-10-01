@@ -541,7 +541,7 @@ namespace Framework.Game.Defense
         public void OnClick_GiveUpButton()
         {
             SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
-            popup.SetYesNoPopupMessage(LanguageManager.Instance.GetStringData("MSG_Surrender"), () => GameManager.Instance.GameOver());
+            popup.SetYesNoPopupMessage(LanguageManager.Instance.GetStringData("MSG_Surrender"), () => GameManager.Instance.FieldBossDamage());
         }
 
         public void OnClick_Relocation()

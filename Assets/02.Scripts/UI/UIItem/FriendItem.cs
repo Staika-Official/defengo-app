@@ -8,7 +8,6 @@ using Framework.GameData.Defense;
 using Framework.Sound;
 using System;
 using Framework.UI;
-using Newtonsoft.Json;
 using Framework.Util;
 
 public class FriendItem : MonoBehaviour
@@ -67,8 +66,9 @@ public class FriendItem : MonoBehaviour
 
         button_sendEnergy.gameObject.SetActive(isFriend);
         button_sendEnergy.SetInterectible(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
-        button_sendEnergy.transform.GetChild(0).GetComponent<Image>().color = button_sendEnergy.button.interactable ? Color.white : Color.gray;
         button_sendFriendRequest.gameObject.SetActive(!isFriend && !data.pendingFromCaller && !data.pendingFromFriend);
+        button_inviteFriendlyBattle.gameObject.SetActive(false);
+        button_inviteFriendlyBattle.SetInterectible(button_inviteFriendlyBattle.gameObject.activeSelf);
     }
 
     public void SetFriendData(FriendData data, bool _isFriend, bool _isBattleInvite)
@@ -81,9 +81,9 @@ public class FriendItem : MonoBehaviour
         text_userName.text = friendData.nickname;
 
         button_sendEnergy.SetInterectible(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
-        button_sendEnergy.transform.GetChild(0).GetComponent<Image>().color = button_sendEnergy.button.interactable ? Color.white : Color.gray;
         button_sendFriendRequest.gameObject.SetActive(!isFriend);
         button_inviteFriendlyBattle.gameObject.SetActive(isFriend && isBattleInvite);
+        button_inviteFriendlyBattle.SetInterectible(button_inviteFriendlyBattle.gameObject.activeSelf);
     }
 
     void SuccessSendEnergy()
@@ -91,7 +91,7 @@ public class FriendItem : MonoBehaviour
         SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
         popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
         button_sendEnergy.SetInterectible(false);
-        button_sendEnergy.transform.GetChild(0).GetComponent<Image>().color = button_sendEnergy.button.interactable ? Color.white : Color.gray;
+        PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendEnergy(friendData.userId);
     }
     void FailedSendEnergy(string energy)
     {
@@ -104,6 +104,7 @@ public class FriendItem : MonoBehaviour
         SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
         popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
         gameObject.SetActive(false);
+        PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendFriendRequest(friendData.userId);
     }
     void FailedSendFriendRequest(string error)
     {

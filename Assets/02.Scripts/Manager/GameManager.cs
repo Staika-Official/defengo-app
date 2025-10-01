@@ -926,7 +926,7 @@ namespace Framework.Game.Defense
 
                 NetworkManager.Instance.SendPlayRecord(data);
             }
-            else if (gameMode == GameMode.SINGLE)
+            else if (gameMode == GameMode.BATTLE)
             {
                 BattleRecord battleRecord = new()
                 {
@@ -956,6 +956,7 @@ namespace Framework.Game.Defense
             UIManager.Instance.WaveEndSequence();
             InterestPayment();
             UIManager.Instance.button_giveUp.gameObject.SetActive(waveIdx >= ConfigData.SURRENDER_WAVE_MIN && gameMode == GameMode.BATTLE);
+            UIManager.Instance.button_giveUp.gameObject.SetActive(true);
             if (waveIdx != 0 && waveIdx % 5 == 0 && gameMode == GameMode.BATTLE)
             {
                 ReachBossWave();
