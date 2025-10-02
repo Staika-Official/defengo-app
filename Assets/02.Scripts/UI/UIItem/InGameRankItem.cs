@@ -29,10 +29,7 @@ namespace Framework.UI
 
         public void Initialize(NetworkBattleData data)
         {
-            if(data.isGameOver)
-            {
-                defeatObject.SetActive(true);
-            }
+            defeatObject.SetActive(data.isGameOver);
 
             infoObject.SetActive(true);
             betaLockObject.SetActive(false);

@@ -182,6 +182,7 @@ namespace Framework.Network
             {
                 ["averageScore"] = metaScore,
                 ["averageRate"] = 40,
+                ["isPlaying"] = false,
             };
 
             if (runner == null)
@@ -229,6 +230,7 @@ namespace Framework.Network
                 ["averageScore"] = metaScore,
                 ["averageRate"] = 40,
                 ["password"] = UserInfoManager.Instance.userId,
+                ["isPlaying"] = false,
             };
 
             if (runner == null)
@@ -298,8 +300,14 @@ namespace Framework.Network
 
         public IEnumerator GameStart()
         {
-            Debug.Log("[NetworkConnect] GameStart coroutine started. Waiting 4s...");
-            yield return new WaitForSeconds(0.5f);
+            Debug.Log("[NetworkConnect] GameStart coroutine started. Waiting 0s...");
+            
+            var customProps = new Dictionary<string, SessionProperty>
+            {
+                ["isPlaying"] = true,
+            };
+            runner.SessionInfo.UpdateCustomProperties(customProps);
+            yield return new WaitForSeconds(0f);
             Rpc_LoadGameScene(runner, runner.LocalPlayer.AsIndex.ToString());
         }
 
@@ -453,7 +461,8 @@ namespace Framework.Network
                     if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
                         continue;
                     session.Properties.TryGetValue("password", out var pw);
-                    if (session.Name == roomName && roomPassword == pw)
+                    session.Properties.TryGetValue("isPlaying", out var isPlaying);
+                    if (session.Name == roomName && roomPassword == pw && !isPlaying)
                     {
                         Debug.Log($"[NetworkConnect] Joining available friendly session: {session.Name}");
                         JoinFriendlySession(session.Name);
@@ -477,7 +486,8 @@ namespace Framework.Network
 
                 foreach (var session in sessionList)
                 {
-                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount)
+                    session.Properties.TryGetValue("isPlaying", out var isPlaying);
+                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount || !isPlaying)
                         continue;
 
                     Debug.Log($"[NetworkConnect] Joining available session: {session.Name}");

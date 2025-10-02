@@ -324,14 +324,15 @@ namespace Framework.Game.Defense
                 }
                 battleResultPromotePopup.Initialize();
 
-                button_Pause.gameObject.SetActive(false);
-                button_rank.gameObject.SetActive(isBattleMode);
                 button_rank.onPointerUp = OnClick_RankButton;
                 button_giveUp.gameObject.SetActive(false);
                 button_giveUp.onPointerUp = OnClick_GiveUpButton;
 
                 goScorePanel.gameObject.SetActive(!NetworkConnect.Instance.isFriendlyMatch);
             }
+
+            button_Pause.gameObject.SetActive(!isBattleMode);
+            button_rank.gameObject.SetActive(isBattleMode);
 
             // button_SummonCharacter.onPointerUp = () =>
             // {
