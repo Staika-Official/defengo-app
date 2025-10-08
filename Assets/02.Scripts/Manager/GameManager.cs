@@ -1102,6 +1102,10 @@ namespace Framework.Game.Defense
         public void CountStart()
         {
             Debug.Log($"[{gameObject.name}] Count Start");
+            if (gameMode == GameMode.BATTLE)
+            {
+                UIManager.Instance.EnableBossSummon();
+            }
             if (countNextWave != null)
                 StopCoroutine(countNextWave);
             countNextWave = WaitForNextWave(WaveStart);

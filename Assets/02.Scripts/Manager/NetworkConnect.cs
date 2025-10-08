@@ -53,6 +53,9 @@ namespace Framework.Network
         // Host migration token storage
         private HostMigrationToken _hostMigrationToken;
 
+        // Ensures countdown RPC triggers only once per session
+        private static bool _countdownStarted;
+
         public bool IsCurrentHost()
         {
             // 1. If I was already host, I’m still host
@@ -79,6 +82,9 @@ namespace Framework.Network
             this.isFriendlyMatch = isFriendlyMatch;
             this.roomName = roomName;
             this.roomPassword = roomPassword;
+
+            // reset countdown flag on a fresh lobby connection
+            _countdownStarted = false;
 
             Debug.Log($"[NetworkConnect] Connecting to lobby... ~ Is Friendly Match: {isFriendlyMatch}");
 
@@ -589,6 +595,7 @@ namespace Framework.Network
         public void OnDestroy()
         {
             Debug.Log("[NetworkConnect] Destroyed. Clearing instance.");
+            _countdownStarted = false;
             Instance = null;
         }
 
@@ -820,6 +827,12 @@ namespace Framework.Network
         [Rpc]
         public static void Rpc_CountStart(NetworkRunner runner)
         {
+            if (_countdownStarted)
+            {
+                Debug.Log("[NetworkConnect] Rpc_CountStart skipped (already started).");
+                return;
+            }
+            _countdownStarted = true;
             Debug.Log("[NetworkConnect] Rpc_CountStart triggered. Starting countdown...");
             GameManager.Instance.CountStart();
         }

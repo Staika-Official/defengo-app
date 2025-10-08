@@ -373,6 +373,10 @@ namespace Framework.Game.Defense
             bossAmount = 0;
             InitPopup();
             SetBossSummon();
+            if (IsBattleMode)
+            {
+                button_SummonBoss.SetInterectible(false);
+            }
         }
 
         public void SetInterestValue(int interestValue)
@@ -457,23 +461,28 @@ namespace Framework.Game.Defense
         public int BOSS_COOLTIME => (int)(ConfigData.BOSS_COOLTIME - ConfigData.BOSS_COOLTIME * bossCoolTimeBuffValue);
         public IEnumerator BossCoolTime()
         {
-            float timer = 0;
-            // button_SummonBoss.SetInterectible(false);
-            image_BossCoolTime[bossAmount].gameObject.SetActive(true);
-            image_BossCoolTime[bossAmount].fillAmount = 0;
-
-            while (true)
+            while (pendingBossRefills > 0 || bossAmount < 2)
             {
-                timer += Time.deltaTime;
-                image_BossCoolTime[bossAmount].fillAmount = timer / BOSS_COOLTIME;
-                if (timer >= BOSS_COOLTIME)
+                float timer = 0;
+                image_BossCoolTime[bossAmount].gameObject.SetActive(true);
+                image_BossCoolTime[bossAmount].fillAmount = 0;
+
+                while (timer < BOSS_COOLTIME)
                 {
-                    SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_COOLTIME);
-                    SetBossSummon();
-                    break;
+                    timer += Time.deltaTime;
+                    image_BossCoolTime[bossAmount].fillAmount = timer / BOSS_COOLTIME;
+                    yield return Time.deltaTime;
                 }
-                yield return Time.deltaTime;
+
+                SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_COOLTIME);
+                if (pendingBossRefills > 0)
+                {
+                    pendingBossRefills--;
+                }
+                SetBossSummon();
             }
+
+            BossCoolTimeCo = null;
         }
 
         public static Transform GetDynamicCanvasTransform()
@@ -499,6 +508,11 @@ namespace Framework.Game.Defense
         public void GameOver(int bounsWave = 0)
         {
             StartCoroutine(GameOverSequence(bounsWave));
+        }
+
+        public void EnableBossSummon()
+        {
+            button_SummonBoss.SetInterectible(true);
         }
 
         private IEnumerator GameOverSequence(int bounsWave)
@@ -589,14 +603,10 @@ namespace Framework.Game.Defense
             SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
             //image_BossCoolTime[bossAmount].fillAmount = 0;
 
+            // queue a refill and ensure the cooldown runner is active
+            pendingBossRefills++;
             if (BossCoolTimeCo == null)
             {
-                BossCoolTimeCo = BossCoolTime();
-                StartCoroutine(BossCoolTimeCo);
-            }
-            else
-            {
-                StopCoroutine(BossCoolTimeCo);
                 BossCoolTimeCo = BossCoolTime();
                 StartCoroutine(BossCoolTimeCo);
             }
@@ -614,6 +624,7 @@ namespace Framework.Game.Defense
         }
 
         public IEnumerator BossCoolTimeCo;
+        private int pendingBossRefills = 0;
         public IEnumerator SetBossMessage(int level)
         {
             text_bossMessageLevel.text = $"Lv.{level}";
@@ -647,21 +658,17 @@ namespace Framework.Game.Defense
             SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
             //image_BossCoolTime[bossAmount].fillAmount = 0;
 
+            // queue a refill and ensure the cooldown runner is active
+            pendingBossRefills++;
             if (BossCoolTimeCo == null)
             {
-                BossCoolTimeCo = BossCoolTime();
-                StartCoroutine(BossCoolTimeCo);
-            }
-            else
-            {
-                StopCoroutine(BossCoolTimeCo);
                 BossCoolTimeCo = BossCoolTime();
                 StartCoroutine(BossCoolTimeCo);
             }
 
             icon_BossActive[bossAmount].SetActive(false);
 
-            StartCoroutine(BossCoolTime());
+            // Do not start a separate cooldown; queued refills handle it
 
             GameManager.Instance.TutorialSummonBoss();
 
