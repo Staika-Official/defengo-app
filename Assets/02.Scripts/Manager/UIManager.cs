@@ -232,6 +232,7 @@ namespace Framework.Game.Defense
 
         public void ActiveTimeCount(bool isActive)
         {
+            Debug.Log($"[{gameObject.name}] Active Time Count {isActive}");
             uISequences_WaveCountTimer.gameObject.SetActive(isActive);
             uISequences_WaveCountTimer.ExcuteSeqeunce();
         }
@@ -509,6 +510,7 @@ namespace Framework.Game.Defense
 
         public void SetTimeCount(int timeValue)
         {
+            Debug.Log($"[{gameObject.name}] Active Time Count {timeValue}");
             int time = timeValue + 1;
 
             string timer = time.ToString("0");
@@ -626,9 +628,41 @@ namespace Framework.Game.Defense
 
             TutorialManager.Instance.BossSummonSequence();
             SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
-            image_BossCoolTime[0].fillAmount = 0;
+            
+            int tempBossAmount = bossAmount == 2 ? 1 : bossAmount;
+            //icon_BossActive[tempBossAmount].SetActive(false);
+            image_BossCoolTime[tempBossAmount].gameObject.SetActive(false);
+
+            bossAmount--;
+
+            bool isBossAmount = bossAmount > 0;
+            if (isBossAmount)
+            {
+                icon_BossActive[0].SetActive(true);
+            }
+
+            text_bossAmount.gameObject.SetActive(isBossAmount);
+            text_bossAmount.text = $"x{bossAmount}";
+            button_SummonBoss.SetInterectible(bossAmount > 0);
+            SoundManager.Instance.PlaySound(SoundKey.SF_BOSS_SUMMON);
+            //image_BossCoolTime[bossAmount].fillAmount = 0;
+
+            if (BossCoolTimeCo == null)
+            {
+                BossCoolTimeCo = BossCoolTime();
+                StartCoroutine(BossCoolTimeCo);
+            }
+            else
+            {
+                StopCoroutine(BossCoolTimeCo);
+                BossCoolTimeCo = BossCoolTime();
+                StartCoroutine(BossCoolTimeCo);
+            }
+
             icon_BossActive[bossAmount].SetActive(false);
+
             StartCoroutine(BossCoolTime());
+
             GameManager.Instance.TutorialSummonBoss();
 
             int level = GameManager.Instance.monsterSpawner.bossIdx;

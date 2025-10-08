@@ -254,11 +254,12 @@ namespace Framework.UI
 
             //toastMessage.Initialize();
 
+            bool isUserTutorial = !UserInfoManager.Instance.userState.finishedTutorial;
+
             //testCode
             // UserInfoManager.Instance.userState.finishedTutorial = false; 
-            //bool isUserTutorial = true;
+            // isUserTutorial = true;
 
-            bool isUserTutorial = !UserInfoManager.Instance.userState.finishedTutorial;
             if (isUserTutorial)
             {
                 LobbyTutorialManager.Instance.Initialize();

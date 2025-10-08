@@ -154,6 +154,8 @@ namespace Framework.Game.Defense
                 gameMode = GameMode.TUTORIAL;
             }
 
+            monsterSpawner.InitializeStart();
+
             anim_Transition.SetTrigger("TransitionOut");
 
             yield return new WaitForSeconds(2);
@@ -966,6 +968,8 @@ namespace Framework.Game.Defense
             }
             else
             {
+                if (countNextWave != null)
+                    StopCoroutine(countNextWave);
                 countNextWave = WaitForNextWave(WaveStart);
                 StartCoroutine(countNextWave);
             }
@@ -1073,7 +1077,7 @@ namespace Framework.Game.Defense
 
         public void Damaged()
         {
-            if (!UserInfoManager.Instance.userState.finishedTutorial)
+            if (gameMode == GameMode.TUTORIAL)
             {
                 GridManager.Instance.TutorialDamage();
             }
@@ -1097,12 +1101,17 @@ namespace Framework.Game.Defense
 
         public void CountStart()
         {
+            Debug.Log($"[{gameObject.name}] Count Start");
+            if (countNextWave != null)
+                StopCoroutine(countNextWave);
             countNextWave = WaitForNextWave(WaveStart);
             StartCoroutine(countNextWave);
         }
 
         public void BossWaveCountStart()
         {
+            if (countNextWave != null)
+                StopCoroutine(countNextWave);
             countNextWave = WaitForNextWave(FieldBossWaveStart);
             StartCoroutine(countNextWave);
         }

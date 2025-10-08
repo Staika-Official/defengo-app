@@ -72,7 +72,7 @@ namespace Framework.Game.Defense
             _ = NetworkManager.Instance.AbusingRecord("Cheat MonsterSpawner");
         }
 
-        private void Start()
+        public void InitializeStart()
         {
             bossIdx = 0;
             waveIdx = 0;
@@ -419,6 +419,7 @@ namespace Framework.Game.Defense
 
         public IEnumerator SetMonsterStart()
         {
+            Debug.Log($"[{gameObject.name}] Start wave {currentWaveIdx}");
             IsGameOver = true;
             isWaveStart = true;
             WaveData data;
