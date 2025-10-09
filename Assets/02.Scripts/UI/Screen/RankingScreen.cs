@@ -68,14 +68,13 @@ namespace Framework.UI
         public override void ActiveScreen()
         {
             //todo (true)-Daily, (false)-Weekly
-            if (UserInfoManager.Instance.userState.finishedTutorial == false)
-            {
-                focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
-                toggle.SelectTab(1);
-            }
+            // if (UserInfoManager.Instance.userState.finishedTutorial == false)
+            // {
+            //     focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
+            //     toggle.SelectTab(1);
+            // }
 
-            TogglePage(1);
-            //TogglePage(false);
+            toggle.SelectTab(1);
             focusRoundId = focusLeaderBoardType switch
             {
                 LeaderBoardType.WAVE_DAILY => dailyLastRoundId,

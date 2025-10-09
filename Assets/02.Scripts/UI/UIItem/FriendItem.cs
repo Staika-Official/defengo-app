@@ -47,10 +47,8 @@ public class FriendItem : MonoBehaviour
         button_inviteFriendlyBattle.onPointerUp += async () =>
         {
             SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
-            await NetworkManager.Instance.InviteFriendToBattle(friendData.userId, NetworkConnect.Instance.roomName, NetworkConnect.Instance.roomPassword, () =>
-            {
-                button_inviteFriendlyBattle.SetInterectible(false);
-            });
+            await NetworkManager.Instance.InviteFriendToBattle(friendData.userId, NetworkConnect.Instance.roomName, NetworkConnect.Instance.roomPassword, null);
+            button_inviteFriendlyBattle.SetInterectible(false);
         };
     }
 

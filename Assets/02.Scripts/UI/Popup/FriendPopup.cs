@@ -26,6 +26,7 @@ namespace Framework.UI
         public ScrollRect scrollFriends;
         public FriendItem friendItem;
         public TextMeshProUGUI text_FriendCount;
+        public GameObject goNoFriend;
 
         public GameObject goRecommendedFriend;
         public Button button_RefreshRecommend;
@@ -135,8 +136,9 @@ namespace Framework.UI
         {
             friendDatas = data.friends;
 
-            goListFriend.gameObject.SetActive(friendDatas.Count > 0);
-            goRecommendedFriend.gameObject.SetActive(friendDatas.Count == 0);
+            // goListFriend.gameObject.SetActive(friendDatas.Count > 0);
+            goNoFriend.SetActive(friendDatas.Count == 0);
+            goRecommendedFriend.gameObject.SetActive(!isBattleInvite);
 
             for (int i = 0; i < friendDatas.Count; i++)
             {
