@@ -40,7 +40,7 @@ namespace Framework.UI
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
                 if (NetworkConnect.Instance != null && NetworkConnect.Instance.runner != null)
-                    NetworkConnect.Instance.runner.Shutdown();
+                    NetworkConnect.Instance.ShutDown();
                 SceneLoadManager.Instance.SwitchingScene(2);
 
                 GameManager.Instance.objectPoolManager.AllClear();

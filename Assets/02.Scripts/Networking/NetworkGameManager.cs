@@ -160,7 +160,7 @@ namespace Framework.Game.Defense
 
                         UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
                         NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
-                        NetworkConnect.Instance.runner.Shutdown();
+                        NetworkConnect.Instance.ShutDown();
                     }
                 }
             }
@@ -210,7 +210,7 @@ namespace Framework.Game.Defense
 
                         UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
                         NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
-                        await NetworkConnect.Instance.runner.Shutdown();
+                        NetworkConnect.Instance.ShutDown();
                     }
                 }
             }

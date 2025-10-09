@@ -26,13 +26,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4176551213087354693}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.15, y: 0.15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4176551213371805989}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &4176551213087354699
 MeshRenderer:
@@ -150,6 +150,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4176551213371805991}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -157,7 +158,6 @@ Transform:
   m_Children:
   - {fileID: 4176551213087354698}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &4716538168294556555
 BoxCollider2D:
@@ -169,6 +169,25 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -202,6 +221,12 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -220,37 +245,264 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   anim: {fileID: 4176551213087354692}
   characterName: 
-  range: 0
+  range:
+    migratedVersion: 
+    currentCryptoKey: 1737493333
+    hiddenValue: 1728811093
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
   isTouched: 0
-  contructibleIdx: 0
-  glacierIdx: 0
+  constructibleIdx:
+    currentCryptoKey: 1096197431
+    hiddenValue: 1096197431
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  glacierIdx:
+    currentCryptoKey: 1349248015
+    hiddenValue: 1349248015
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
   isTutorial: 0
-  totalDamage: 0
+  totalDamage:
+    migratedVersion: 
+    currentCryptoKey: 1753018334
+    hiddenValue: 1760525534
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
   characterIndex: 403
-  starGradeIndex: 0
-  upgradeIndex: 0
+  starGradeIndex:
+    currentCryptoKey: 1999722181
+    hiddenValue: 1999722181
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  upgradeIndex:
+    currentCryptoKey: 1608953585
+    hiddenValue: 1608953585
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
   characterData: {fileID: 11400000, guid: 5e319120c7f8f49699e31a9c69b3c9c1, type: 2}
-  upgradeFactor: 0
-  basicAttackDamage: 0
-  classDamage: 0
-  attackSpeed: 0
-  criticalRange: 0
-  targetCount: 2
-  attackRange: 0
-  projectileSpeed: 0
-  strikeRange: 0
-  buffValue: 0
-  buffRange: 0
-  buffCycle: 0
-  buffDuration: 0
-  totalBuffValue: 0
-  getAttackBuffValue: 0
-  criticalDamageRate: 0
+  upgradeFactor:
+    migratedVersion: 
+    currentCryptoKey: 1376891994
+    hiddenValue: 1387532634
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  basicAttackDamage:
+    migratedVersion: 
+    currentCryptoKey: 1888622547
+    hiddenValue: 1880593107
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  classDamage:
+    migratedVersion: 
+    currentCryptoKey: 1566142443
+    hiddenValue: 1567578603
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  attackSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1325129702
+    hiddenValue: 1323301862
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalRange:
+    migratedVersion: 
+    currentCryptoKey: 1633384820
+    hiddenValue: 1635343220
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  targetCount:
+    currentCryptoKey: 1869024706
+    hiddenValue: 1869024704
+    fakeValue: 2
+    fakeValueActive: 1
+    inited: 1
+  attackRange:
+    migratedVersion: 
+    currentCryptoKey: 1726909875
+    hiddenValue: 1720577715
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 1
+    inited: 1
+  projectileSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1696538570
+    hiddenValue: 1696538570
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  strikeRange:
+    migratedVersion: 
+    currentCryptoKey: 1943744640
+    hiddenValue: 1932581760
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffValue:
+    migratedVersion: 
+    currentCryptoKey: 1972935364
+    hiddenValue: 1973065924
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffRange:
+    migratedVersion: 
+    currentCryptoKey: 1967414460
+    hiddenValue: 1968981180
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffCycle:
+    migratedVersion: 
+    currentCryptoKey: 1853520445
+    hiddenValue: 1853520445
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  buffDuration:
+    migratedVersion: 
+    currentCryptoKey: 1457562960
+    hiddenValue: 1453711440
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  totalBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1945789312
+    hiddenValue: 1935932032
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  getAttackBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1694765262
+    hiddenValue: 1695548622
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  criticalDamageRate:
+    migratedVersion: 
+    currentCryptoKey: 1269229206
+    hiddenValue: 1273407126
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
   isThrow: 0
+  isDrag: 0
   isAttackType: 0
   isDraggable: 0
+  isLeft: 0
   maxStarGradeValue: 0
-  sellPriceRatio: 0
+  sellPriceRatio:
+    migratedVersion: 
+    currentCryptoKey: 1239515071
+    hiddenValue: 1233117631
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
+  isShield: 0
+  isNonFocus: 0
   collisions: []
   characterState: 0
   pivotPosition: {x: 0, y: 0}
@@ -258,9 +510,24 @@ MonoBehaviour:
   animTransform: {fileID: 0}
   isSummoned: 0
   meshRenderer: {fileID: 0}
-  speedBuffValue: 0
+  speedBuffValue:
+    migratedVersion: 
+    currentCryptoKey: 1811207874
+    hiddenValue: 1809249474
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    fakeValue: 0
+    fakeValueActive: 0
+    inited: 1
   projectileName: BlackOrbProjectile
   particleName: BlackHit1
   characterInterface: {fileID: 0}
+  characterShield: {fileID: 0}
   targetedMonster: []
+  buffParticle: []
+  skinID: 0
+  isDestroyed: 0
   stackExplosionDamage: 0

@@ -74,7 +74,7 @@ namespace Framework.UI
             button_Close.gameObject.SetActive(false);
             StopCoroutine(timer);
             timer = null;
-            await NetworkConnect.Instance.runner.Shutdown();
+            NetworkConnect.Instance.ShutDown();
             PopUpSequence(false);
         }
 
