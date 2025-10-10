@@ -1340,17 +1340,32 @@ namespace Framework.Network
             //Sort
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
 
-            data = data
-            // .OrderBy(p => p.isGameOver)              // ✅ put abnormal exits last
-            .OrderByDescending(p => p.waveCount)          // ✅ higher wave better
-            .ThenByDescending(p => p.monsterBossKilled)  // ✅ then boss kills
-            .ThenByDescending(p => p.monsterKilled)      // ✅ then kills
-            .ToList();
+            // Separate abnormal exits from normal players
+            var normalPlayers = data.Where(p => !p.isAbnormalExit).ToList();
+            var abnormalExits = data.Where(p => p.isAbnormalExit).ToList();
 
-            for (int i = 0; i < data.Count; i++)
-                data[i].rank = i + 1;
+            // Sort normal players by performance
+            normalPlayers = normalPlayers
+                .OrderByDescending(p => p.waveCount)          // Higher wave better
+                .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
+                .ThenByDescending(p => p.monsterKilled)       // Then normal kills
+                .ToList();
 
-            return data;
+            // Sort abnormal exits by performance (they rank below all normal players)
+            abnormalExits = abnormalExits
+                .OrderByDescending(p => p.waveCount)
+                .ThenByDescending(p => p.monsterBossKilled)
+                .ThenByDescending(p => p.monsterKilled)
+                .ToList();
+
+            // Combine: normal players first, then abnormal exits
+            var sortedData = normalPlayers.Concat(abnormalExits).ToList();
+
+            // Assign ranks
+            for (int i = 0; i < sortedData.Count; i++)
+                sortedData[i].rank = i + 1;
+
+            return sortedData;
         }
 
         public async void ShutDown()

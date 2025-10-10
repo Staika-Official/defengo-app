@@ -247,47 +247,55 @@ namespace Framework.Game.Defense
 
         /// <summary>
         /// Check if a dead player's rank is confirmed (can't change anymore)
-        /// Rank is confirmed when even the WORST alive player has better stats than me
-        /// This means all alive players are ahead of me, so my position among dead players is locked
+        ///
+        /// For abnormal exits: rank is IMMEDIATELY confirmed (they always get lowest rank)
+        /// For normal deaths: rank is confirmed when all alive normal players are ahead
         /// </summary>
         private bool CheckIfRankConfirmed(NetworkBattleData myData, List<NetworkBattleData> sortedData)
         {
             if (!myData.isGameOver)
                 return false;
 
-            // Get all alive players
-            var alivePlayers = sortedData.Where(p => !p.isGameOver && !p.isAbnormalExit).ToList();
-
-            if (alivePlayers.Count == 0)
-                return true; // All others are dead, rank is confirmed
-
-            // Find the WORST alive player (last in sorted list of alive players)
-            var worstAlive = alivePlayers.Last();
-
-            // My rank is confirmed if even the worst alive player has better stats than me
-            // This means ALL alive players are currently ahead of me
-            // So my final rank position is locked (can't get better or worse)
-            // Compare: wave count (most important), then boss kills, then normal kills
-
-            if (worstAlive.waveCount > myData.waveCount)
+            // Abnormal exits always get lowest rank immediately - rank is ALWAYS confirmed
+            if (myData.isAbnormalExit)
             {
-                // Even worst alive player is ahead in waves, rank confirmed
+                Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} is abnormal exit - rank immediately confirmed");
                 return true;
             }
-            else if (worstAlive.waveCount == myData.waveCount)
+
+            // For normal deaths: check if all alive normal players are ahead
+            var aliveNormalPlayers = sortedData.Where(p => !p.isGameOver && !p.isAbnormalExit).ToList();
+
+            if (aliveNormalPlayers.Count == 0)
+                return true; // All normal players are dead/exited, rank is confirmed
+
+            // Find the WORST alive normal player
+            var worstAliveNormal = aliveNormalPlayers.Last();
+
+            // My rank is confirmed if even the worst alive normal player has better stats than me
+            // This means ALL alive normal players are currently ahead of me
+            // Note: abnormal exits don't affect this - they're always ranked below normal players
+            // Compare: wave count (most important), then boss kills, then normal kills
+
+            if (worstAliveNormal.waveCount > myData.waveCount)
+            {
+                // Even worst alive normal player is ahead in waves, rank confirmed
+                return true;
+            }
+            else if (worstAliveNormal.waveCount == myData.waveCount)
             {
                 // Same wave, check boss kills
-                if (worstAlive.monsterBossKilled > myData.monsterBossKilled)
+                if (worstAliveNormal.monsterBossKilled > myData.monsterBossKilled)
                     return true;
-                else if (worstAlive.monsterBossKilled == myData.monsterBossKilled)
+                else if (worstAliveNormal.monsterBossKilled == myData.monsterBossKilled)
                 {
                     // Same boss kills, check normal kills
-                    if (worstAlive.monsterKilled > myData.monsterKilled)
+                    if (worstAliveNormal.monsterKilled > myData.monsterKilled)
                         return true;
                 }
             }
 
-            // At least one alive player is behind me, so they could die and affect my rank
+            // At least one alive normal player is behind me, so they could die and affect my rank
             return false;
         }
 
