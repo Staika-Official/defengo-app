@@ -701,31 +701,32 @@ namespace Framework.Game.Defense
             Debug.Log("Battle Game Over");
         }
 
-        // public void SurrenderBattle()
-        // {
-        //     if (isGameOver) return;
-        //     isGameOver = true;
-        //     gameState = GameState.GAME_OVER;
-        //     SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
+        public void SurrenderBattle()
+        {
+            if (isGameOver) return;
+            isGameOver = true;
+            gameState = GameState.GAME_OVER;
+            SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
 
-        //     SurrenderBattlePayload payload = new SurrenderBattlePayload()
-        //     {
-        //         sessionId = NetworkConnect.Instance.sessionId,
-        //         leavePlayId = NetworkConnect.Instance.playId,
-        //         leaveUserId = UserInfoManager.Instance.userId
-        //     };
+            EndBattlePayload payload = new EndBattlePayload()
+            {
+                lastWave = waveIdx,
+                playId = NetworkConnect.Instance.playId,
+                requestGo = Go,
+                sessionId = NetworkConnect.Instance.sessionId,
+                slotNumber = UserSlotManager.Instance.focusIdx,
+                userId = UserInfoManager.Instance.userId,
+            };
 
-        //     if (!NetworkConnect.Instance.isFriendlyMatch)
-        //     {
-        //         CallSurrenderBattle(payload);
-        //     }
+            if (!NetworkConnect.Instance.isFriendlyMatch)
+                CallEndBattle(payload);
 
-        //     NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, true);
+            NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, true);
 
-        //     // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-        //     // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
-        //     Debug.Log("Battle Game Surrender");
-        // }
+            // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+            // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
+            Debug.Log("Battle Game Over");
+        }
 
         async void CallEndBattle(EndBattlePayload payload)
         {

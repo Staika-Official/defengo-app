@@ -104,8 +104,16 @@ namespace Framework.Game.Defense
         [Rpc(RpcSources.All, RpcTargets.All)]
         public void RpcSummaryBattle()
         {
+            // Don't show summary if already shown (early summary)
+            if (NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary)
+            {
+                Debug.Log("[NetworkGameManager] Summary already shown, skipping RpcSummaryBattle");
+                return;
+            }
+
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
+            NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
             UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
             NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
         }
@@ -198,6 +206,23 @@ namespace Framework.Game.Defense
 
             Debug.Log($"{gameObject.name} {nickname} is GameOver ~ remain player: {remain} (total: {NetworkConnect.Instance.dic_PlayerData.Count} / died: {gameOverPlayerCount}) \n data : {JsonUtility.ToJson(data)}");
 
+            // Check if local player can show summary early
+            var myData = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
+            if (myData != null && myData.isGameOver && !NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary)
+            {
+                // Check if my rank is confirmed (can't be beaten by alive players)
+                bool rankConfirmed = CheckIfRankConfirmed(myData, data);
+
+                if (rankConfirmed)
+                {
+                    Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} rank confirmed at {myData.rank}, showing early summary");
+                    NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
+                    UIManager.Instance.battleResultPopup.SetResultInfo(myData.rank,
+                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount,
+                        GameManager.Instance.monsterSpawner.killedMonsterCount);
+                }
+            }
+
             if (remain == 1)
             {
                 var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
@@ -208,6 +233,7 @@ namespace Framework.Game.Defense
                     {
                         var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
 
+                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
                         UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
                         NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
                         NetworkConnect.Instance.ShutDown();
@@ -217,6 +243,52 @@ namespace Framework.Game.Defense
 
             if (gameOverPlayerCount == maxCount || remain == 0)
                 RpcSummaryBattle();
+        }
+
+        /// <summary>
+        /// Check if a dead player's rank is confirmed (can't change anymore)
+        /// Rank is confirmed when even the WORST alive player has better stats than me
+        /// This means all alive players are ahead of me, so my position among dead players is locked
+        /// </summary>
+        private bool CheckIfRankConfirmed(NetworkBattleData myData, List<NetworkBattleData> sortedData)
+        {
+            if (!myData.isGameOver)
+                return false;
+
+            // Get all alive players
+            var alivePlayers = sortedData.Where(p => !p.isGameOver && !p.isAbnormalExit).ToList();
+
+            if (alivePlayers.Count == 0)
+                return true; // All others are dead, rank is confirmed
+
+            // Find the WORST alive player (last in sorted list of alive players)
+            var worstAlive = alivePlayers.Last();
+
+            // My rank is confirmed if even the worst alive player has better stats than me
+            // This means ALL alive players are currently ahead of me
+            // So my final rank position is locked (can't get better or worse)
+            // Compare: wave count (most important), then boss kills, then normal kills
+
+            if (worstAlive.waveCount > myData.waveCount)
+            {
+                // Even worst alive player is ahead in waves, rank confirmed
+                return true;
+            }
+            else if (worstAlive.waveCount == myData.waveCount)
+            {
+                // Same wave, check boss kills
+                if (worstAlive.monsterBossKilled > myData.monsterBossKilled)
+                    return true;
+                else if (worstAlive.monsterBossKilled == myData.monsterBossKilled)
+                {
+                    // Same boss kills, check normal kills
+                    if (worstAlive.monsterKilled > myData.monsterKilled)
+                        return true;
+                }
+            }
+
+            // At least one alive player is behind me, so they could die and affect my rank
+            return false;
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]

@@ -133,7 +133,7 @@ namespace Framework.Network
             var result = await runner.StartGame(new StartGameArgs()
             {
                 GameMode = Fusion.GameMode.AutoHostOrClient,
-                SessionName = sessionName,
+                SessionName = sessionName
             });
 
             if (result.Ok)
@@ -613,13 +613,22 @@ namespace Framework.Network
                 GameManager.Instance.GameOver();
                 if (runner != null)
                     runner.Shutdown();
-                // PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
-                // delegate
-                // {
-                runner.Shutdown();
-                GameManager.Instance.objectPoolManager.AllClear();
-                SceneLoadManager.Instance.SwitchingScene(2);
-                // });
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    runner.Shutdown();
+                    GameManager.Instance.objectPoolManager.AllClear();
+                    SceneLoadManager.Instance.SwitchingScene(2);
+                });
+            }
+            else if (networkBattleStatus == NetworkBattleStatus.LOBBY)
+            {
+                StopAllCoroutines();
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+                });
             }
         }
 

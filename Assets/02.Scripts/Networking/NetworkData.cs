@@ -127,6 +127,7 @@ namespace Framework.Network
         public int monsterBossKilled;
         public bool selectedFieldBossReward;
         public string rankTier;
+        public bool hasShownSummary;
     }
 
     [Serializable]
