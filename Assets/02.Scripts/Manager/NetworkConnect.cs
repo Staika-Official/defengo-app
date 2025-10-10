@@ -12,6 +12,7 @@ using System.Linq;
 using Framework.Game.Defense;
 using System.Threading.Tasks;
 using Random = UnityEngine.Random;
+using Newtonsoft.Json;
 
 namespace Framework.Network
 {
@@ -55,6 +56,9 @@ namespace Framework.Network
 
         // Ensures countdown RPC triggers only once per session
         private bool _countdownStarted;
+
+        // Flag to prevent player sync during host migration on all clients
+        private bool _isHostMigrating;
 
         public bool IsCurrentHost()
         {
@@ -367,11 +371,25 @@ namespace Framework.Network
 
         public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
         {
-            Debug.Log($"[NetworkConnect] Player joined: {player.AsIndex}");
+            Debug.Log($"[NetworkConnect] ===== OnPlayerJoined called on Player {playerIdx} =====");
+            Debug.Log($"[NetworkConnect] Joining player index: {player.AsIndex}");
+            Debug.Log($"[NetworkConnect] Is local player: {player.AsIndex == runner.LocalPlayer.AsIndex}");
+            Debug.Log($"[NetworkConnect] _isHostMigrating: {_isHostMigrating}");
+            Debug.Log($"[NetworkConnect] _hostMigrationToken: {(_hostMigrationToken != null ? "NOT NULL" : "NULL")}");
+            Debug.Log($"[NetworkConnect] Current dic_PlayerData.Count: {dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Current players: [{string.Join(", ", dic_PlayerData.Keys)}]");
 
             if (player.AsIndex == runner.LocalPlayer.AsIndex)
             {
                 Debug.Log("[NetworkConnect] This is the local player joining.");
+
+                // IMPORTANT: Skip sending join data during host migration
+                // Player data is preserved through the migration snapshot
+                if (_isHostMigrating)
+                {
+                    Debug.Log($"[NetworkConnect] Skipping Rpc_JoinGame for local player during host migration");
+                    return;
+                }
 
                 NetworkBattleData data = new()
                 {
@@ -394,6 +412,15 @@ namespace Framework.Network
             }
             else
             {
+                // IMPORTANT: Skip player syncing during host migration
+                // Player data is preserved through the migration snapshot
+                // Attempting to send targeted RPCs during migration can cause NullReferenceException
+                if (_hostMigrationToken != null || _isHostMigrating)
+                {
+                    Debug.Log($"[NetworkConnect] Skipping player sync during host migration for player {player.AsIndex}");
+                    return;
+                }
+
                 Debug.Log($"[NetworkConnect] Syncing player data for new player {player.AsIndex}.");
                 NetworkBattleData data = new()
                 {
@@ -418,7 +445,9 @@ namespace Framework.Network
 
         public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
         {
-            Debug.Log($"[NetworkConnect] Player left: {player.AsIndex}");
+            Debug.Log($"[NetworkConnect] OnPlayerLeft called on Player {playerIdx}: Player {player.AsIndex} left");
+            Debug.Log($"[NetworkConnect] dic_PlayerData count before removal: {dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Players: {string.Join(", ", dic_PlayerData.Keys)}");
 
             // Check if the leaving player was the host
             // IMPORTANT: Before OnPlayerLeft is called, Photon has already migrated the host
@@ -428,6 +457,10 @@ namespace Framework.Network
             {
                 wasHost = dic_PlayerData[player.AsIndex].isHost;
                 Debug.Log($"[NetworkConnect] Leaving player was host (from playerData): {wasHost}");
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkConnect] Player {player.AsIndex} not found in dic_PlayerData!");
             }
 
             // Alternative: if OnPlayerLeft is called BEFORE migration, this would be true
@@ -738,6 +771,10 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] Host migration initiated - Current status: {networkBattleStatus} - Token: {hostMigrationToken}");
 
+            // Set migration flag IMMEDIATELY to prevent OnPlayerJoined from syncing during migration
+            _isHostMigrating = true;
+            Debug.Log($"[NetworkConnect] Set _isHostMigrating flag at start of migration");
+
             // Store the migration token for potential retry scenarios
             _hostMigrationToken = hostMigrationToken;
 
@@ -852,19 +889,35 @@ namespace Framework.Network
                 });
             }
 
+            // IMPORTANT: Find old host BEFORE cleanup
+            int oldHostIdx = -1;
+            foreach (var kvp in dic_PlayerData)
+            {
+                if (kvp.Value.isHost && isHost && kvp.Key != playerIdx)
+                {
+                    oldHostIdx = kvp.Key;
+                    Debug.Log($"[NetworkConnect] Found old host before cleanup: {oldHostIdx}");
+                    break;
+                }
+            }
+
             // IMPORTANT: Clean up old host data AFTER NetworkGameManager is restored
             // This prevents RPC calls to null references
             CleanupOldHostData();
 
-            // Broadcast new host to all clients
+            // Broadcast new host to all clients with old host index
             if (isHost)
             {
-                Debug.Log($"[NetworkConnect] Broadcasting new host (Player {playerIdx}) to all clients");
-                Rpc_BroadcastNewHost(runner, playerIdx);
+                Debug.Log($"[NetworkConnect] Broadcasting new host (Player {playerIdx}) and old host ({oldHostIdx}) to all clients");
+                Rpc_BroadcastNewHost(runner, playerIdx, oldHostIdx);
             }
 
             // Restore UI and game state based on current battle status
             RestoreStateAfterMigration();
+
+            // Clear the migration token after successful migration
+            _hostMigrationToken = null;
+            Debug.Log("[NetworkConnect] Cleared host migration token - migration complete");
 
             Debug.Log("[NetworkConnect] Host migration resume completed successfully");
         }
@@ -978,7 +1031,9 @@ namespace Framework.Network
         /// </summary>
         private void RestoreLobbyState()
         {
-            Debug.Log("[NetworkConnect] Restoring lobby state after migration");
+            Debug.Log($"[NetworkConnect] ===== RestoreLobbyState CALLED on Player {playerIdx} =====");
+            Debug.Log($"[NetworkConnect] dic_PlayerData.Count BEFORE restore: {dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Player indices: [{string.Join(", ", dic_PlayerData.Keys)}]");
 
             // Count only non-abnormal players for matchmaking logic
             int activePlayerCount = dic_PlayerData.Values.Count(p => !p.isAbnormalExit);
@@ -989,6 +1044,11 @@ namespace Framework.Network
             if (matchmakingPopup != null)
             {
                 matchmakingPopup.UpdateUserInfo();
+                Debug.Log($"[NetworkConnect] UI updated in RestoreLobbyState");
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkConnect] MatchMakingPopup is NULL in RestoreLobbyState!");
             }
 
             // Show brief notification about host migration if we became the new host
@@ -1036,77 +1096,71 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] CleanupOldHostData called - Status: {networkBattleStatus}");
 
-            // Find old host who left
-            int oldHostIdx = -1;
+            // Find players who are in dic_PlayerData but NOT in runner.ActivePlayers
+            // These are the players who left and triggered the host migration
+            var activePlayerIndices = new HashSet<int>();
+            foreach (var player in runner.ActivePlayers)
+            {
+                activePlayerIndices.Add(player.AsIndex);
+            }
+
+            // Find all disconnected players
+            var disconnectedPlayers = new List<int>();
             foreach (var kvp in dic_PlayerData)
             {
-                var playerIdx = kvp.Key;
-                var playerData = kvp.Value;
-
-                // If this player data says they're host but we're now the host, they're the old host
-                if (playerData.isHost && isHost && playerIdx != this.playerIdx)
+                if (!activePlayerIndices.Contains(kvp.Key))
                 {
-                    Debug.Log($"[NetworkConnect] Found old host: player {playerIdx}");
-                    oldHostIdx = playerIdx;
-                    break;
+                    disconnectedPlayers.Add(kvp.Key);
+                    Debug.Log($"[NetworkConnect] Found disconnected player: {kvp.Key} (was host: {kvp.Value.isHost})");
                 }
             }
 
-            if (oldHostIdx == -1)
+            if (disconnectedPlayers.Count == 0)
             {
-                Debug.Log("[NetworkConnect] No old host found to cleanup");
+                Debug.Log("[NetworkConnect] No disconnected players found to cleanup");
+                return;
+            }
+
+            // Process each disconnected player
+            foreach (int disconnectedIdx in disconnectedPlayers)
+            {
+                ProcessDisconnectedPlayer(disconnectedIdx);
+            }
+        }
+
+        /// <summary>
+        /// Processes a single disconnected player during host migration cleanup
+        /// </summary>
+        private void ProcessDisconnectedPlayer(int disconnectedIdx)
+        {
+            if (!dic_PlayerData.ContainsKey(disconnectedIdx))
+            {
+                Debug.LogWarning($"[NetworkConnect] Player {disconnectedIdx} not found in dic_PlayerData");
                 return;
             }
 
             switch (networkBattleStatus)
             {
                 case NetworkBattleStatus.LOBBY:
-                    // LOBBY: Remove old host completely
-                    dic_PlayerData.Remove(oldHostIdx);
-                    Debug.Log($"[NetworkConnect] Removed old host {oldHostIdx} from lobby");
-
-                    // Update UI
-                    var matchmakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                    if (matchmakingPopup != null)
-                    {
-                        matchmakingPopup.UpdateUserInfo();
-                    }
-
-                    // Reset countdown based on remaining players
-                    if (dic_PlayerData.Count >= minPlayerCount)
-                    {
-                        if (ICountMatchingTimeOut != null)
-                            StopCoroutine(ICountMatchingTimeOut);
-                        if (ICountTimeStart != null)
-                            StopCoroutine(ICountTimeStart);
-                        ICountTimeStart = StartCoroutine(CountTimeStart());
-                        Debug.Log("[NetworkConnect] Old host left lobby, restarting countdown");
-                    }
-                    else
-                    {
-                        if (ICountTimeStart != null)
-                            StopCoroutine(ICountTimeStart);
-                        if (ICountMatchingTimeOut != null)
-                            StopCoroutine(ICountMatchingTimeOut);
-                        ICountMatchingTimeOut = StartCoroutine(CountMatchingTimeOut());
-                        Debug.Log("[NetworkConnect] Old host left lobby, below minPlayerCount, starting timeout");
-                    }
+                    // LOBBY: Remove disconnected player completely
+                    dic_PlayerData.Remove(disconnectedIdx);
+                    Debug.Log($"[NetworkConnect] Removed disconnected player {disconnectedIdx} from lobby");
                     break;
 
                 case NetworkBattleStatus.INGAME:
-                    // BATTLE: Keep old host data, mark as game over
+                    // BATTLE: Keep disconnected player data, mark as game over
                     if (networkGameManager != null)
                     {
-                        dic_PlayerData[oldHostIdx].isAbnormalExit = true;
-                        dic_PlayerData[oldHostIdx].isInitialize = true;
-                        networkGameManager.Rpc_RequestGameOver(oldHostIdx, dic_PlayerData[oldHostIdx].waveCount, true);
-                        Debug.Log($"[NetworkConnect] Called Rpc_RequestGameOver for old host {oldHostIdx}");
+                        dic_PlayerData[disconnectedIdx].isAbnormalExit = true;
+                        dic_PlayerData[disconnectedIdx].isInitialize = true;
+                        networkGameManager.Rpc_RequestGameOver(disconnectedIdx, dic_PlayerData[disconnectedIdx].waveCount, true);
+                        Debug.Log($"[NetworkConnect] Called Rpc_RequestGameOver for disconnected player {disconnectedIdx}");
                     }
                     else
                     {
-                        Debug.LogWarning($"[NetworkConnect] NetworkGameManager is null, cannot call RPC for old host {oldHostIdx}");
-                        dic_PlayerData[oldHostIdx].isAbnormalExit = true;
-                        dic_PlayerData[oldHostIdx].isInitialize = true;
+                        Debug.LogWarning($"[NetworkConnect] NetworkGameManager is null, cannot call RPC for disconnected player {disconnectedIdx}");
+                        dic_PlayerData[disconnectedIdx].isAbnormalExit = true;
+                        dic_PlayerData[disconnectedIdx].isInitialize = true;
                     }
                     break;
             }
@@ -1185,9 +1239,15 @@ namespace Framework.Network
         }
 
         [Rpc]
-        public static void Rpc_BroadcastNewHost(NetworkRunner runner, int newHostIdx)
+        public static void Rpc_BroadcastNewHost(NetworkRunner runner, int newHostIdx, int oldHostIdx)
         {
-            Debug.Log($"[NetworkConnect] Rpc_BroadcastNewHost: Player {newHostIdx} is now the host.");
+            Debug.Log($"[NetworkConnect] Rpc_BroadcastNewHost RECEIVED on Player {Instance.playerIdx}: newHost={newHostIdx}, oldHost={oldHostIdx}");
+            Debug.Log($"[NetworkConnect] Current player data count BEFORE cleanup: {Instance.dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Players in dic_PlayerData: {string.Join(", ", Instance.dic_PlayerData.Keys)}");
+
+            // Set migration flag to prevent OnPlayerJoined from re-adding players
+            Instance._isHostMigrating = true;
+            Debug.Log($"[NetworkConnect] Set _isHostMigrating flag on Player {Instance.playerIdx}");
 
             // Clear old host flags
             foreach (var playerData in Instance.dic_PlayerData.Values)
@@ -1204,18 +1264,88 @@ namespace Framework.Network
             // Update local isHost flag
             Instance.isHost = (Instance.playerIdx == newHostIdx);
 
-            Debug.Log($"[NetworkConnect] Host migration broadcast complete. LocalPlayer isHost: {Instance.isHost}");
+            // Remove old host if it exists (only in LOBBY)
+            if (oldHostIdx != -1 && Instance.dic_PlayerData.ContainsKey(oldHostIdx))
+            {
+                Debug.Log($"[NetworkConnect] Removing old host {oldHostIdx} from player data (status: {Instance.networkBattleStatus}, localPlayer: {Instance.playerIdx})");
+
+                if (Instance.networkBattleStatus == NetworkBattleStatus.LOBBY)
+                {
+                    bool removed = Instance.dic_PlayerData.Remove(oldHostIdx);
+                    if (removed)
+                    {
+                        Debug.Log($"[NetworkConnect] ✓ Successfully removed old host {oldHostIdx} from lobby on Player {Instance.playerIdx}");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[NetworkConnect] ✗ FAILED to remove old host {oldHostIdx} - Remove returned false!");
+                    }
+
+                    Debug.Log($"[NetworkConnect] Player data count AFTER removal: {Instance.dic_PlayerData.Count}");
+                    Debug.Log($"[NetworkConnect] Players remaining: {string.Join(", ", Instance.dic_PlayerData.Keys)}");
+                    foreach (var kvp in Instance.dic_PlayerData)
+                    {
+                        Debug.Log($"[NetworkConnect]   Player {kvp.Key}: {kvp.Value.nickname}, isHost={kvp.Value.isHost}");
+                    }
+
+                    // Update UI for all clients
+                    var matchmakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                    if (matchmakingPopup != null)
+                    {
+                        matchmakingPopup.UpdateUserInfo();
+                        Debug.Log($"[NetworkConnect] UI updated on Player {Instance.playerIdx}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[NetworkConnect] MatchMakingPopup is NULL on Player {Instance.playerIdx}!");
+                    }
+
+                    // IMPORTANT: Restore lobby state for ALL clients, not just the new host
+                    // This ensures timers are restarted correctly on all clients
+                    Instance.RestoreLobbyState();
+                    Debug.Log($"[NetworkConnect] Lobby state restored on Player {Instance.playerIdx}");
+                }
+                else
+                {
+                    Debug.Log($"[NetworkConnect] NOT removing old host because status is {Instance.networkBattleStatus}, not LOBBY");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[NetworkConnect] Cannot remove old host {oldHostIdx} - either invalid index (-1) or not in dic_PlayerData. Contains? {Instance.dic_PlayerData.ContainsKey(oldHostIdx)}");
+            }
+
+            // Clear migration flag after cleanup is complete
+            Instance._isHostMigrating = false;
+            Debug.Log($"[NetworkConnect] Cleared _isHostMigrating flag on Player {Instance.playerIdx}");
+
+            Debug.Log($"[NetworkConnect] Host migration broadcast complete on Player {Instance.playerIdx}. LocalPlayer isHost: {Instance.isHost}");
         }
 
         [Rpc]
         public static void Rpc_JoinGame(NetworkRunner runner, string data)
         {
-            Debug.Log("[NetworkConnect] Rpc_JoinGame (all players).");
+            Debug.Log($"[NetworkConnect] ===== Rpc_JoinGame (broadcast) received on Player {Instance.playerIdx} =====");
+            Debug.Log($"[NetworkConnect] _isHostMigrating = {Instance._isHostMigrating}");
+            Debug.Log($"[NetworkConnect] Data: {data}");
+            Debug.Log($"[NetworkConnect] dic_PlayerData.Count BEFORE: {Instance.dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Players BEFORE: [{string.Join(", ", Instance.dic_PlayerData.Keys)}]");
+
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
+
             if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
+            {
                 Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
+                Debug.Log($"[NetworkConnect] ADDED Player {battleData.playerIdx} to dic_PlayerData");
+            }
             else
+            {
                 Instance.dic_PlayerData[battleData.playerIdx] = battleData;
+                Debug.Log($"[NetworkConnect] UPDATED Player {battleData.playerIdx} in dic_PlayerData");
+            }
+
+            Debug.Log($"[NetworkConnect] dic_PlayerData.Count AFTER: {Instance.dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Players AFTER: [{string.Join(", ", Instance.dic_PlayerData.Keys)}]");
 
             foreach (var item in Instance.dic_PlayerData.Values)
                 item.isInitialize = false;
@@ -1254,7 +1384,7 @@ namespace Framework.Network
         [Rpc]
         public static void Rpc_JoinGame(NetworkRunner runner, [RpcTarget] PlayerRef playerRef, string data)
         {
-            Debug.Log($"[NetworkConnect] Rpc_JoinGame (targeted). {data}");
+            Debug.Log($"[NetworkConnect] Rpc_JoinGame (targeted). \n{data}");
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
             if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
                 Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
@@ -1299,6 +1429,14 @@ namespace Framework.Network
         Coroutine ICountTimeStart;
         IEnumerator CountTimeStart()
         {
+            Debug.Log($"[NetworkConnect] ===== CountTimeStart STARTED on Player {playerIdx} =====");
+            Debug.Log($"[NetworkConnect] Total player count: {dic_PlayerData.Count}");
+            Debug.Log($"[NetworkConnect] Player indices: [{string.Join(", ", dic_PlayerData.Keys)}]");
+            foreach (var kvp in dic_PlayerData)
+            {
+                Debug.Log($"[NetworkConnect]   Player {kvp.Key}: {kvp.Value.nickname}, isHost={kvp.Value.isHost}");
+            }
+            Debug.Log($"[NetworkConnect] ============================================");
             int cd = 30;
             while (cd > 0)
             {

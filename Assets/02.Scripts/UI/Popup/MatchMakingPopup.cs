@@ -84,6 +84,16 @@ namespace Framework.UI
             bool isFriendlyMatch = NetworkConnect.Instance.isFriendlyMatch;
             int maxPlayerCount = NetworkConnect.Instance.maxPlayerCount;
 
+            // IMPORTANT: Clear all slots except slot 0 (local player) first
+            // This prevents ghost players from appearing after host migration
+            for (int i = 1; i < matchingUserInfoItems.Count; i++)
+            {
+                matchingUserInfoItems[i].userInfo.SetActive(false);
+                matchingUserInfoItems[i].matching.SetActive(false);
+                matchingUserInfoItems[i].locked.SetActive(false);
+                matchingUserInfoItems[i].button_Invite.gameObject.SetActive(false);
+            }
+
             foreach (var item in NetworkConnect.Instance.dic_PlayerData.Values)
             {
                 int slotIndex = (item.playerIdx == NetworkConnect.Instance.playerIdx) ? 0 : idx;

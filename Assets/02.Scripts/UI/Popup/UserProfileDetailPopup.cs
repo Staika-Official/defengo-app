@@ -290,7 +290,7 @@ namespace Framework.UI
         {
             friendItem = _friendItem;
             text_Title.SetEntry("UI_Friend");
-            button_AddFriend.gameObject.SetActive(!isFriend && !friendItem.pendingFromFriend && !friendItem.pendingFromUser);
+            button_AddFriend.gameObject.SetActive(!isFriend && !friendItem.pendingFromUser);
             button_DeleteFriend.gameObject.SetActive(isFriend);
             // text_Title.RefreshString();
             UserProfileData data = DataManager.Instance.dic_userProfileData[otherEquippedProfileId];
