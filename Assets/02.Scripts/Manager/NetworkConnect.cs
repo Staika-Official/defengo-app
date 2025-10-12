@@ -1244,30 +1244,71 @@ namespace Framework.Network
             //Sort
             List<NetworkBattleData> data = NetworkConnect.Instance.dic_PlayerData.Values.ToList();
 
-            // Separate abnormal exits from normal players
+            // Separate abnormal exits (with locked ranks) from normal players
             var normalPlayers = data.Where(p => !p.isAbnormalExit).ToList();
             var abnormalExits = data.Where(p => p.isAbnormalExit).ToList();
 
-            // Sort normal players by performance
+            // Sort normal players by performance (alive first, then by wave/kills)
             normalPlayers = normalPlayers
-                .OrderByDescending(p => p.waveCount)          // Higher wave better
+                .OrderBy(p => p.isGameOver)                   // Alive players first (false < true)
+                .ThenByDescending(p => p.waveCount)          // Higher wave better
                 .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
                 .ToList();
 
-            // Sort abnormal exits by performance (they rank below all normal players)
+            // Sort abnormal exits by their LOCKED rank (assigned at surrender time)
+            // Their rank was set when they surrendered = lowest rank among alive at that moment
             abnormalExits = abnormalExits
-                .OrderByDescending(p => p.waveCount)
-                .ThenByDescending(p => p.monsterBossKilled)
-                .ThenByDescending(p => p.monsterKilled)
+                .OrderBy(p => p.rank)  // Use the rank assigned at surrender time
                 .ToList();
 
-            // Combine: normal players first, then abnormal exits
-            var sortedData = normalPlayers.Concat(abnormalExits).ToList();
+            // Build final sorted list by rank
+            var sortedData = new List<NetworkBattleData>();
+            int nextNormalIdx = 0;
+            int nextAbnormalIdx = 0;
+            int currentRank = 1;
 
-            // Assign ranks
-            for (int i = 0; i < sortedData.Count; i++)
-                sortedData[i].rank = i + 1;
+            // Merge normal and abnormal players by comparing ranks
+            while (nextNormalIdx < normalPlayers.Count || nextAbnormalIdx < abnormalExits.Count)
+            {
+                // Check if we should place a normal player next
+                bool placeNormal = false;
+
+                if (nextNormalIdx < normalPlayers.Count && nextAbnormalIdx >= abnormalExits.Count)
+                {
+                    // Only normal players left
+                    placeNormal = true;
+                }
+                else if (nextNormalIdx >= normalPlayers.Count && nextAbnormalIdx < abnormalExits.Count)
+                {
+                    // Only abnormal players left
+                    placeNormal = false;
+                }
+                else
+                {
+                    // Both available - abnormal player's locked rank tells us where they should go
+                    var abnormalPlayer = abnormalExits[nextAbnormalIdx];
+                    // If abnormal's locked rank is > current rank, place normal players first
+                    placeNormal = (abnormalPlayer.rank > currentRank);
+                }
+
+                if (placeNormal)
+                {
+                    var player = normalPlayers[nextNormalIdx];
+                    player.rank = currentRank;
+                    sortedData.Add(player);
+                    nextNormalIdx++;
+                    currentRank++;
+                }
+                else
+                {
+                    var player = abnormalExits[nextAbnormalIdx];
+                    // Keep their locked rank (don't override)
+                    sortedData.Add(player);
+                    nextAbnormalIdx++;
+                    currentRank = player.rank + 1; // Next rank after this abnormal player
+                }
+            }
 
             return sortedData;
         }

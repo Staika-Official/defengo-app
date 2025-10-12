@@ -185,6 +185,18 @@ namespace Framework.Game.Defense
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver = true;
             NetworkConnect.Instance.dic_PlayerData[playerId].isAbnormalExit = isAbnormal;
+
+            // For abnormal exits (surrender/disconnect), assign the lowest rank among currently alive players
+            if (isAbnormal)
+            {
+                // Count how many players are currently NOT game over (still alive, EXCLUDING the surrendering player)
+                int aliveCount = NetworkConnect.Instance.dic_PlayerData.Values.Count(p => !p.isGameOver);
+                // Assign rank = aliveCount + 1 (lowest rank among ALL alive players INCLUDING the surrendering player)
+                // Example: 2 others alive + 1 surrendering = rank 3
+                NetworkConnect.Instance.dic_PlayerData[playerId].rank = aliveCount + 1;
+                Debug.Log($"[NetworkGameManager] Player {playerId} surrendered, assigned rank {aliveCount + 1} (lowest among {aliveCount + 1} alive players before surrender)");
+            }
+
             gameOverPlayerCount += 1;
 
             if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)
