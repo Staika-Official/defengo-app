@@ -19,6 +19,8 @@ namespace Framework.UI
         public TextMeshProUGUI text_TimeCount;
         public int timeCount;
         public IEnumerator timer;
+
+        NetworkBattleData localPlayerData = new();
         public override void ActivePopup()
         {
             timeCount = 0;
@@ -27,13 +29,13 @@ namespace Framework.UI
             Debug.Log("Matching Start");
             PopUpSequence(true);
 
-            NetworkBattleData playerData = new NetworkBattleData()
+            localPlayerData = new NetworkBattleData()
             {
                 profileId = UserInfoManager.Instance.userState.equippedProfileId,
                 nickname = UserInfoManager.Instance.nickname,
                 decList = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds
             };
-            matchingUserInfoItems[0].UserInfoInitialize(playerData);
+            matchingUserInfoItems[0].UserInfoInitialize(localPlayerData);
 
             bool isFriendlyMatch = NetworkConnect.Instance.isFriendlyMatch;
             int maxPlayerCount = NetworkConnect.Instance.maxPlayerCount;
@@ -93,7 +95,7 @@ namespace Framework.UI
                 matchingUserInfoItems[i].locked.SetActive(false);
                 matchingUserInfoItems[i].button_Invite.gameObject.SetActive(false);
             }
-
+            
             foreach (var item in NetworkConnect.Instance.dic_PlayerData.Values)
             {
                 int slotIndex = (item.playerIdx == NetworkConnect.Instance.playerIdx) ? 0 : idx;
@@ -129,6 +131,8 @@ namespace Framework.UI
                     matchingUserInfoItems[i].locked.SetActive(true);
                 }
             }
+
+            matchingUserInfoItems[0].UserInfoInitialize(localPlayerData);
 
             button_Close.gameObject.SetActive(true);
         }
