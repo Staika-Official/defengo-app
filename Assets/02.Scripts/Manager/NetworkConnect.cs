@@ -341,6 +341,7 @@ namespace Framework.Network
             {
                 ["isPlaying"] = true,
             };
+            runner.SessionInfo.IsOpen = false;
             runner.SessionInfo.UpdateCustomProperties(customProps);
             yield return new WaitForSeconds(0f);
             Rpc_LoadGameScene(runner, runner.LocalPlayer.AsIndex.ToString());
@@ -762,7 +763,8 @@ namespace Framework.Network
 
         /// <summary>
         /// Called on ALL clients when host disconnects.
-        /// Deterministic host selection: only the lowest PlayerRef index calls StartGame(token).
+        /// LOBBY: Simply reset and create/join a new session - NO MIGRATION.
+        /// INGAME: Use Fusion's built-in host migration with deterministic host selection.
         /// </summary>
         public async void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
         {
@@ -770,7 +772,47 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] Current status: {networkBattleStatus}");
             Debug.Log($"[NetworkConnect] Active players: [{string.Join(", ", runner.ActivePlayers.Select(p => p.AsIndex))}]");
 
-            // Set migration flag IMMEDIATELY to prevent OnPlayerJoined from syncing during migration
+            // LOBBY: Don't migrate - just reset and create/join a new session
+            if (networkBattleStatus == NetworkBattleStatus.LOBBY)
+            {
+                Debug.Log("[NetworkConnect] LOBBY: Host left - resetting and creating/joining new session");
+                Debug.Log("[NetworkConnect] NO HOST MIGRATION in lobby - fresh start");
+
+                // Stop all timers immediately
+                StopAllCoroutines();
+                ICountTimeStart = null;
+                ICountMatchingTimeOut = null;
+
+                // Shutdown the runner cleanly
+                Debug.Log("[NetworkConnect] Shutting down runner");
+                await runner.Shutdown(shutdownReason: ShutdownReason.Ok);
+
+                // Clean up the old runner GameObject
+                if (runner != null && runner.gameObject != null)
+                {
+                    Destroy(runner.gameObject);
+                    this.runner = null;
+                }
+
+                // Reset all state variables
+                dic_PlayerData.Clear();
+                isHost = false;
+                _countdownStarted = false;
+                _isHostMigrating = false;
+                playerIdx = 0;
+
+                // Restart matchmaking from scratch - will create or join a new session
+                Debug.Log("[NetworkConnect] Restarting matchmaking - creating/joining new session");
+                ConnectToLobby(isFriendlyMatch, roomName, roomPassword);
+                var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
+                popup.UpdateUserInfo();
+                return;
+            }
+
+            // INGAME: Perform host migration
+            Debug.Log("[NetworkConnect] INGAME: Starting host migration process");
+
+            // Set migration flag to prevent OnPlayerJoined from syncing during migration
             _isHostMigrating = true;
 
             // Find the old host index BEFORE clearing dic_PlayerData
@@ -783,35 +825,6 @@ namespace Framework.Network
                     Debug.Log($"[NetworkConnect] Found old host: Player {oldHostIdx}");
                     break;
                 }
-            }
-
-            // LOBBY: Clear dic_PlayerData on ALL clients
-            if (networkBattleStatus == NetworkBattleStatus.LOBBY)
-            {
-                Debug.Log($"[NetworkConnect] LOBBY migration: Clearing dic_PlayerData on Player {playerIdx}");
-                dic_PlayerData.Clear();
-
-                // Update UI on ALL clients to show empty state
-                var matchmakingPopup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
-                if (matchmakingPopup != null)
-                {
-                    matchmakingPopup.UpdateUserInfo();
-                    Debug.Log($"[NetworkConnect] UI updated after clearing dic_PlayerData");
-                }
-
-                // Stop all timers on ALL clients
-                if (ICountTimeStart != null)
-                    StopCoroutine(ICountTimeStart);
-                if (ICountMatchingTimeOut != null)
-                    StopCoroutine(ICountMatchingTimeOut);
-                ICountMatchingTimeOut = StartCoroutine(CountMatchingTimeOut());
-
-                Debug.Log($"[NetworkConnect] Stopped all countdown timers on Player {playerIdx}");
-            }
-            // INGAME: Keep dic_PlayerData (snapshot will preserve state)
-            else if (networkBattleStatus == NetworkBattleStatus.INGAME)
-            {
-                Debug.Log($"[NetworkConnect] INGAME migration: Preserving dic_PlayerData on Player {playerIdx}");
             }
 
             // Deterministic host selection: Choose client with lowest PlayerRef index
@@ -834,7 +847,7 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] Chosen new host: Player {chosenHost.AsIndex}");
             Debug.Log($"[NetworkConnect] Am I the chosen host? {isChosenHost}");
 
-            if (/* isChosenHost */true)
+            if (isChosenHost)
             {
                 Debug.Log($"[NetworkConnect] I am the chosen host (Player {runner.LocalPlayer.AsIndex}), calling StartGame(token)");
 
@@ -892,7 +905,7 @@ namespace Framework.Network
 
         /// <summary>
         /// Called by Fusion ONLY on the new host after StartGame(token) completes.
-        /// Then OnPlayerJoined will fire for the local player.
+        /// Only called for INGAME migrations - LOBBY never migrates.
         /// </summary>
         private void OnHostMigrationResume(NetworkRunner runner)
         {
@@ -909,22 +922,14 @@ namespace Framework.Network
             // Reset countdown flag on migration to allow fresh start
             _countdownStarted = false;
 
+            // This should ONLY be called for INGAME status
             if (networkBattleStatus == NetworkBattleStatus.LOBBY)
             {
-                Debug.Log($"[NetworkConnect] LOBBY migration resume on new host (Player {playerIdx})");
-                // LOBBY: dic_PlayerData was already cleared in OnHostMigration on ALL clients
-                // UI already updated and timers already stopped in OnHostMigration
-                // OnPlayerJoined will fire next for local player, then normal flow continues
-                Debug.Log($"[NetworkConnect] dic_PlayerData count: {dic_PlayerData.Count}");
-
-                // Reopen session if needed (we lost a player, so session should be open)
-                if (runner.SessionInfo != null && !runner.SessionInfo.IsOpen)
-                {
-                    runner.SessionInfo.IsOpen = true;
-                    Debug.Log($"[NetworkConnect] Reopened session after host migration in LOBBY");
-                }
+                Debug.LogError("[NetworkConnect] OnHostMigrationResume called during LOBBY - this should NOT happen!");
+                return;
             }
-            else if (networkBattleStatus == NetworkBattleStatus.INGAME)
+
+            if (networkBattleStatus == NetworkBattleStatus.INGAME)
             {
                 Debug.Log($"[NetworkConnect] INGAME migration resume on Player {playerIdx}");
 
