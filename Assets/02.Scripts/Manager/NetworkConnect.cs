@@ -653,15 +653,13 @@ namespace Framework.Network
             dic_PlayerData[idx].sessionId = data.sessionId;
             dic_PlayerData[idx].playId = data.playId;
 
-            if (isHost)
+            bool allReady = dic_PlayerData.Values.All(p => p.isInitialize);
+            if (allReady)
             {
-                bool allReady = dic_PlayerData.Values.All(p => p.isInitialize);
-                if (allReady)
-                {
-                    Debug.Log("[NetworkConnect] All players ready. Closing session and starting countdown.");
-                    runner.SessionInfo.IsOpen = false;
-                    Rpc_CountStart(runner);
-                }
+                Debug.Log("[NetworkConnect] All players ready. Closing session and starting countdown.");
+                runner.SessionInfo.IsOpen = false;
+
+                GameManager.Instance.CountStart();
             }
         }
 
@@ -1158,6 +1156,8 @@ namespace Framework.Network
         {
             Debug.Log($"[NetworkConnect] Rpc_JoinGame (targeted). \n{data}");
             NetworkBattleData battleData = JsonUtility.FromJson<NetworkBattleData>(data);
+            if (data == null)
+                return;
             if (!Instance.dic_PlayerData.ContainsKey(battleData.playerIdx))
                 Instance.dic_PlayerData.Add(battleData.playerIdx, battleData);
             else
