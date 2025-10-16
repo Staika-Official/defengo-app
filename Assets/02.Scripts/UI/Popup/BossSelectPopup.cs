@@ -5,6 +5,7 @@ using Framework.Util;
 using System.Linq;
 using CodeStage.AntiCheat.ObscuredTypes;
 using Framework.Game.Defense;
+using TMPro;
 
 namespace Framework.UI
 {
@@ -14,6 +15,7 @@ namespace Framework.UI
         public List<BossSelectItem> bossSelectItems;
         public InfiniteHorizontalScroll infiniteHorizontalScroll;
         public RectTransform scrollRect;
+        public TextMeshProUGUI text_bossDescription;
         public Dictionary<string, BossData> dic_bossData = new();
         public Animation openSequence;
         public int targetIdx;
@@ -79,6 +81,42 @@ namespace Framework.UI
         public override void Initialize()
         {
             GetBossData();
+
+            // 스크롤 중앙 인덱스 변경 이벤트 연결
+            infiniteHorizontalScroll.OnCenterIndexChanged.AddListener(OnScrollCenterChange);
+        }
+
+        /// <summary>
+        /// 스크롤 중앙에 표시되는 보스가 변경될 때 호출
+        /// </summary>
+        /// <param name="centerIndex">중앙에 있는 아이템의 인덱스</param>
+        /// <param name="progress">전환 진행도 (0~1)</param>
+        public void OnScrollCenterChange(int centerIndex, float progress)
+        {
+            // 중앙 인덱스에 해당하는 BossSelectItem 가져오기
+            if (centerIndex < 0 || centerIndex >= bossSelectItems.Count)
+                return;
+
+            BossSelectItem centerItem = bossSelectItems[centerIndex];
+
+            // BossData 가져오기
+            BossData centerBossData = null;
+            foreach (var kvp in dic_bossData)
+            {
+                if ((int)kvp.Value.bossIndex == centerItem.bossIdx)
+                {
+                    centerBossData = kvp.Value;
+                    targetBossName = kvp.Key;
+                    break;
+                }
+            }
+
+            // 보스 정보 업데이트
+            if (centerBossData != null)
+            {
+                text_bossDescription.text = LanguageManager.Instance.GetStringData(centerBossData.bossDescKey);
+                Debug.Log($"Center Boss: {centerBossData.bossNameKey}, Progress: {progress:F2}");
+            }
         }
 
         public async void GetBossData()
@@ -130,7 +168,7 @@ namespace Framework.UI
         public void SetSummonBossInfo()
         {
             BossData bossData = dic_bossData[targetBossName];
-            
+            text_bossDescription.text = LanguageManager.Instance.GetStringData(bossData.bossDescKey);
         }
     }
 }

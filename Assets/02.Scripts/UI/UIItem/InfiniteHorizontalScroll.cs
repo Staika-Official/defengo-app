@@ -54,6 +54,14 @@ namespace Framework.UI
 
         #endregion
         /***********************************************************************
+        *                           Events
+        ***********************************************************************/
+        #region .
+        /// <summary> 스크롤 중 중앙에 있는 아이템 인덱스 변경 이벤트 (progress 포함) </summary>
+        public UnityEvent<int, float> OnCenterIndexChanged;
+
+        #endregion
+        /***********************************************************************
         *                           Look Up Tables
         ***********************************************************************/
         #region .
@@ -214,6 +222,16 @@ namespace Framework.UI
         {
             MoveAll();
             if (useImposter) MoveImposter();
+
+            // 중앙에 표시될 다음 인덱스 계산
+            int nextIndex = (_currentIndex - _direction) % _targetCount;
+            if (nextIndex < 0) nextIndex += _targetCount;
+
+            // progress가 0.5를 넘으면 다음 아이템이 중앙에 더 가까움
+            int centerIndex = _progress >= 0.5f ? nextIndex : _currentIndex;
+
+            // 이벤트 발생
+            OnCenterIndexChanged?.Invoke(centerIndex, _progress);
         }
 
         private void OnTransitionEnd()

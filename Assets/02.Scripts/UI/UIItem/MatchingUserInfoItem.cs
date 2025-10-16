@@ -41,8 +41,7 @@ namespace Framework.UI
             try
             {
                 UserProfileData userProfileData = DataManager.Instance.dic_userProfileData[networkBattleData.profileId];
-
-                if (userProfileData.isCharacter)
+                if (!userProfileData.isCharacter)
                 {
                     image_Profile.gameObject.SetActive(true);
                     image_limitedProfile.gameObject.SetActive(false);

@@ -73,12 +73,13 @@ namespace Framework.UI
                 });
             }, () =>
             {
-
+                button_Close.onClick?.Invoke();
             });
         }
         IEnumerator ShowSequence(GetBattleSummaryResponse summaryData, MyBattleLeaderboardInfo newRank)
         {
             Debug.Log($"{gameObject.name} Show sequence");
+            UIManager.Instance.battleResultTablePopup.PopUpSequence(false);
             var oldRank = UIManager.Instance.battleResultPopup.currentRank;
             var oldCofig = DataManager.Instance.GetRankTierConfig(oldRank.finalRank);
             var newCofig = DataManager.Instance.GetRankTierConfig(newRank.finalRank);

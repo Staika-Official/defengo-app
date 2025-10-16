@@ -44,12 +44,12 @@ namespace Framework.UI
                 SceneLoadManager.Instance.SwitchingScene(2);
 
                 GameManager.Instance.objectPoolManager.AllClear();
+                PopUpSequence(false);
             }
             else
             {
                 UIManager.Instance.battleResultPromotePopup.ActivePopup();
             }
-            PopUpSequence(false);
         }
 
         public override void Initialize()

@@ -155,6 +155,7 @@ MonoBehaviour:
   bossSelectItems: []
   infiniteHorizontalScroll: {fileID: 756241306342122648}
   scrollRect: {fileID: 1247524814686819242}
+  text_bossDescription: {fileID: 209797210483687133}
   openSequence: {fileID: 2822938445740125940}
   targetIdx: 0
   targetBossName:
@@ -246,6 +247,9 @@ MonoBehaviour:
   transitionTime: 0.5
   useImposter: 1
   _currentIndex: 0
+  OnCenterIndexChanged:
+    m_PersistentCalls:
+      m_Calls: []
   scaling: 0.1
   param: 1
 --- !u!1 &2059880774065440230
@@ -900,10 +904,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 6533194872353520534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: 20}
-  m_SizeDelta: {x: 950, y: 200}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 20}
+  m_SizeDelta: {x: -60, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1680037484389903647
 CanvasRenderer:
@@ -933,11 +937,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uBCF4\uC2A4 \uC124\uBA85 \uC774 \uBCF4\uC2A4\uB294 \uC5B4\uCA4C\uAD6C
-    \uC800\uCA4C\uAD6C \uCE90\uB9AD\uD130\uC5D0\uAC8C  \uB3C5\uC744 \uBFCC\uB824
-    \uAC10\uC5FC \uC2DC\uD0A4\uACE0 \uAC10\uC5FC\uB41C \uCE90\uB9AD\uD130\uB294 \uBCF4\uC2A4
-    \uACF5\uACA9\uC2DC\uC5D0 \uBCF4\uC2A4\uC758 \uCCB4\uB825\uC744 \uC62C\uB824\uC900\uB2E4
-    \n\r\uBE14\uB77C\uBE14\uB77C\uBE14\uB77C \uAE30\uD0C0\uB4F1\uB4F1 "
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
   m_sharedMaterial: {fileID: -901028585359562673, guid: 03da826af0d7bb148afc26be23d2246d, type: 2}
@@ -968,7 +968,7 @@ MonoBehaviour:
   m_fontSizeBase: 35
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 24
+  m_fontSizeMin: 18
   m_fontSizeMax: 35
   m_fontStyle: 0
   m_HorizontalAlignment: 2

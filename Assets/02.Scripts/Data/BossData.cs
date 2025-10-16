@@ -9,6 +9,7 @@ public class BossData : ScriptableObject
 {
     public FieldBossMonster bossIndex;
     public string bossNameKey;
+    public string bossDescKey;
     public SkeletonDataAsset anim;
     public ObscuredFloat[] uniqueValue;
     public ObscuredFloat health;
