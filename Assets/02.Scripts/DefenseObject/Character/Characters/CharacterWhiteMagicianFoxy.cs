@@ -81,11 +81,11 @@ namespace Framework.Game.Defense
                 {
                     if (electricMonsters[i] == monster)
                     {
-                        electricMonsters[i].ElectricDamage(totalDamage);
+                        electricMonsters[i].ElectricDamage(totalDamage, this);
                     }
                     else
                     {
-                        electricMonsters[i].ElectricDamage(totalDamage * totalTransferDamage);
+                        electricMonsters[i].ElectricDamage(totalDamage * totalTransferDamage, this);
                     }
 
                 }

@@ -191,7 +191,7 @@ namespace Framework.Game.Defense
                     if (!dic_HitMonsters.ContainsKey(monster))
                     {
                         Coroutine coroutine = StartCoroutine(monster.BoomerangSequence(attackValue,
-                            damageType, criticalDamageRate, PlayHitEffect));
+                            damageType, criticalDamageRate, PlayHitEffect, character));
                         dic_HitMonsters.Add(monster, coroutine);
                     }
                 }

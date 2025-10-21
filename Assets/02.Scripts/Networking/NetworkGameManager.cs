@@ -161,15 +161,15 @@ namespace Framework.Game.Defense
                 var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
                 if (!my.isGameOver && my.rank == 1)
                 {
-                    GameManager.Instance.GameOver();
-                    if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
-                    {
-                        var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
+                    // GameManager.Instance.GameOver();
+                    // if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
+                    // {
+                    //     var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
 
-                        UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
-                        NetworkConnect.Instance.ShutDown();
-                    }
+                    //     UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+                    //     NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+                    //     NetworkConnect.Instance.ShutDown();
+                    // }
                 }
             }
         }
@@ -240,16 +240,16 @@ namespace Framework.Game.Defense
                 var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
                 if (!my.isGameOver && my.rank == 1)
                 {
-                    GameManager.Instance.GameOver();
-                    if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
-                    {
-                        var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
+                    // GameManager.Instance.GameOver();
+                    // if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
+                    // {
+                    //     var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
 
-                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
-                        UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-                        NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
-                        NetworkConnect.Instance.ShutDown();
-                    }
+                    //     NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
+                    //     UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
+                    //     NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+                    //     NetworkConnect.Instance.ShutDown();
+                    // }
                 }
             }
 

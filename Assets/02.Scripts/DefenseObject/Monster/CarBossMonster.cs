@@ -7,14 +7,14 @@ using Framework.GameData.Defense;
 namespace Framework.Game.Defense
 {
     public class CarBossMonster : Monster
-    { 
+    {
         public float bossSpeed;
         public float bossHealth;
         public int monCloneId;
         public float monCloneHealth;
 
         public IEnumerator cloneSequence;
-       
+
         public override void Abillity()
         {
             cloneSequence = CarBossAbillitySequence();
@@ -33,7 +33,7 @@ namespace Framework.Game.Defense
 
         public override void DeathSequence()
         {
-            
+
         }
 
         public override void EndOfUse()
@@ -60,6 +60,8 @@ namespace Framework.Game.Defense
             transform.name = "Smoker";
             speed = bossData.monsterSpeed;
             health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            monCloneHealth = bossData.uniqueValue[0];
+            monCloneId = 51;
             SetBossMove();
         }
     }

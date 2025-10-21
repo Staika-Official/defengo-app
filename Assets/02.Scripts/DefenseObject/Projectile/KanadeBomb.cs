@@ -41,7 +41,7 @@ namespace Framework.Game.Defense
                 {
                     if (monster.IsAlive)
                     {
-                        monster.HitDamage(damage, DamageType.NORMAL, 0);
+                        monster.HitDamage(damage, DamageType.NORMAL, 0, null);
                     }
                 }
             }

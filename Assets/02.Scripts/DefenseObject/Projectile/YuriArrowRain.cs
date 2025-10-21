@@ -54,7 +54,7 @@ namespace Framework.Game.Defense
                     {
                         if(!dic_HitMonsters.ContainsKey(monster))
                         {
-                            Coroutine coroutine = StartCoroutine(monster.arrowRainSequence(arrowRaineDamage, arrowRainAddtiveDamage, arrowCriticalRange, arrowCriticalDamageRate));
+                            Coroutine coroutine = StartCoroutine(monster.arrowRainSequence(arrowRaineDamage, arrowRainAddtiveDamage, arrowCriticalRange, arrowCriticalDamageRate, null));
                             dic_HitMonsters.Add(monster, coroutine);
                         }
                     }

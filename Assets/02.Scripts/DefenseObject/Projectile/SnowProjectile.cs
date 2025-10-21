@@ -52,7 +52,7 @@ namespace Framework.Game.Defense
         {
             DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
-            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate);
+            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate, character);
             ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(effectName);
             particle.PlayParticle(transform.localPosition, 0);
             SoundManager.Instance.PlaySound(SoundKey.SF_CHARACTER_HUMBOLDT);

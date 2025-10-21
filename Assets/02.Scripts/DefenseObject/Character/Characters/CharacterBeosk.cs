@@ -124,13 +124,13 @@ namespace Framework.Game.Defense
                 {
                     ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
                     particle.PlayParticle(targetCache[0].transform.position, 0);
-                    targetCache[i].HitDamage(99000000, DamageType.INSTANT_KILL, 1);
+                    targetCache[i].HitDamage(99000000, DamageType.INSTANT_KILL, 1, this);
                     SoundManager.Instance.PlaySound(SoundKey.SF_HEAVY_HIT);
                 }
                 else
                 {
                     SoundManager.Instance.PlaySound(SoundKey.SF_CHARACTER_MEOSK);
-                    targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                    targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
                 }
                 
             }

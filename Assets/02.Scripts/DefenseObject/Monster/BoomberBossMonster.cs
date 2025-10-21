@@ -5,6 +5,7 @@ using Spine.Unity;
 using Spine;
 using System.Collections;
 using System.Collections.Generic;
+using Framework.Util;
 
 /*
 BossEf_Bomb1
@@ -18,57 +19,54 @@ namespace Framework.Game.Defense
 {
     public class BoomberBossMonster : Monster
     {
-        public ObscuredFloat abillityTimeCount;
         public ObscuredInt targetCount;
-        public ObscuredInt coefficient;
-        public List<Character> bombCharacterList = new();
+        public ObscuredFloat skillInterval;
+        public ObscuredFloat skillActiveDelay;
+        // public ObscuredFloat reinforceAttackChance;
+        // public ObscuredInt coefficient;
+        public IEnumerator abilitySequence;
+        public List<ObjectParticle> objectParticles = new();
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                StartCoroutine(BoomberAbillityAction());
-            }
-        }
         public override void FieldBossInitialize(BossData bossData)
         {
-            targetCount = 2;
             monsterType = MonsterType.FIELD_BOSS_MONSTER;
             Debug.Log("Boomber");
             isBoss = true;
             transform.name = "Boomber";
+            skillInterval = bossData.uniqueValue[0];
+            targetCount = (int)bossData.uniqueValue[1] + (int)(waveIndex / bossData.uniqueValue[2]);
             speed = bossData.monsterSpeed;
             health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            skillActiveDelay = bossData.uniqueValue[5];
+            // reinforceAttackChance = (bossData.uniqueValue[3] + waveIndex / 5 * bossData.uniqueValue[4]) * 100;
+            objectParticles = new();
             SetBossMove();
         }
 
         public IEnumerator BoomberAbillityAction()
         {
-            bool isReinforceAttack = Random.Range(0, 2) == 0;
+            while (IsAlive)
+            {
+                yield return new WaitForSeconds(skillInterval);
 
-            string animKey = isReinforceAttack ? "Attack2" : "Attack";
+                IsBossAttack = true;
+                TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_Ready", false);
+                IsMove = false;
+                Debug.Log("Boomber Attack Ready");
+                yield return new WaitForSpineAnimationComplete(entry);
 
-            IsBossAttack = true;
-            TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_Ready", false);
-            IsMove = false;
-            Debug.Log("AttackReady");
-            yield return new WaitForSpineAnimationComplete(entry);
+                entry = anim.AnimationState.SetAnimation(0, "Attack", false);
 
-            entry = anim.AnimationState.SetAnimation(0, "Attack", false);
-            
-            SetBomb();
-            Debug.Log(animKey);
-            yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
-            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_BombExplosion");
-            objectParticle.transform.position = transform.position;
-            objectParticle.SimplePlay();
-            Debug.Log("Explosion");
-            yield return new WaitForSpineAnimationComplete(entry);
-            Debug.Log("Boomber Attack End");
-            IsMove = true;
-            IsBossAttack = false;
-            bombCharacterList.Clear();
-            SetWalkSequence();
+                yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
+
+                SetBomb();
+
+                yield return new WaitForSpineAnimationComplete(entry);
+                Debug.Log("Boomber Attack End");
+                IsMove = true;
+                IsBossAttack = false;
+                SetWalkSequence();
+            }
         }
 
         public void SetBomb()
@@ -76,29 +74,15 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
            ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] summonCharacterIdxs = new int[GameManager.Instance.characterSpawner.summonedCharacters.Count];
-
-            for (int i = 0; i < summonCharacterIdxs.Length; i++)
-            {
-                summonCharacterIdxs[i] = i;
-            }
-
-            for (int i = 0; i < summonCharacterIdxs.Length; ++i)
-            {
-                int random1 = Random.Range(0, summonCharacterIdxs.Length);
-                int random2 = Random.Range(0, summonCharacterIdxs.Length);
-
-                (summonCharacterIdxs[random1], summonCharacterIdxs[random2]) = (summonCharacterIdxs[random2], summonCharacterIdxs[random1]);
-            }
+            int[] summonCharacterIdxs = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
 
             int selectedCount = 0;
 
             for (int i = 0; i < summonCharacterIdxs.Length; i++)
             {
                 Character character = GameManager.Instance.characterSpawner.summonedCharacters[summonCharacterIdxs[i]];
-                bombCharacterList.Add(character);
+                SetBombSequence(character);
                 selectedCount++;
-                character.SetBomb();
                 if (selectedCount >= tempTargetCount)
                 {
                     break;
@@ -106,16 +90,32 @@ namespace Framework.Game.Defense
             }
         }
 
-        public void SetBombExplosion()
+        public void SetBombSequence(Character character)
         {
-            foreach (var item in bombCharacterList)
+            ObjectParticle bomb = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_Bomb");
+            bomb.transform.SetParent(character.transform);
+            bomb.transform.localPosition = Vector2.zero;
+            objectParticles.Add(bomb);
+            bomb.PlayParticle(Vector2.zero, skillActiveDelay, () =>
             {
-                item.BombExplosion();
-            }
+                ObjectParticle explosion = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_BombExplosion");
+                explosion.SimplePlay(character.transform);
+                objectParticles.Add(explosion);
+
+                character.DestroyedTile();
+                Glacier glacier = GridManager.Instance.glaciersTiles[character.glacierIdx];
+                if (character.starGradeIndex > 0)
+                {
+                    GameManager.Instance.characterSpawner
+                        .SummonFixedCharacter(character.characterIndex, glacier, character.starGradeIndex - 1);
+                }
+            });
         }
+
         public override void Abillity()
         {
-
+            abilitySequence = BoomberAbillityAction();
+            StartCoroutine(abilitySequence);
         }
 
         public override void DeathSequence()
@@ -130,6 +130,13 @@ namespace Framework.Game.Defense
                 StopCoroutine(deadTimerCoroutine);
                 deadTimerCoroutine = null;
             }
+
+            for (int i = 0; i < objectParticles.Count; i++)
+            {
+                GameManager.Instance.objectPoolManager.ReturnObject(objectParticles[i], objectParticles[i].particleName);
+            }
+
+            objectParticles.Clear();
 
             monsterInterface.transform.SetParent(transform);
             monsterInterface.ReturnObjectPool();

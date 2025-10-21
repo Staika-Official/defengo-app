@@ -116,7 +116,7 @@ namespace Framework.Game.Defense
                 ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
 
                 particle.PlayParticle(targetCache[0].transform.position, 0 );
-                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

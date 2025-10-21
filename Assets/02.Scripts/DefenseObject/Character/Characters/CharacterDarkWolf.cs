@@ -62,7 +62,7 @@ namespace Framework.Game.Defense
                     ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("DarkWolfKill");
                     particle.PlayParticle(targetCache[0].transform.position, 0);
 
-                    targetCache[i].HitDamage(99000000, DamageType.INSTANT_KILL, 1);
+                    targetCache[i].HitDamage(99000000, DamageType.INSTANT_KILL, 1, this);
                     int getGem = Random.Range(0, 100);
                     bool isGetGem = (int)(getGemRate * 100) >= getGem;
 
@@ -105,7 +105,7 @@ namespace Framework.Game.Defense
                     ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("DarkWolfHit");
                     particle.PlayParticle(targetCache[0].transform.position, 0);
                     particle.transform.localScale = isLeft ? Vector3.one : new Vector3(-1, 1, 1);
-                    targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                    targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
                 }
             }
 

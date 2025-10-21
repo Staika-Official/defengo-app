@@ -55,7 +55,7 @@ namespace Framework.Game.Defense
             DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
             GameManager.Instance.buffManager.HighnickelStun(targetMonster, stunDuration);
-            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate);
+            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate, character);
             SoundManager.Instance.PlaySound(SoundKey.SF_ELECTRONIC_BASIC2);
             ReturnObjectPool();
         }

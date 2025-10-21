@@ -55,7 +55,7 @@ namespace Framework.Game.Defense
             //targetMonster.HitDamage(attackValue, isCriticalHit, criticalDamageRate);
             DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
-            targetMonster.BlackOrbStackSequence(attackValue, damageType, criticalDamageRate, additiveDamage);
+            targetMonster.BlackOrbStackSequence(attackValue, damageType, criticalDamageRate, additiveDamage, character);
 
             string blackEffectName = targetMonster.blackOrbCount >= 4 ? "BlackHit2" : "BlackHit1";
             SoundKey soundKey = targetMonster.blackOrbCount >= 4 ? SoundKey.SF_DARK_CRITICAL : SoundKey.SF_DARK_HIT;

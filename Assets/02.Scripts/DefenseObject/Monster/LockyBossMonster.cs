@@ -14,31 +14,29 @@ namespace Framework.Game.Defense
         public ObscuredInt targetCount;
         public List<Character> lockdownCharacters = new();
         public List<ObjectParticle> objectParticles = new();
+        public ObscuredFloat skillInterval;
+
+        public IEnumerator abilitySequence;
+
         public override void FieldBossInitialize(BossData bossData)
         {
-            targetCount = 1;
             monsterType = MonsterType.FIELD_BOSS_MONSTER;
             Debug.Log("Locky");
             isBoss = true;
             transform.name = "Locky";
+            skillInterval = bossData.uniqueValue[0];
             speed = bossData.monsterSpeed;
-
+            targetCount = (int)bossData.uniqueValue[1] + (int)(GameManager.Instance.waveIdx / bossData.uniqueValue[2]);
             health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            objectParticles = new();
             SetBossMove();
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                StartCoroutine(LockyAbillityAction());
-            }
         }
 
 
         public override void Abillity()
         {
-
+            abilitySequence = LockyAbillityAction();
+            StartCoroutine(abilitySequence);
         }
 
         public override void DeathSequence()
@@ -48,16 +46,20 @@ namespace Framework.Game.Defense
 
         public IEnumerator LockyAbillityAction()
         {
-            IsBossAttack = true;
-            TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack", false);
-            IsMove = false;
-            yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
-            LockCharacter();
-            yield return new WaitForSpineAnimationComplete(entry);
-            Debug.Log("Locky Attack End");
-            IsMove = true;
-            IsBossAttack = false;
-            SetWalkSequence();
+            while (IsAlive)
+            {
+                yield return new WaitForSeconds(skillInterval);
+                IsBossAttack = true;
+                TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack", false);
+                IsMove = false;
+                yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
+                LockCharacter();
+                yield return new WaitForSpineAnimationComplete(entry);
+                Debug.Log("Locky Attack End");
+                IsMove = true;
+                IsBossAttack = false;
+                SetWalkSequence();
+            }
         }
 
         public void LockCharacter()
@@ -65,20 +67,7 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
                 ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] summonCharacterIdxs = new int[GameManager.Instance.characterSpawner.summonedCharacters.Count];
-
-            for (int i = 0; i < summonCharacterIdxs.Length; i++)
-            {
-                summonCharacterIdxs[i] = i;
-            }
-
-            for (int i = 0; i < summonCharacterIdxs.Length; ++i)
-            {
-                int random1 = Random.Range(0, summonCharacterIdxs.Length);
-                int random2 = Random.Range(0, summonCharacterIdxs.Length);
-
-                (summonCharacterIdxs[random1], summonCharacterIdxs[random2]) = (summonCharacterIdxs[random2], summonCharacterIdxs[random1]);
-            }
+            int[] summonCharacterIdxs = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
 
             int selectedCount = 0;
 
@@ -86,7 +75,7 @@ namespace Framework.Game.Defense
             {
                 Character character = GameManager.Instance.characterSpawner.summonedCharacters[summonCharacterIdxs[i]];
 
-                if(character.IsLockdown)
+                if (character.IsLockdown)
                 {
                     continue;
                 }
@@ -96,7 +85,7 @@ namespace Framework.Game.Defense
                     LockdownSequence(character);
                     selectedCount++;
 
-                    if(selectedCount >= tempTargetCount)
+                    if (selectedCount >= tempTargetCount)
                     {
                         break;
                     }
@@ -109,6 +98,7 @@ namespace Framework.Game.Defense
             character.Lockdown();
             ObjectParticle lockStart = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_LockStart");
             lockStart.transform.SetParent(character.transform);
+            lockStart.transform.localPosition = Vector2.zero;
             lockStart.PlayParticle(Vector2.zero, 0.5f, () =>
             {
                 Debug.Log("after particle");

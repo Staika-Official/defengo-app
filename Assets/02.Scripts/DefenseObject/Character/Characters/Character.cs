@@ -91,7 +91,7 @@ namespace Framework.Game.Defense
         public List<ObjectParticle> buffParticle = new();
 
         public IEnumerator actionCoroutine;
-        
+
         public bool IsLockdown { get; set; }
         public bool IsInfected { get; set; }
 
@@ -391,6 +391,11 @@ namespace Framework.Game.Defense
 
             //오브젝트 풀링다시 풀링시켜놓음
             GameManager.Instance.objectPoolManager.ReturnObject(this, characterName);
+        }
+
+        public void DowngradeCharacter()
+        {
+            starGradeIndex--;
         }
 
         public void MergeCharacter(Character mergeCharacter)
@@ -1231,42 +1236,12 @@ namespace Framework.Game.Defense
 
         public void Infect()
         {
-
+            IsInfected = true;
         }
 
         public void ReleaseInfect()
         {
-
-        }
-
-        public void SetBomb()
-        {
-            Debug.Log($"{transform.name} : Set Bomb");
-
-            string particleName = starGradeIndex == 0 ? "BossEf_Bomb1" : "BossEf_Bomb2";
-
-            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
-            objectParticle.transform.position = transform.position;
-            objectParticle.SimplePlay();
-
-            if (starGradeIndex == 0)
-            {
-
-            }
-            else
-            {
-
-            }
-
-        }
-
-        public void BombExplosion()
-        {
-            string particleName = starGradeIndex == 0 ? "BossEf_BombExplosion1" : "BossEf_BombExplosion1";
-
-            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
-            objectParticle.transform.position = transform.position;
-            objectParticle.SimplePlay();
+            IsInfected = false;
         }
         #endregion
     }

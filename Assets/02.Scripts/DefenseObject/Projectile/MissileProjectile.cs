@@ -49,7 +49,7 @@ namespace Framework.Game.Defense
                     {
                         DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
-                        monster.HitDamage(attackValue, damageType, criticalDamageRate);
+                        monster.HitDamage(attackValue, damageType, criticalDamageRate, character);
                         //Debug.Log(monster.transform.name);
                         ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(effectName);
                         particle.PlayParticle(transform.localPosition, 0);

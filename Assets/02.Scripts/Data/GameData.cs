@@ -57,6 +57,7 @@ namespace Framework.GameData.Defense
         BLACKORB,
         INSTANT_KILL,
         GAMBLING_KILL,
+        INFECT
     }
 
     public enum UpgradeType

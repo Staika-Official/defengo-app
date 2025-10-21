@@ -219,7 +219,7 @@ namespace Framework.Game.Defense
             }
         }
 
-        public void HitDamage(float damage, DamageType damageType, float criticalDamageRate)
+        public void HitDamage(float damage, DamageType damageType, float criticalDamageRate, Character character)
         {
             if (!IsAlive) return;
             // if (isCritical) damage *= ConfigData.CRITICAL_DAMAGE;
@@ -232,9 +232,12 @@ namespace Framework.Game.Defense
             float x = Random.Range(-0.2f, 0.2f);
 
             Vector3 vec = new(transform.localPosition.x + x, transform.localPosition.y, 0);
-            damageText.SetDamageText(damage, damageType, vec);
+            damageText.SetDamageText(damage, damageType, vec, character);
 
-            health -= damage;
+            if (character != null && character.IsInfected)
+                health += damage;
+            else
+                health -= damage;
             health = Mathf.Clamp(health, 0f, health);
             monsterInterface.UpdateValue(health);
 
@@ -509,7 +512,7 @@ namespace Framework.Game.Defense
 
         public int blackOrbCount;
 
-        public void BlackOrbStackSequence(float damage, DamageType damageType, float criticalDamageRate, float additiveDamage)
+        public void BlackOrbStackSequence(float damage, DamageType damageType, float criticalDamageRate, float additiveDamage, Character character)
         {
             blackOrbCount++;
 
@@ -522,21 +525,22 @@ namespace Framework.Game.Defense
             orbStackInterface.HitMonster(blackOrbCount);
             if (blackOrbCount >= 4)
             {
-                ExplosionBlackOrb(damage, additiveDamage);
+                ExplosionBlackOrb(damage, additiveDamage, character);
                 blackOrbCount = 0;
             }
             else
             {
-                HitDamage(damage, damageType, criticalDamageRate);
+                HitDamage(damage, damageType, criticalDamageRate, character);
             }
         }
 
-        public void ExplosionBlackOrb(float damage, float additiveDamage)
+        public void ExplosionBlackOrb(float damage, float additiveDamage, Character character)
         {
             ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BlackHit2");
             particle.PlayParticle(transform.localPosition, 0);
             float totalDamage = damage + additiveDamage;
-            HitDamage(totalDamage, DamageType.BLACKORB, 1);
+
+            HitDamage(totalDamage, DamageType.BLACKORB, 1, character);
         }
 
         public void ElectricSequence(bool isStart)
@@ -564,9 +568,9 @@ namespace Framework.Game.Defense
             }
         }
 
-        public void ElectricDamage(float damage)
+        public void ElectricDamage(float damage, Character character)
         {
-            HitDamage(damage, DamageType.NORMAL, 0);
+            HitDamage(damage, DamageType.INFECT, 0, character);
         }
 
         public IEnumerator SlowDownSeq;
@@ -684,7 +688,7 @@ namespace Framework.Game.Defense
             }
         }
 
-        public IEnumerator arrowRainSequence(float damage, float addtiveDamage, float criticalRange, float criticalDamageRate)
+        public IEnumerator arrowRainSequence(float damage, float addtiveDamage, float criticalRange, float criticalDamageRate, Character character)
         {
             while (IsAlive)
             {
@@ -701,14 +705,14 @@ namespace Framework.Game.Defense
 
                 DamageType damageType = isCritical ? DamageType.CRITICAL : DamageType.NORMAL;
 
-                HitDamage(totalDamage, damageType, criticalDamageRate);
+                HitDamage(totalDamage, damageType, criticalDamageRate, character);
 
                 yield return new WaitForSeconds(ConfigData.ATTACK_HIT_TIK_RATE);
             }
         }
 
 
-        public IEnumerator OwlrusStormSequence(float damage, float addtiveDamage, DamageType damageType, float criticalDamageRate)
+        public IEnumerator OwlrusStormSequence(float damage, float addtiveDamage, DamageType damageType, float criticalDamageRate, Character character)
         {
             while (IsAlive)
             {
@@ -716,7 +720,7 @@ namespace Framework.Game.Defense
 
                 totalDamage = damage + maxHealth * addtiveDamage;
 
-                HitDamage(totalDamage, damageType, criticalDamageRate);
+                HitDamage(totalDamage, damageType, criticalDamageRate, character);
 
                 float hitTik = ConfigData.ATTACK_HIT_TIK_RATE * 0.5f;
 
@@ -724,27 +728,27 @@ namespace Framework.Game.Defense
             }
         }
 
-        public IEnumerator BoomerangSequence(float damage, DamageType damageType, float criticalDamageRate, UnityAction<Transform> action)
+        public IEnumerator BoomerangSequence(float damage, DamageType damageType, float criticalDamageRate, UnityAction<Transform> action, Character character)
         {
             while (IsAlive)
             {
                 action?.Invoke(transform);
 
-                HitDamage(damage, damageType, criticalDamageRate);
+                HitDamage(damage, damageType, criticalDamageRate, character);
 
                 yield return new WaitForSeconds(ConfigData.ATTACK_HIT_TIK_RATE);
             }
         }
 
 
-        public void HammerSequence(float damage, float additiveDamage, DamageType damageType, float criticalDamageRate)
+        public void HammerSequence(float damage, float additiveDamage, DamageType damageType, float criticalDamageRate, Character character)
         {
             float totalDamage = 0f;
 
             totalDamage = Mathf.Floor(damage + health * additiveDamage);
             //Debug.Log($"Monster HP{health}");
             //Debug.Log($"hammering Per(최력비례댐) Damage{totalDamage}");
-            HitDamage(totalDamage, damageType, criticalDamageRate);
+            HitDamage(totalDamage, damageType, criticalDamageRate, character);
         }
 
         //public void SlowDownSequence(bool isStart, float value, Projectile projectile)

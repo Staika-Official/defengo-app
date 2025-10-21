@@ -108,7 +108,7 @@ namespace Framework.Game.Defense
             {
                 if (!targetCache[i].IsAlive) continue;
                 SoundManager.Instance.PlaySound(SoundKey.SF_CHARACTER_MEOSK);
-                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

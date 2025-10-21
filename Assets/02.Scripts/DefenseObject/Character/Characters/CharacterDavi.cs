@@ -132,7 +132,7 @@ namespace Framework.Game.Defense
                 SoundKey soundKey = revolutionCount < 3 ? SoundKey.SF_WOODEN_HAMMER : SoundKey.SF_STEEL_HAMMER;
 
                 SoundManager.Instance.PlaySound(soundKey);
-                targetCache[i].HitDamage(totalDamage + additiveDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage + additiveDamage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

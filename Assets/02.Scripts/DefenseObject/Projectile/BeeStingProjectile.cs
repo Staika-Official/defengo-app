@@ -65,7 +65,7 @@ namespace Framework.Game.Defense
             DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
             //몬스터에게 데미지 가격
-            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate);
+            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate, character);
 
             //히트 파티클 생성
             ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(effectName);

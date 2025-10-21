@@ -73,7 +73,7 @@ namespace Framework.Game.Defense
                         if (!dic_HitMonsters.ContainsKey(monster))
                         {
                             Coroutine coroutine = StartCoroutine(monster.OwlrusStormSequence(attackValue, addtiveDamage,
-                                damageType, criticalDamageRate));
+                                damageType, criticalDamageRate, character));
                             dic_HitMonsters.Add(monster, coroutine);
                         }
                     }

@@ -98,13 +98,13 @@ namespace Framework.Game.Defense
                     {
                         if (isUpgradePerDamageActive)
                         {
-                            monster.HammerSequence(hammerAttackDamage, hammerAttackAdditiveDamage, damageType, criticalDamageRate);
+                            monster.HammerSequence(hammerAttackDamage, hammerAttackAdditiveDamage, damageType, criticalDamageRate, this);
                         }
                         else
                         {
                             float attackDamage = Mathf.Floor(hammerAttackDamage);
                             //Debug.Log($"Hammering 해머 데미지 : {attackDamage}");
-                            monster.HitDamage(Mathf.Floor(attackDamage), damageType, criticalDamageRate);
+                            monster.HitDamage(Mathf.Floor(attackDamage), damageType, criticalDamageRate, this);
                         }
                     }
                 }
@@ -153,7 +153,7 @@ namespace Framework.Game.Defense
 
             for (int i = 0; i < targetCache.Count; i++)
             {
-                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

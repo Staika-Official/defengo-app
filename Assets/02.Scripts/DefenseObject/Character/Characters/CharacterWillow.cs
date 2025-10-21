@@ -131,7 +131,7 @@ namespace Framework.Game.Defense
                 particle.PlayParticle(targetCache[0].transform.position, 0);
                 SoundKey soundKey = isBerserker ? SoundKey.SF_SWORD_BERSERKER : SoundKey.SF_SWORD_NORMAL;
                 SoundManager.Instance.PlaySound(soundKey);
-                targetCache[i].HitDamage(damage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(damage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

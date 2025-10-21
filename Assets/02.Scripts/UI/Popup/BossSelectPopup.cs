@@ -21,7 +21,7 @@ namespace Framework.UI
         public int targetIdx;
         public ObscuredString targetBossName;
         public readonly string[] TempbossList = {
-            /* "Boomber",  */"Trush", "Smoker"/*"Locky, "Sotty", "Locky", "Parasite", "Boomber", "Emberon"*/
+            "Trush", "Smoker", "Sotty",  "Locky", "Parasite", "Boomber", "Emberon"
         };
 
         public override void ActivePopup()
@@ -115,7 +115,7 @@ namespace Framework.UI
             if (centerBossData != null)
             {
                 text_bossDescription.text = LanguageManager.Instance.GetStringData(centerBossData.bossDescKey);
-                Debug.Log($"Center Boss: {centerBossData.bossNameKey}, Progress: {progress:F2}");
+                // Debug.Log($"Center Boss: {centerBossData.bossNameKey}, Progress: {progress:F2}");
             }
         }
 

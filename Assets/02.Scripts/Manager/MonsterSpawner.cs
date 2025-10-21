@@ -197,34 +197,47 @@ namespace Framework.Game.Defense
             {
                 case FieldBossMonster.TRUSH:
                     NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
-                    normalBossMonster.monsterType = MonsterType.BOSS_MONSTER;
-                    normalBossMonster.isBoss = true;
                     normalBossMonster.waveIndex = bossIdx + 1;
                     normalBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(normalBossMonster);
                     break;
                 case FieldBossMonster.SMOKER:
                     CarBossMonster carBossMonster = GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101");
-                    carBossMonster.monsterType = MonsterType.BOSS_MONSTER;
-                    carBossMonster.isBoss = true;
                     carBossMonster.waveIndex = bossIdx + 1;
-                    carBossMonster.monCloneHealth = bossData.uniqueValue[0];
-                    carBossMonster.monCloneId = 51;
                     carBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(carBossMonster);
                     break;
+                case FieldBossMonster.SOTTY:
+                    SottyBossMonster sottyBossMonster = GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3");
+                    sottyBossMonster.waveIndex = bossIdx + 1;
+                    sottyBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(sottyBossMonster);
+                    break;
+                case FieldBossMonster.LOCKY:
+                    LockyBossMonster lockyBossMonster = GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4");
+                    lockyBossMonster.waveIndex = bossIdx + 1;
+                    lockyBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(lockyBossMonster);
+                    break;
+                case FieldBossMonster.PARASITE:
+                    ParasiteBossMonster parasiteBossMonster = GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5");
+                    parasiteBossMonster.waveIndex = bossIdx + 1;
+                    parasiteBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(parasiteBossMonster);
+                    break;
+                case FieldBossMonster.BOOMBER:
+                    BoomberBossMonster boomberBossMonster = GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6");
+                    boomberBossMonster.waveIndex = bossIdx + 1;
+                    boomberBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(boomberBossMonster);
+                    break;
+                case FieldBossMonster.EMBEREON:
+                    EmberonBossMonster emberonBossMonster = GameManager.Instance.objectPoolManager.GetObject<EmberonBossMonster>($"Boss_7");
+                    emberonBossMonster.waveIndex = bossIdx + 1;
+                    emberonBossMonster.FieldBossInitialize(bossData);
+                    monsters.Add(emberonBossMonster);
+                    break;
             }
-            // Monster monster = bossData.bossIndex switch
-            // {
-            //     FieldBossMonster.SMOKER => GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101"),
-            //     // FieldBossMonster.SOTTY => GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3"),
-            //     // FieldBossMonster.LOCKY => GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4"),
-            //     // FieldBossMonster.PARASITE => GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5"),
-            //     FieldBossMonster.BOOMBER => GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6"),
-            //     // FieldBossMonster.EMBEREON => throw new System.NotImplementedException(),
-            //     _ => throw new System.NotImplementedException(),
-            // };
-            // monsters.Add(monster);
         }
 
         public void SetBossMonsterStart()

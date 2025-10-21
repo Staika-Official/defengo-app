@@ -95,7 +95,7 @@ namespace Framework.Game.Defense
                         //몬스터 색상 변경을 위한 함수
                         monster.ToxicSequence(true);
                         //몬스터에게 데미지 줌
-                        monster.HitDamage(toxicDamage, damageType, criticalDamage);
+                        monster.HitDamage(toxicDamage, damageType, criticalDamage, null);
                     }
                     else
                     {

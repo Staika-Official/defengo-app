@@ -13,6 +13,9 @@ namespace Framework.Game.Defense
         public ObscuredFloat abillityTimeCount;
         public ObscuredInt targetCount;
         public ObscuredInt coefficient;
+        public ObscuredFloat skillInterval;
+
+        public IEnumerator abilitySequence;
 
         public override void FieldBossInitialize(BossData bossData)
         {
@@ -21,38 +24,35 @@ namespace Framework.Game.Defense
             isBoss = true;
             transform.name = "Sotty";
             speed = bossData.monsterSpeed;
-            coefficient = 30;
-
+            skillInterval = bossData.uniqueValue[0];
+            coefficient = (int)bossData.uniqueValue[2];
             health = bossData.health + GameManager.Instance.tempBossAddHealth;
-            targetCount = 1 + (5 / coefficient);
+            targetCount = (int)bossData.uniqueValue[1] + (GameManager.Instance.waveIdx / coefficient);
             SetBossMove();
-        }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                StartCoroutine(SottyAbillityAction());
-            }
         }
 
         public IEnumerator SottyAbillityAction()
         {
-            IsBossAttack = true;
-            TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack", false);
-            IsMove = false;
-            yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
-            ConversionCharacter();
-            yield return new WaitForSpineAnimationComplete(entry);
-            Debug.Log("Sotty Attack End");
-            IsMove = true;
-            IsBossAttack = false;
-            SetWalkSequence();
+            while (IsAlive)
+            {
+                yield return new WaitForSeconds(skillInterval);
+                IsBossAttack = true;
+                TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack", false);
+                IsMove = false;
+                yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
+                ConversionCharacter();
+                yield return new WaitForSpineAnimationComplete(entry);
+                Debug.Log("Sotty Attack End");
+                IsMove = true;
+                IsBossAttack = false;
+                SetWalkSequence();
+            }
         }
 
         public override void Abillity()
         {
-
+            abilitySequence = SottyAbillityAction();
+            StartCoroutine(abilitySequence);
         }
 
         public void ConversionCharacter()
@@ -85,7 +85,10 @@ namespace Framework.Game.Defense
                     {
                         ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_Soti");
                         // objectParticle.transform.position = character.transform.localPosition;
-                        objectParticle.PlayParticle(character.transform.localPosition, 0);
+                        objectParticle.PlayParticle(character.transform.localPosition, 0, () =>
+                        {
+                            GameManager.Instance.objectPoolManager.ReturnObject(objectParticle, objectParticle.particleName);
+                        });
                         character.DestroyedTile();
                         Glacier glacier = GridManager.Instance.glaciersTiles[character.glacierIdx];
                         GameManager.Instance.characterSpawner

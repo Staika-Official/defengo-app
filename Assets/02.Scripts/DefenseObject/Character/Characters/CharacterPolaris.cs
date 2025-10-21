@@ -66,7 +66,7 @@ namespace Framework.Game.Defense
 
                 ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
                 particle.PlayParticle(targetCache[0].transform.position, 0);
-                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
 
                 for (int j = 0; j < GameManager.Instance.monsterSpawner.monsters.Count; j++)
                 {
@@ -81,7 +81,7 @@ namespace Framework.Game.Defense
                     {
                         if (near.IsAlive)
                         {
-                            near.HitDamage(totalDamage, damageType, criticalDamageRate);
+                            near.HitDamage(totalDamage, damageType, criticalDamageRate, this);
                         }
                     }
                 }
@@ -126,7 +126,7 @@ namespace Framework.Game.Defense
                 SoundManager.Instance.PlaySound(SoundKey.SF_CHARACTER_MEOSK);
                 ObjectParticle particle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
                 particle.PlayParticle(targetCache[0].transform.position, 0);
-                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate);
+                targetCache[i].HitDamage(totalDamage, damageType, criticalDamageRate, this);
             }
 
             yield return new WaitForSpineAnimationComplete(entry);

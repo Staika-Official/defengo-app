@@ -51,7 +51,7 @@ namespace Framework.Game.Defense
         {
             DamageType damageType = isCriticalHit ? DamageType.CRITICAL : DamageType.NORMAL;
 
-            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate);
+            targetMonster.HitDamage(attackValue, damageType, criticalDamageRate, character);
             SoundKey soundKey = objectName == "DarkSlowProjectile" ? SoundKey.SF_CHARACTER_DARKRAZY : SoundKey.SF_CHARACTER_RAZY;
             SoundManager.Instance.PlaySound(soundKey);
         }
