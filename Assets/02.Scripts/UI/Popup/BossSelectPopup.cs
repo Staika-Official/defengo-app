@@ -165,10 +165,13 @@ namespace Framework.UI
             infiniteHorizontalScroll.Initiailize();
         }
 
-        public void SetSummonBossInfo()
+        public int RandomBoss()
         {
-            BossData bossData = dic_bossData[targetBossName];
-            text_bossDescription.text = LanguageManager.Instance.GetStringData(bossData.bossDescKey);
+            int rd = 0;
+
+            
+
+            return rd;
         }
     }
 }

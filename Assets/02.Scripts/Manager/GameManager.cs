@@ -989,8 +989,7 @@ namespace Framework.Game.Defense
             };
             int rewardGroupIndex = Calculator.GetIndependentTrial(rewardGroup);
             Debug.Log("rewardGroup Index : " + rewardGroupIndex);
-            var TempbossList = UIManager.Instance.bossSelectPopup.TempbossList;
-            int randomIdx = Random.Range(0, TempbossList.Length);
+            int randomIdx = UIManager.Instance.bossSelectPopup.RandomBoss();
             NetworkConnect.Instance.networkGameManager.Rpc_RequestReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
         }
         public float tempBossAddHealth;

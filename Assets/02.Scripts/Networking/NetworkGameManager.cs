@@ -13,7 +13,6 @@ namespace Framework.Game.Defense
     {
         public int rewardGroupIndex;
         public int gameOverPlayerCount = 0;
-        public int rank = 0;
 
         public override void Spawned()
         {

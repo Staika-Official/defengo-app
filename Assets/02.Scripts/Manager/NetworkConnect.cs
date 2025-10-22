@@ -27,11 +27,9 @@ namespace Framework.Network
 
         [Header("Network State")]
         public bool isHost;
-        public int hostIdx;
         public int metaScore;
         public NetworkRunner runner;
         public Dictionary<int, NetworkBattleData> dic_PlayerData = new(); // player index -> battle data
-        public bool isJoin;
         public NetworkBattleStatus networkBattleStatus;
         public int playerIdx;
         public string nickname;
@@ -44,6 +42,7 @@ namespace Framework.Network
         public string roomUuid;
         public int sessionId;
         public string userId;
+        public float avgElo = 0;
 
         [Header("References")]
         public GameObject networkObjectPrefab;
@@ -386,6 +385,7 @@ namespace Framework.Network
                     isInitialize = false,
                     userId = UserInfoManager.Instance.userId,
                     rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
+                    elo = myCurrentRank.elo
                 };
 
                 this.playerIdx = data.playerIdx;
@@ -1203,10 +1203,13 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] ===== CountTimeStart STARTED on Player {playerIdx} =====");
             Debug.Log($"[NetworkConnect] Total player count: {dic_PlayerData.Count}");
             Debug.Log($"[NetworkConnect] Player indices: [{string.Join(", ", dic_PlayerData.Keys)}]");
+            float totalElo = 0;
             foreach (var kvp in dic_PlayerData)
             {
                 Debug.Log($"[NetworkConnect]   Player {kvp.Key}: {kvp.Value.nickname}, isHost={kvp.Value.isHost}");
+                totalElo += kvp.Value.elo;
             }
+            avgElo = totalElo / dic_PlayerData.Count;
             Debug.Log($"[NetworkConnect] ============================================");
             int cd = 30;
             while (cd > 0)

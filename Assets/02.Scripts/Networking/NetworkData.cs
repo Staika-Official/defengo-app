@@ -116,6 +116,7 @@ namespace Framework.Network
         public bool isHost;
         public bool isInitialize;
         public string tier;
+        public float elo;
         public int waveCount;
         public bool isGameOver;
         public bool isAbnormalExit;
