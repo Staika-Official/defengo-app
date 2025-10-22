@@ -4060,7 +4060,7 @@ namespace Framework.Network
         public async void SendBattleRecord(BattleRecord data)
         {
             disposedBattleRecords.Push(data);
-            int stackCount = disposedPlayRecords.Count;
+            int stackCount = disposedBattleRecords.Count;
 
             for (int i = 0; i < stackCount; i++)
             {
