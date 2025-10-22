@@ -4059,8 +4059,9 @@ namespace Framework.Network
 
         public async void SendBattleRecord(BattleRecord data)
         {
+            Debug.Log($"Send Battle Record Data wave {data.waveNumber}");
             disposedBattleRecords.Push(data);
-            int stackCount = disposedPlayRecords.Count;
+            int stackCount = disposedBattleRecords.Count;
 
             for (int i = 0; i < stackCount; i++)
             {
@@ -4072,7 +4073,7 @@ namespace Framework.Network
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postCreateBattleRecord,
                                 UserInfoManager.Instance.userId, NetworkConnect.Instance.sessionId, data.waveNumber), "POST");
-
+            Debug.Log($"Send battle record {req.url}");
             req.downloadHandler = new DownloadHandlerBuffer();
             var json = JsonUtility.ToJson(data);
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);

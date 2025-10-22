@@ -46,15 +46,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isHost: 0
-  hostIdx: 0
   metaScore: 0
   runner: {fileID: 0}
-  isJoin: 0
   networkBattleStatus: 0
   playerIdx: 0
   nickname: 
-  minPlayerCount: 2
-  maxPlayerCount: 3
+  minPlayerCount: 1
+  maxPlayerCount: 1
   isFriendlyMatch: 0
   roomName: 
   roomPassword: 
@@ -62,6 +60,7 @@ MonoBehaviour:
   roomUuid: 
   sessionId: 0
   userId: 0
+  avgElo: 0
   networkObjectPrefab: {fileID: 1596769890440477238, guid: c32eb26ea8b789c45bff5d47938d2568, type: 3}
   networkGameManager: {fileID: 3859254312547479572, guid: c32eb26ea8b789c45bff5d47938d2568, type: 3}
   myCurrentRank:

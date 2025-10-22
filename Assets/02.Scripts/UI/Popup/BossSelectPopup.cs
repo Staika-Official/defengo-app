@@ -6,6 +6,7 @@ using System.Linq;
 using CodeStage.AntiCheat.ObscuredTypes;
 using Framework.Game.Defense;
 using TMPro;
+using Framework.Network;
 
 namespace Framework.UI
 {
@@ -22,6 +23,29 @@ namespace Framework.UI
         public ObscuredString targetBossName;
         public readonly string[] TempbossList = {
             "Trush", "Smoker", "Sotty",  "Locky", "Parasite", "Boomber", "Emberon"
+        };
+
+        // Define ELO-based boss spawn configuration
+        // Each tier maps to field_boss_id (1-based) with their emergence rates
+        Dictionary<int, Dictionary<int, float>> eloTiers = new Dictionary<int, Dictionary<int, float>>()
+        {
+            // ELO 800 tier
+            { 800, new Dictionary<int, float> { {1, 0.5f}, {2, 0.5f} } },
+
+            // ELO 900 tier
+            { 900, new Dictionary<int, float> { {1, 0.33f}, {2, 0.33f}, {3, 0.34f} } },
+
+            // ELO 1000 tier
+            { 1000, new Dictionary<int, float> { {1, 0.25f}, {2, 0.25f}, {3, 0.25f}, {4, 0.25f} } },
+
+            // ELO 1300 tier
+            { 1300, new Dictionary<int, float> { {1, 0.15f}, {2, 0.15f}, {3, 0.23f}, {4, 0.23f}, {5, 0.24f} } },
+
+            // ELO 1500 tier
+            { 1500, new Dictionary<int, float> { {1, 0.1f}, {2, 0.1f}, {3, 0.2f}, {4, 0.2f}, {5, 0.2f}, {6, 0.2f} } },
+
+            // ELO 1800 tier
+            { 1800, new Dictionary<int, float> { {1, 0.01f}, {2, 0.01f}, {3, 0.22f}, {4, 0.22f}, {5, 0.22f}, {6, 0.22f}, {7, 0.1f} } }
         };
 
         public override void ActivePopup()
@@ -127,7 +151,7 @@ namespace Framework.UI
                 while (true)
                 {
                     itemCount += TempbossList.Length;
-                    if(itemCount >= 5)
+                    if (itemCount >= 5)
                     {
                         break;
                     }
@@ -154,24 +178,69 @@ namespace Framework.UI
             }
 
             List<BossData> tempList = dic_bossData.Values.ToList();
-            
+
             for (int i = 0; i < bossSelectItems.Count; i++)
             {
                 BossData bossData = tempList[i % tempList.Count];
 
                 bossSelectItems[i].Initialize(bossData);
             }
-            
+
             infiniteHorizontalScroll.Initiailize();
         }
 
+        /// <summary>
+        /// Selects a random boss index based on average ELO rating from NetworkConnect.
+        /// Uses probability-based selection according to ELO tier configuration.
+        /// </summary>
+        /// <returns>Index of the selected boss in TempbossList (0-6)</returns>
         public int RandomBoss()
         {
-            int rd = 0;
+            // Get average ELO from NetworkConnect
+            float avgElo = NetworkConnect.Instance.avgElo;
 
-            
+            Debug.Log($"[BossSelectPopup] RandomBoss - avgElo: {avgElo}");
 
-            return rd;
+            // Determine which ELO tier to use based on avgElo
+            Dictionary<int, float> selectedTier;
+            if (avgElo < 800)
+                selectedTier = eloTiers[800];
+            else if (avgElo < 900)
+                selectedTier = eloTiers[900];
+            else if (avgElo < 1000)
+                selectedTier = eloTiers[1000];
+            else if (avgElo < 1300)
+                selectedTier = eloTiers[1300];
+            else if (avgElo < 1500)
+                selectedTier = eloTiers[1500];
+            else
+                selectedTier = eloTiers[1800];
+
+            // Generate random value between 0 and 1
+            float randomValue = Random.Range(0f, 1f);
+            float cumulativeProbability = 0f;
+
+            // Select boss based on probability
+            int selectedBossId = 1; // Default to first boss
+            foreach (var kvp in selectedTier)
+            {
+                cumulativeProbability += kvp.Value;
+                if (randomValue <= cumulativeProbability)
+                {
+                    selectedBossId = kvp.Key;
+                    break;
+                }
+            }
+
+            // Convert field_boss_id (1-based) to TempbossList index (0-based)
+            int bossIndex = selectedBossId - 1;
+
+            // Ensure index is within valid range
+            bossIndex = Mathf.Clamp(bossIndex, 0, TempbossList.Length - 1);
+
+            Debug.Log($"[BossSelectPopup] Selected boss - avgElo: {avgElo}, bossId: {selectedBossId}, bossIndex: {bossIndex}, bossName: {TempbossList[bossIndex]}");
+
+            return bossIndex;
         }
     }
 }

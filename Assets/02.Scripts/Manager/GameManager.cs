@@ -265,9 +265,6 @@ namespace Framework.Game.Defense
             rewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("gemRewardData");
             bossRewardData = await DataLoadManager.Instance.GetDataAsyncBinary<RewardsTableData>("BossRewardData");
 
-            Debug.Log($"Get reward data: {JsonConvert.SerializeObject(rewardData)}");
-            Debug.Log($"Get boss reward data: {JsonConvert.SerializeObject(bossRewardData)}");
-
             switch (gameMode)
             {
                 case GameMode.SINGLE:
@@ -281,7 +278,6 @@ namespace Framework.Game.Defense
                 case GameMode.BATTLE:
                     RewardRuleList rewardRuleList = await DataLoadManager.Instance.GetDataAsyncBinary<RewardRuleList>("testWaveData");
 
-                    Debug.Log($"Get battle reward rule list: {JsonConvert.SerializeObject(rewardRuleList)}");
                     for (int i = 0; i < rewardRuleList.rewardRules.Length; i++)
                     {
                         RewardRule rewardRule = rewardRuleList.rewardRules[i];
@@ -297,7 +293,6 @@ namespace Framework.Game.Defense
 
         public void MonsterGemReward(int idx, bool isLoss, bool isBoss)
         {
-            Debug.Log($"Monster Gem Reward: IDX: {idx} - IsLoss: {isLoss} - isBoss: {isBoss}");
             RewardsTableData data = isBoss ? bossRewardData : rewardData;
 
             if (idx >= data.rewards.Length)
@@ -862,11 +857,12 @@ namespace Framework.Game.Defense
 
         public void SetPlayRecordData(int killedBossLevel, int waveIdx)
         {
+            Debug.Log($"SetPlayRecord Data in stage {gameState}");
             if (gameState == GameState.GAME_OVER) return;
             int waveValue = waveIdx > 71 ? 71 : waveIdx;
             RewardRule rewardRule = dic_RewardRules[$"WAVE_{waveValue}"];
 
-            //Debug.Log("SetPlayRecord Data Reward Value : " + rewardRule.rewardGo);
+            Debug.Log($"SetPlayRecord Data in mode {gameMode}");
 
             int reqGo = rewardRule.rewardGo * monsterSpawner.killedMonsterCount;
             int bossGo = killedBossLevel != 0 ? dic_RewardRules[$"BOSS_{killedBossLevel}"].rewardGo : 0;
