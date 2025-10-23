@@ -46,14 +46,14 @@ namespace Framework.Game.Defense
                 TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_Start", false);
                 entry.Loop = false;
 
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(anim.Skeleton.Data.FindAnimation("Attack_Start").Duration);
 
                 entry = anim.AnimationState.SetAnimation(0, "Attack_Idle", false);
                 entry.Loop = false;
 
                 // yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
 
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(anim.Skeleton.Data.FindAnimation("Attack_Start").Duration);
 
                 Debug.Log("Emberon Attack End");
 

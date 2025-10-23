@@ -1262,6 +1262,7 @@ namespace Framework.Network
                 .ThenByDescending(p => p.waveCount)          // Higher wave better
                 .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
+                .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
                 .ToList();
 
             // Sort abnormal exits by their LOCKED rank (assigned at surrender time)

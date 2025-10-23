@@ -53,7 +53,7 @@ namespace Framework.Game.Defense
                 TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_Ready", false);
                 IsMove = false;
                 Debug.Log("Boomber Attack Ready");
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(anim.Skeleton.Data.FindAnimation("Attack_Ready").Duration);
 
                 entry = anim.AnimationState.SetAnimation(0, "Attack", false);
 
@@ -61,7 +61,7 @@ namespace Framework.Game.Defense
 
                 SetBomb();
 
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(anim.Skeleton.Data.FindAnimation("Attack").Duration);
                 Debug.Log("Boomber Attack End");
                 IsMove = true;
                 IsBossAttack = false;

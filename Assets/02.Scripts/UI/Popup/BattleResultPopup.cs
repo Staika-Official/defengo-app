@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using TMPro;
 using Framework.Game.Defense;
 using Framework.Network;
-using System.Linq;
 
 namespace Framework.UI
 {
@@ -71,20 +70,8 @@ namespace Framework.UI
 
         public List<NetworkBattleData> GetSortedDictPlayerData()
         {
-            //Sort
-            List<NetworkBattleData> data = dic_PlayerData.Values.ToList();
-
-            data = data
-            // .OrderBy(p => p.isGameOver)              // ✅ put abnormal exits last
-            .OrderByDescending(p => p.waveCount)          // ✅ higher wave better
-            .ThenByDescending(p => p.monsterBossKilled)  // ✅ then boss kills
-            .ThenByDescending(p => p.monsterKilled)      // ✅ then kills
-            .ToList();
-
-            for (int i = 0; i < data.Count; i++)
-                data[i].rank = i + 1;
-
-            return data;
+            // Use the authoritative sorting logic from NetworkConnect to avoid code duplication
+            return NetworkConnect.Instance.GetSortedDictPlayerData();
         }
     }
 }
