@@ -53,7 +53,7 @@ public class DamageText : MonoBehaviour
         }
 
         if (character != null && character.IsInfected)
-            text_DamageText.text = $"<sprite=28><color=#0EC24C>{textValue}</color>";
+            text_DamageText.text = $"<color=#0EC24C>{textValue}</color>";
 
         transform.DOScale(minScaleValue, 0);
         transform.DOScale(maxValue, scalingDuration).SetEase(Ease.OutBounce);

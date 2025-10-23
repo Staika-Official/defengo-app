@@ -200,13 +200,16 @@ namespace Framework.Game.Defense
 
             if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)
             {
-                SurrenderBattlePayload payload = new SurrenderBattlePayload()
+                EndBattlePayload payload = new EndBattlePayload()
                 {
                     sessionId = NetworkConnect.Instance.dic_PlayerData[playerId].sessionId,
-                    leavePlayId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
-                    leaveUserId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
+                    playId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
+                    userId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
                 };
-                await NetworkManager.Instance.SurrenderBattle(payload, null, null);
+                await NetworkManager.Instance.EndBattle(payload, null, async () =>
+                {
+                    await NetworkManager.Instance.EndBattle(payload, null, null);
+                });
             }
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
             UIManager.Instance.ingameStatusMessage.SetMessage($"GameOver !!", nickname);

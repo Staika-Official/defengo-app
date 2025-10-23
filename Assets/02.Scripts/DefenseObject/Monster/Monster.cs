@@ -234,7 +234,7 @@ namespace Framework.Game.Defense
             Vector3 vec = new(transform.localPosition.x + x, transform.localPosition.y, 0);
             damageText.SetDamageText(damage, damageType, vec, character);
 
-            if (character != null && character.IsInfected)
+            if (character != null && character.IsInfected && monsterType == MonsterType.FIELD_BOSS_MONSTER)
                 health += damage;
             else
                 health -= damage;

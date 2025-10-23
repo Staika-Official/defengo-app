@@ -640,7 +640,8 @@ namespace Framework.Game.Defense
                 yield return new WaitForSeconds(GetDuration());
 
                 //캐릭터 공격 액션 진행
-                CharacterAction();
+                if (!IsLockdown)
+                    CharacterAction();
             }
         }
 
