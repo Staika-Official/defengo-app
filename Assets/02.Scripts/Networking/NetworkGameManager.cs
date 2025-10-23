@@ -154,23 +154,63 @@ namespace Framework.Game.Defense
             Debug.Log($"{gameObject.name} Rpc Round Id : {roundId}");
 
             int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+
+            // Check if only one player remains alive
             if (remain == 1)
             {
                 var data = NetworkConnect.Instance.GetSortedDictPlayerData();
-                var my = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
-                if (!my.isGameOver && my.rank == 1)
-                {
-                    // GameManager.Instance.GameOver();
-                    // if (!NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
-                    // {
-                    //     var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
+                var lastAlivePlayer = data.Find(x => !x.isGameOver);
 
-                    //     UIManager.Instance.battleResultPopup.SetResultInfo(dat.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
-                    //     NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
-                    //     NetworkConnect.Instance.ShutDown();
-                    // }
+                if (lastAlivePlayer != null)
+                {
+                    // Check if the last alive player has surpassed all dead players
+                    bool hasSurpassedAll = CheckIfSurpassedAllDeadPlayers(lastAlivePlayer, data);
+
+                    if (hasSurpassedAll)
+                    {
+                        Debug.Log($"[NetworkGameManager] Last alive player {lastAlivePlayer.playerIdx} has surpassed all dead players. Auto-ending game.");
+
+                        // Trigger game over for the last alive player (they win)
+                        if (lastAlivePlayer.playerIdx == NetworkConnect.Instance.playerIdx)
+                        {
+                            Debug.Log($"[NetworkGameManager] I am the last alive player, triggering GameOver to show results");
+                            GameManager.Instance.GameOver();
+                        }
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if the last alive player has definitively surpassed all dead players
+        /// This means their current wave is higher than the highest wave any dead player reached
+        /// </summary>
+        private bool CheckIfSurpassedAllDeadPlayers(NetworkBattleData alivePlayer, List<NetworkBattleData> sortedData)
+        {
+            // Get all dead players (include both normal deaths and abnormal exits)
+            var deadPlayers = sortedData.Where(p => p.isGameOver).ToList();
+
+            if (deadPlayers.Count == 0)
+            {
+                Debug.Log($"[NetworkGameManager] No dead players found, cannot surpass");
+                return false; // No dead players to surpass
+            }
+
+            // Find the best performing dead player (highest wave)
+            var bestDeadPlayer = deadPlayers.OrderByDescending(p => p.waveCount)
+                                            .ThenByDescending(p => p.monsterBossKilled)
+                                            .ThenByDescending(p => p.monsterKilled)
+                                            .First();
+
+            // Alive player has surpassed if their wave is strictly greater than the best dead player's wave
+            if (alivePlayer.waveCount > bestDeadPlayer.waveCount)
+            {
+                Debug.Log($"[NetworkGameManager] Alive player {alivePlayer.playerIdx} wave {alivePlayer.waveCount} > best dead player {bestDeadPlayer.playerIdx} wave {bestDeadPlayer.waveCount} - AUTO ENDING GAME");
+                return true;
+            }
+
+            Debug.Log($"[NetworkGameManager] Alive player {alivePlayer.playerIdx} wave {alivePlayer.waveCount} <= best dead player {bestDeadPlayer.playerIdx} wave {bestDeadPlayer.waveCount} - continue playing");
+            return false;
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -263,7 +303,7 @@ namespace Framework.Game.Defense
         /// Check if a dead player's rank is confirmed (can't change anymore)
         ///
         /// For abnormal exits: rank is IMMEDIATELY confirmed (they always get lowest rank)
-        /// For normal deaths: rank is confirmed when all alive normal players are ahead
+        /// For normal deaths: rank is confirmed when all alive normal players are ahead OR when the player is guaranteed last place
         /// </summary>
         private bool CheckIfRankConfirmed(NetworkBattleData myData, List<NetworkBattleData> sortedData)
         {
@@ -282,6 +322,18 @@ namespace Framework.Game.Defense
 
             if (aliveNormalPlayers.Count == 0)
                 return true; // All normal players are dead/exited, rank is confirmed
+
+            // Count total normal players (alive + dead but not abnormal)
+            var deadNormalPlayers = sortedData.Where(p => p.isGameOver && !p.isAbnormalExit).ToList();
+            int totalNormalPlayers = aliveNormalPlayers.Count + deadNormalPlayers.Count;
+
+            // If I'm the only dead normal player, my rank is immediately confirmed
+            // (I'm guaranteed last place among normal players)
+            if (deadNormalPlayers.Count == 1 && deadNormalPlayers[0].playerIdx == myData.playerIdx)
+            {
+                Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} is the only dead player - rank immediately confirmed as last place");
+                return true;
+            }
 
             // Find the WORST alive normal player
             var worstAliveNormal = aliveNormalPlayers.Last();
