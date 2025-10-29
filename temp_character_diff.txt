@@ -1,0 +1,128 @@
+diff --git a/Assets/02.Scripts/DefenseObject/Character/Characters/Character.cs b/Assets/02.Scripts/DefenseObject/Character/Characters/Character.cs
+index ab2a9e8..cdb3333 100644
+--- a/Assets/02.Scripts/DefenseObject/Character/Characters/Character.cs
++++ b/Assets/02.Scripts/DefenseObject/Character/Characters/Character.cs
+@@ -91,7 +91,7 @@ namespace Framework.Game.Defense
+         public List<ObjectParticle> buffParticle = new();
+ 
+         public IEnumerator actionCoroutine;
+-        
++
+         public bool IsLockdown { get; set; }
+         public bool IsInfected { get; set; }
+ 
+@@ -368,10 +368,12 @@ namespace Framework.Game.Defense
+             else
+             {
+                 //튜도리얼이아니라면 랜덤캐릭터를 얻어와서 생성시켜줌
+-                GameManager.Instance.characterSpawner.SummonSynthesisCharacter(glacierIdx, starGradeIndex);
++                GameManager.Instance.characterSpawner.SummonSynthesisCharacter(glacierIdx, starGradeIndex, IsInfected);
+                 //GameManager.Instance.characterSpawner.SummonSynthesisWantCharacter<CharacterHiFive>(glacierIdx, starGradeIndex, "HiFive");
+             }
+ 
++            ReleaseInfect();
++
+             //본인이 버프를 주고있는 캐릭터가 0이상이다 0이하면 버프를 안주고있다는 뜻
+             if (dic_speedBuffValue.Count > 0)
+             {
+@@ -393,6 +395,11 @@ namespace Framework.Game.Defense
+             GameManager.Instance.objectPoolManager.ReturnObject(this, characterName);
+         }
+ 
++        public void DowngradeCharacter()
++        {
++            starGradeIndex--;
++        }
++
+         public void MergeCharacter(Character mergeCharacter)
+         {
+             //합쳐지 되면 버프나 폴라리스의 타이머나 진행중인 것들을 초기화해주기위한 이벤트 함수
+@@ -404,6 +411,10 @@ namespace Framework.Game.Defense
+             //소환 해제로 변경해줌 어짜피 새롭게 인잇하면 isSummoned값 true로 변경
+             isSummoned = false;
+ 
++            if (IsInfected)
++                mergeCharacter.IsInfected = true;
++            ReleaseInfect();
++
+             //합쳐진 캐릭터를 업그레이드 시켜주는 함수 (합쳐지는 캐릭터도 반환하면서 새로운 캐릭터를 생성시키는거와 동일)
+             mergeCharacter.UpgradeCharacter();
+             CharacterUpgradeSound(mergeCharacter);
+@@ -635,7 +646,8 @@ namespace Framework.Game.Defense
+                 yield return new WaitForSeconds(GetDuration());
+ 
+                 //캐릭터 공격 액션 진행
+-                CharacterAction();
++                if (!IsLockdown)
++                    CharacterAction();
+             }
+         }
+ 
+@@ -1178,7 +1190,7 @@ namespace Framework.Game.Defense
+ 
+         public virtual void CharacterTypeCheckToMarge(Character character)
+         {
+-            if (character.starGradeIndex == this.starGradeIndex && character.characterIndex == this.characterIndex && starGradeIndex < 4)
++            if (character.starGradeIndex == this.starGradeIndex && character.characterIndex == this.characterIndex && starGradeIndex < 4 && !IsLockdown && !character.IsLockdown)
+             {
+                 MergeCharacter(character);
+                 transform.localPosition = character.pivotPosition;
+@@ -1229,44 +1241,25 @@ namespace Framework.Game.Defense
+             Debug.Log($"{transform.name} Release Lockdown");
+         }
+ 
+-        public void Infect()
++        public ObjectParticle infectedFX = null;
++        public ObjectParticle Infect()
+         {
+-
++            IsInfected = true;
++
++            infectedFX = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_Infected");
++            infectedFX.gameObject.name = "BossEf_Infected";
++            infectedFX.SimplePlay();
++            infectedFX.transform.SetParent(transform);
++            infectedFX.transform.localPosition = Vector2.zero;
++            return infectedFX;
+         }
+ 
+         public void ReleaseInfect()
+         {
+-
+-        }
+-
+-        public void SetBomb()
+-        {
+-            Debug.Log($"{transform.name} : Set Bomb");
+-
+-            string particleName = starGradeIndex == 0 ? "BossEf_Bomb1" : "BossEf_Bomb2";
+-
+-            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
+-            objectParticle.transform.position = transform.position;
+-            objectParticle.SimplePlay();
+-
+-            if (starGradeIndex == 0)
+-            {
+-
+-            }
+-            else
+-            {
+-
+-            }
+-
+-        }
+-
+-        public void BombExplosion()
+-        {
+-            string particleName = starGradeIndex == 0 ? "BossEf_BombExplosion1" : "BossEf_BombExplosion1";
+-
+-            ObjectParticle objectParticle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>(particleName);
+-            objectParticle.transform.position = transform.position;
+-            objectParticle.SimplePlay();
++            IsInfected = false;
++            if (infectedFX != null)
++                GameManager.Instance.objectPoolManager.ReturnObject(infectedFX, infectedFX.particleName);
++            infectedFX = null;
+         }
+         #endregion
+     }
