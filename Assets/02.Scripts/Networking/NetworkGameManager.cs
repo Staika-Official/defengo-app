@@ -12,7 +12,6 @@ namespace Framework.Game.Defense
     public class NetworkGameManager : NetworkBehaviour, IAfterSpawned
     {
         public int rewardGroupIndex;
-        public int gameOverPlayerCount = 0;
 
         public override void Spawned()
         {
@@ -72,8 +71,10 @@ namespace Framework.Game.Defense
         {
             Debug.Log($"{gameObject.name} {NetworkConnect.Instance.dic_PlayerData[playerId].nickname} id: {playerId} request game over \n ");
             if (NetworkConnect.Instance.IsCurrentHost())
+            {
                 Rpc_GameOver(playerId, roundId, isAbnormal);
-            Rpc_RequestSelectFieldBossReward(playerId);
+                Rpc_SelectdFieldBossReward(playerId);
+            }
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -101,37 +102,24 @@ namespace Framework.Game.Defense
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void RpcSummaryBattle()
+        public void Rpc_SummaryBattle()
         {
-            // Don't show summary if already shown (early summary)
             if (NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary)
-            {
-                Debug.Log("[NetworkGameManager] Summary already shown, skipping RpcSummaryBattle");
                 return;
-            }
-
-            Debug.Log($"[NetworkGameManager] RpcSummaryBattle called on Player {NetworkConnect.Instance.playerIdx}");
-
-            // Log all player data before sorting
-            foreach (var kvp in NetworkConnect.Instance.dic_PlayerData)
-            {
-                Debug.Log($"[NetworkGameManager] Before sort - Player {kvp.Key}: rank={kvp.Value.rank}, wave={kvp.Value.waveCount}, isGameOver={kvp.Value.isGameOver}, isAbnormalExit={kvp.Value.isAbnormalExit}");
-            }
-
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
-            // Log sorted data
-            for (int i = 0; i < data.Count; i++)
-            {
-                Debug.Log($"[NetworkGameManager] After sort - Position {i}: Player {data[i].playerIdx}, rank={data[i].rank}, wave={data[i].waveCount}");
-            }
-
             var myData = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
-            Debug.Log($"[NetworkGameManager] My rank: {myData.rank}, My wave: {NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount}");
+            int myActualRank = data.FindIndex(x => x.playerIdx == NetworkConnect.Instance.playerIdx) + 1; // Position in sorted list = actual rank
+            Debug.Log($"[NetworkGameManager] My rank from data: {myData.rank}, My actual rank from position: {myActualRank}, My wave: {NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount}");
 
+            // Update the rank in dic_PlayerData to match the actual rank from sorted list
+            // This ensures BattleResultTablePopup shows the same rank
+            NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].rank = myActualRank;
             NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
-            UIManager.Instance.battleResultPopup.SetResultInfo(myData.rank,
+
+            UIManager.Instance.battleResultPopup.SetResultInfo(myActualRank,
             NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, GameManager.Instance.monsterSpawner.killedMonsterCount);
+            NetworkConnect.Instance.PushSnapShot();
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -144,8 +132,8 @@ namespace Framework.Game.Defense
                 GameManager.Instance.BossWaveSeqeunce(roundId, nickname, bossIdx);
                 UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
                 UIManager.Instance.ingameStatusMessage.SetMessage($"{roundId} Boss Wave!!", nickname);
-                Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, roundId);
             }
+            NetworkConnect.Instance.PushSnapShot();
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
@@ -153,14 +141,19 @@ namespace Framework.Game.Defense
         {
             Debug.Log($"{gameObject.name} Spawn Boss");
             if (nickname != NetworkConnect.Instance.nickname)
-                GameManager.Instance.SpawnPlasticMonster(NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount, bossHealth);
+            {
+                int gameOverCount = NetworkConnect.Instance.dic_PlayerData.Values.Count(p => p.isGameOver);
+                GameManager.Instance.SpawnPlasticMonster(NetworkConnect.Instance.dic_PlayerData.Count - gameOverCount, bossHealth);
+            }
+            NetworkConnect.Instance.PushSnapShot();
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
-        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled = -1, int monsterBossKilled = -1)
+        public void Rpc_WaveComplete(int playerId, int roundId, int monsterKilled = 0, int monsterBossKilled = 0)
         {
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
-            NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
+            if (!NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver)
+                NetworkConnect.Instance.dic_PlayerData[playerId].waveCount = roundId;
             if (monsterKilled != -1)
                 NetworkConnect.Instance.dic_PlayerData[playerId].monsterKilled += monsterKilled;
             if (monsterBossKilled != -1)
@@ -170,70 +163,35 @@ namespace Framework.Game.Defense
             Debug.Log($"{gameObject.name} Rpc nickname : {nickname}");
             Debug.Log($"{gameObject.name} Rpc Round Id : {roundId}");
 
-            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+            int gameOverCount = NetworkConnect.Instance.dic_PlayerData.Values.Count(p => p.isGameOver);
+            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverCount;
 
             // Check if only one player remains alive
-            if (remain == 1)
+            if (remain == 1 && !NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].isGameOver)
             {
                 var data = NetworkConnect.Instance.GetSortedDictPlayerData();
-                var lastAlivePlayer = data.Find(x => !x.isGameOver);
+                int myActualRank = data.FindIndex(x => x.playerIdx == NetworkConnect.Instance.playerIdx) + 1;
 
-                if (lastAlivePlayer != null)
+                if (myActualRank == 1)
                 {
-                    // Check if the last alive player has surpassed all dead players
-                    bool hasSurpassedAll = CheckIfSurpassedAllDeadPlayers(lastAlivePlayer, data);
+                    // Then trigger GameOver to clean up and notify other clients
+                    GameManager.Instance.GameOver();
 
-                    if (hasSurpassedAll)
-                    {
-                        Debug.Log($"[NetworkGameManager] Last alive player {lastAlivePlayer.playerIdx} has surpassed all dead players. Auto-ending game.");
-
-                        // Trigger game over for the last alive player (they win)
-                        if (lastAlivePlayer.playerIdx == NetworkConnect.Instance.playerIdx)
-                        {
-                            Debug.Log($"[NetworkGameManager] I am the last alive player, triggering GameOver to show results");
-                            GameManager.Instance.GameOver();
-                        }
-                    }
+                    // Show result for the last survivor (rank 1)
+                    Rpc_SummaryBattle();
                 }
             }
-        }
 
-        /// <summary>
-        /// Check if the last alive player has definitively surpassed all dead players
-        /// This means their current wave is higher than the highest wave any dead player reached
-        /// </summary>
-        private bool CheckIfSurpassedAllDeadPlayers(NetworkBattleData alivePlayer, List<NetworkBattleData> sortedData)
-        {
-            // Get all dead players (include both normal deaths and abnormal exits)
-            var deadPlayers = sortedData.Where(p => p.isGameOver).ToList();
-
-            if (deadPlayers.Count == 0)
-            {
-                Debug.Log($"[NetworkGameManager] No dead players found, cannot surpass");
-                return false; // No dead players to surpass
-            }
-
-            // Find the best performing dead player (highest wave)
-            var bestDeadPlayer = deadPlayers.OrderByDescending(p => p.waveCount)
-                                            .ThenByDescending(p => p.monsterBossKilled)
-                                            .ThenByDescending(p => p.monsterKilled)
-                                            .First();
-
-            // Alive player has surpassed if their wave is strictly greater than the best dead player's wave
-            if (alivePlayer.waveCount > bestDeadPlayer.waveCount)
-            {
-                Debug.Log($"[NetworkGameManager] Alive player {alivePlayer.playerIdx} wave {alivePlayer.waveCount} > best dead player {bestDeadPlayer.playerIdx} wave {bestDeadPlayer.waveCount} - AUTO ENDING GAME");
-                return true;
-            }
-
-            Debug.Log($"[NetworkGameManager] Alive player {alivePlayer.playerIdx} wave {alivePlayer.waveCount} <= best dead player {bestDeadPlayer.playerIdx} wave {bestDeadPlayer.waveCount} - continue playing");
-            return false;
+            // Also show finalized results for all OTHER dead players
+            // Since the last survivor completed a wave, all dead players' ranks are now finalized
+            CheckAndShowFinalizedResults();
+            NetworkConnect.Instance.PushSnapShot();
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]
         public async void Rpc_GameOver(int playerId, int roundId, bool isAbnormal)
         {
-            Debug.Log($"{gameObject.name} {NetworkConnect.Instance.dic_PlayerData[playerId].nickname} id: {playerId} game over \n ");
+            Debug.Log($"{gameObject.name} {NetworkConnect.Instance.dic_PlayerData[playerId].nickname} id: {playerId} game over at round {roundId} \n ");
             if (NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver)
                 return;
 
@@ -241,6 +199,8 @@ namespace Framework.Game.Defense
             string nickname = NetworkConnect.Instance.dic_PlayerData[playerId].nickname;
             NetworkConnect.Instance.dic_PlayerData[playerId].isGameOver = true;
             NetworkConnect.Instance.dic_PlayerData[playerId].isAbnormalExit = isAbnormal;
+            NetworkConnect.Instance.dic_PlayerData[playerId].selectedFieldBossReward = true;
+            NetworkConnect.Instance.FieldBossRewardCheck(playerId);
 
             // For abnormal exits (surrender/disconnect), assign the lowest rank among currently alive players
             if (isAbnormal)
@@ -253,19 +213,17 @@ namespace Framework.Game.Defense
                 Debug.Log($"[NetworkGameManager] Player {playerId} surrendered, assigned rank {aliveCount + 1} (lowest among {aliveCount + 1} alive players before surrender)");
             }
 
-            gameOverPlayerCount += 1;
-
             if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)
             {
-                EndBattlePayload payload = new EndBattlePayload()
+                SurrenderBattlePayload payload = new SurrenderBattlePayload()
                 {
                     sessionId = NetworkConnect.Instance.dic_PlayerData[playerId].sessionId,
-                    playId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
-                    userId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
+                    leavePlayId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
+                    leaveUserId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
                 };
-                await NetworkManager.Instance.EndBattle(payload, null, async () =>
+                await NetworkManager.Instance.SurrenderBattle(payload, null, async () =>
                 {
-                    await NetworkManager.Instance.EndBattle(payload, null, null);
+                    await NetworkManager.Instance.SurrenderBattle(payload, null, null);
                 });
             }
             UIManager.Instance.ingameStatusMessage.gameObject.SetActive(true);
@@ -273,135 +231,65 @@ namespace Framework.Game.Defense
 
             var data = NetworkConnect.Instance.GetSortedDictPlayerData();
 
-            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverPlayerCount;
+            int gameOverCount = NetworkConnect.Instance.dic_PlayerData.Values.Count(p => p.isGameOver);
+            int remain = NetworkConnect.Instance.dic_PlayerData.Count - gameOverCount;
 
-            Debug.Log($"{gameObject.name} {nickname} is GameOver ~ remain player: {remain} (total: {NetworkConnect.Instance.dic_PlayerData.Count} / died: {gameOverPlayerCount}) \n data : {JsonUtility.ToJson(data)}");
+            Debug.Log($"{gameObject.name} {nickname} is GameOver ~ remain player: {remain} (total: {NetworkConnect.Instance.dic_PlayerData.Count} / died: {gameOverCount}) \n data : {JsonUtility.ToJson(data)}");
 
-            // Check if local player can show summary early
-            var myData = data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx);
-            if (myData != null && myData.isGameOver && !NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary)
+            // Check if we should show results for ANY player whose rank is now finalized
+            CheckAndShowFinalizedResults();
+            NetworkConnect.Instance.PushSnapShot();
+        }
+
+        /// <summary>
+        /// Checks all dead players to see if their rank is finalized and shows results if ready.
+        /// A player's rank is finalized when no alive players have worse performance.
+        /// </summary>
+        private void CheckAndShowFinalizedResults()
+        {
+            var data = NetworkConnect.Instance.GetSortedDictPlayerData();
+
+            // Find all dead players who haven't shown summary yet
+            var deadPlayers = NetworkConnect.Instance.dic_PlayerData.Values
+                .Where(p => p.isGameOver)
+                .ToList();
+
+            foreach (var deadPlayer in deadPlayers)
             {
-                Debug.Log($"[NetworkGameManager] Checking early summary for Player {NetworkConnect.Instance.playerIdx}");
+                // Check if this dead player's rank is finalized
+                bool rankFinalized = IsRankFinalized(deadPlayer, data);
 
-                // Log all player data before checking rank confirmation
-                foreach (var kvp in NetworkConnect.Instance.dic_PlayerData)
+                if (rankFinalized && deadPlayer.playerIdx == NetworkConnect.Instance.playerIdx
+                && !NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary)
                 {
-                    Debug.Log($"[NetworkGameManager] Early Summary Check - Player {kvp.Key}: rank={kvp.Value.rank}, wave={kvp.Value.waveCount}, isGameOver={kvp.Value.isGameOver}, isAbnormalExit={kvp.Value.isAbnormalExit}");
-                }
+                    // Show result for local player
+                    int myActualRank = data.FindIndex(x => x.playerIdx == NetworkConnect.Instance.playerIdx) + 1;
 
-                // Log sorted data
-                for (int i = 0; i < data.Count; i++)
-                {
-                    Debug.Log($"[NetworkGameManager] Early Summary Sorted - Position {i}: Player {data[i].playerIdx}, rank={data[i].rank}, wave={data[i].waveCount}");
-                }
-
-                // Check if my rank is confirmed (can't be beaten by alive players)
-                bool rankConfirmed = CheckIfRankConfirmed(myData, data);
-
-                Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} - myData.rank={myData.rank}, rankConfirmed={rankConfirmed}");
-
-                if (rankConfirmed)
-                {
-                    Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} rank confirmed at {myData.rank}, showing early summary");
+                    NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].rank = myActualRank;
                     NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].hasShownSummary = true;
-                    UIManager.Instance.battleResultPopup.SetResultInfo(myData.rank,
+
+                    Debug.Log($"[NetworkGameManager] Showing finalized result for local player - Rank: {myActualRank}");
+
+                    UIManager.Instance.battleResultPopup.SetResultInfo(myActualRank,
                         NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount,
                         GameManager.Instance.monsterSpawner.killedMonsterCount);
                 }
             }
-
-            if (remain == 1)
-            {
-                var dat = NetworkConnect.Instance.GetSortedDictPlayerData();
-                var lastAlivePlayer = dat.Find(x => !x.isGameOver);
-
-                if (lastAlivePlayer != null)
-                {
-                    // Check if the last alive player has surpassed all dead players
-                    bool hasSurpassedAll = CheckIfSurpassedAllDeadPlayers(lastAlivePlayer, dat);
-
-                    if (hasSurpassedAll)
-                    {
-                        Debug.Log($"[NetworkGameManager] Last alive player {lastAlivePlayer.playerIdx} has surpassed all dead players. Auto-ending game.");
-
-                        // Trigger game over for the last alive player (they win)
-                        if (lastAlivePlayer.playerIdx == NetworkConnect.Instance.playerIdx)
-                        {
-                            Debug.Log($"[NetworkGameManager] I am the last alive player, triggering GameOver to show results");
-                            GameManager.Instance.GameOver();
-                        }
-                    }
-                }
-            }
-
-            if (gameOverPlayerCount == maxCount || remain == 0)
-                RpcSummaryBattle();
         }
 
         /// <summary>
-        /// Check if a dead player's rank is confirmed (can't change anymore)
-        ///
-        /// For abnormal exits: rank is IMMEDIATELY confirmed (they always get lowest rank)
-        /// For normal deaths: rank is confirmed when all alive normal players are ahead OR when the player is guaranteed last place
+        /// Determines if a dead player's rank is finalized.
+        /// Rank is finalized when all alive players have better or equal performance.
         /// </summary>
-        private bool CheckIfRankConfirmed(NetworkBattleData myData, List<NetworkBattleData> sortedData)
+        private bool IsRankFinalized(NetworkBattleData deadPlayer, List<NetworkBattleData> sortedData)
         {
-            if (!myData.isGameOver)
-                return false;
-
-            // Abnormal exits always get lowest rank immediately - rank is ALWAYS confirmed
-            if (myData.isAbnormalExit)
+            int deadIdx = sortedData.FindIndex(x => x.playerIdx == deadPlayer.playerIdx);
+            for (int i = deadIdx; i < sortedData.Count; i++)
             {
-                Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} is abnormal exit - rank immediately confirmed");
-                return true;
+                if (!sortedData[i].isGameOver)
+                    return false;
             }
-
-            // For normal deaths: check if all alive normal players are ahead
-            var aliveNormalPlayers = sortedData.Where(p => !p.isGameOver && !p.isAbnormalExit).ToList();
-
-            if (aliveNormalPlayers.Count == 0)
-                return true; // All normal players are dead/exited, rank is confirmed
-
-            // Count total normal players (alive + dead but not abnormal)
-            var deadNormalPlayers = sortedData.Where(p => p.isGameOver && !p.isAbnormalExit).ToList();
-            int totalNormalPlayers = aliveNormalPlayers.Count + deadNormalPlayers.Count;
-
-            // If I'm the only dead normal player, my rank is immediately confirmed
-            // (I'm guaranteed last place among normal players)
-            if (deadNormalPlayers.Count == 1 && deadNormalPlayers[0].playerIdx == myData.playerIdx)
-            {
-                Debug.Log($"[NetworkGameManager] Player {myData.playerIdx} is the only dead player - rank immediately confirmed as last place");
-                return true;
-            }
-
-            // Find the WORST alive normal player
-            var worstAliveNormal = aliveNormalPlayers.Last();
-
-            // My rank is confirmed if even the worst alive normal player has better stats than me
-            // This means ALL alive normal players are currently ahead of me
-            // Note: abnormal exits don't affect this - they're always ranked below normal players
-            // Compare: wave count (most important), then boss kills, then normal kills
-
-            if (worstAliveNormal.waveCount > myData.waveCount)
-            {
-                // Even worst alive normal player is ahead in waves, rank confirmed
-                return true;
-            }
-            else if (worstAliveNormal.waveCount == myData.waveCount)
-            {
-                // Same wave, check boss kills
-                if (worstAliveNormal.monsterBossKilled > myData.monsterBossKilled)
-                    return true;
-                else if (worstAliveNormal.monsterBossKilled == myData.monsterBossKilled)
-                {
-                    // Same boss kills, check normal kills
-                    if (worstAliveNormal.monsterKilled > myData.monsterKilled)
-                        return true;
-                }
-            }
-
-            // At least one alive normal player is behind me, so they could die and affect my rank
-            return false;
+            return true;
         }
 
         [Rpc(RpcSources.All, RpcTargets.All)]

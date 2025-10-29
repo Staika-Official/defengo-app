@@ -27,7 +27,7 @@ namespace Framework.Game.Defense
             skillInterval = bossData.uniqueValue[0];
             speed = bossData.monsterSpeed;
             targetCount = (int)bossData.uniqueValue[1] + (int)(GameManager.Instance.waveIdx / bossData.uniqueValue[2]);
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             objectParticles = new();
             SetBossMove();
         }
@@ -41,7 +41,7 @@ namespace Framework.Game.Defense
 
         public override void DeathSequence()
         {
-
+            StopCoroutine(abilitySequence);
         }
 
         public IEnumerator LockyAbillityAction()
@@ -54,7 +54,7 @@ namespace Framework.Game.Defense
                 IsMove = false;
                 yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
                 LockCharacter();
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(0.3f);
                 Debug.Log("Locky Attack End");
                 IsMove = true;
                 IsBossAttack = false;
@@ -67,7 +67,8 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
                 ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] summonCharacterIdxs = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
+            int listCount = GameManager.Instance.characterSpawner.summonedCharacters.Count;
+            int[] summonCharacterIdxs = Calculator.GetMultiIndex(listCount, listCount);
 
             int selectedCount = 0;
 
@@ -101,6 +102,8 @@ namespace Framework.Game.Defense
             lockStart.transform.localPosition = Vector2.zero;
             lockStart.PlayParticle(Vector2.zero, 0.5f, () =>
             {
+                if (!IsAlive)
+                    return;
                 Debug.Log("after particle");
                 ObjectParticle lockIdle = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_LockIdle");
                 objectParticles.Add(lockIdle);

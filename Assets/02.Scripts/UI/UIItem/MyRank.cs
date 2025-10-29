@@ -14,8 +14,10 @@ namespace Framework.UI
         [SerializeField] private Image image_limitedProfile;
         [SerializeField] private Image image_backGround;
         [SerializeField] private TextMeshProUGUI text_Rank;
+        [SerializeField] private TextMeshProUGUI text_RankTier;
         [SerializeField] private TextMeshProUGUI text_Go;
         [SerializeField] private TextMeshProUGUI text_NickName;
+        [SerializeField] private GameObject go_LP;
         // public GameObject goIconObject;
         // public GameObject swapIconObject;
         [SerializeField] private Button button_myRank;
@@ -75,6 +77,8 @@ namespace Framework.UI
 
                 text_Go.text = value;
                 transform.DOLocalMoveY(233, 0.05f);
+                go_LP.SetActive(false);
+                text_RankTier.gameObject.SetActive(false);
             }
         }
         public void SetMyRank(MyBattleLeaderboardInfo myRankData)
@@ -118,10 +122,18 @@ namespace Framework.UI
                         image_limitedProfile.sprite = userProfileData.sprite_image;
                         break;
                 }
-
-                text_Rank.text = $"{DataManager.Instance.GetRankTierConfig(myRankData.finalRank).description}";
+                var find = RankingScreen.Instance.activeRankinfoItems.Find(x => x.userId == myRankData.userId);
+                text_Rank.text = find != null ? find.text_Rank.text : "99+";
                 text_NickName.text = UserInfoManager.Instance.nickname;
-                string value = $"<sprite=12>{(int)myRankData.lp}";
+
+                string value = $"{(int)myRankData.totalLp}";
+                if ((int)DataManager.Instance.GetRankTierConfig(myRankData.finalRank).tierType < (int)RankTierType.RANKTIER_5)
+                    value = $"{(int)myRankData.totalLp % 100}";
+                else
+                    value = $"{(int)myRankData.totalLp}";
+                text_RankTier.text = $"{DataManager.Instance.GetRankTierConfig(myRankData.finalRank).description}";
+                text_RankTier.gameObject.SetActive(true);
+                go_LP.SetActive(true);
 
                 text_Go.text = value;
                 transform.DOLocalMoveY(233, 0.05f);

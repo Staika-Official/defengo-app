@@ -57,7 +57,7 @@ namespace Framework.UI
 
         [SerializeField] private LeaderBoardType focusLeaderBoardType = LeaderBoardType.WAVE_WEEKLY;
 
-        [SerializeField] private List<RankInfoItem> activeRankinfoItems = new();
+        [SerializeField] public List<RankInfoItem> activeRankinfoItems = new();
         [SerializeField] private Queue<RankInfoItem> rankInfoItems = new();
 
         private void Start()
@@ -104,7 +104,22 @@ namespace Framework.UI
         public void RankDetail(string userId)
         {
             RankProfilePopup popup = PopupManager.Instance.GetPopUp<RankProfilePopup>("rankProfile");
-            _ = NetworkManager.Instance.GetUserProfileDetail(focusLeaderBoardType, userId, focusRoundId, popup.SetProfileData, FailedDetail);
+            if (focusLeaderBoardType != LeaderBoardType.LEAGUE)
+            {
+                _ = NetworkManager.Instance.GetUserProfileDetail(focusLeaderBoardType, userId, focusRoundId, (data) =>
+                {
+                    popup.SetProfileData(data);
+                    popup.FriendCheck(userId);
+                }, FailedDetail);
+            }
+            else
+            {
+                _ = NetworkManager.Instance.GetBattleUserProfileDetail(userId, (data) =>
+                {
+                    popup.SetProfileData(data);
+                    popup.FriendCheck(userId);
+                }, FailedDetail);
+            }
         }
 
         public void FailedDetail()

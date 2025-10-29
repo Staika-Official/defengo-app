@@ -39,7 +39,7 @@ namespace Framework.UI
                 {
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
-                if (NetworkConnect.Instance != null && NetworkConnect.Instance.runner != null)
+                if (NetworkConnect.Instance != null)
                     NetworkConnect.Instance.ShutDown();
                 SceneLoadManager.Instance.SwitchingScene(2);
 

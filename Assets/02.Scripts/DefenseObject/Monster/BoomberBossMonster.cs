@@ -36,7 +36,7 @@ namespace Framework.Game.Defense
             skillInterval = bossData.uniqueValue[0];
             targetCount = (int)bossData.uniqueValue[1] + (int)(waveIndex / bossData.uniqueValue[2]);
             speed = bossData.monsterSpeed;
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             skillActiveDelay = bossData.uniqueValue[5];
             // reinforceAttackChance = (bossData.uniqueValue[3] + waveIndex / 5 * bossData.uniqueValue[4]) * 100;
             objectParticles = new();
@@ -74,7 +74,9 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
            ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] summonCharacterIdxs = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
+
+            int listCount = GameManager.Instance.characterSpawner.summonedCharacters.Count;
+            int[] summonCharacterIdxs = Calculator.GetMultiIndex(listCount, listCount);
 
             int selectedCount = 0;
 
@@ -103,11 +105,21 @@ namespace Framework.Game.Defense
                 objectParticles.Add(explosion);
 
                 character.DestroyedTile();
+
                 Glacier glacier = GridManager.Instance.glaciersTiles[character.glacierIdx];
                 if (character.starGradeIndex > 0)
                 {
                     GameManager.Instance.characterSpawner
                         .SummonFixedCharacter(character.characterIndex, glacier, character.starGradeIndex - 1);
+                }
+                else
+                {
+                    //현재빙하에캐릭터 생성가능 표시를 해줌
+                    GridManager.Instance.glaciersTiles[character.glacierIdx].isImpossibleSummon = false;
+
+                    //빙하에 캐릭터생성이 가능한지 확인 후 젬이 10개이상인지 확인해서 아이콘 표시 변경해줌
+                    //꽉찬상태라면 캐릭터 생성을 막아줘야하는데 캐릭터를합치면 남는 빙하가 있을 수도있으니 다시 재셋팅을 해주는 것
+                    UIManager.Instance.SetPossibleSummon(GridManager.Instance.IsPossibleSummon() && GameManager.Instance.Gem >= 10);
                 }
             });
         }
@@ -120,7 +132,7 @@ namespace Framework.Game.Defense
 
         public override void DeathSequence()
         {
-
+            StopCoroutine(abilitySequence);
         }
 
         public override void EndOfUse()

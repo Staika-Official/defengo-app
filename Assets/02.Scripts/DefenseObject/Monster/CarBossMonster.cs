@@ -59,7 +59,7 @@ namespace Framework.Game.Defense
             isBoss = true;
             transform.name = "Smoker";
             speed = bossData.monsterSpeed;
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             monCloneHealth = bossData.uniqueValue[0];
             monCloneId = 51;
             SetBossMove();

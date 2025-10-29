@@ -17,6 +17,9 @@ namespace Framework.UI
         public Image image_CharacterPortrait;
         public Image image_backGround;
 
+        public ButtonComponent button_AddFriend;
+        public ButtonComponent button_DeleteFriend;
+
         public TextMeshProUGUI text_userNickname;
         public TextMeshProUGUI text_bestScore;
         public TextMeshProUGUI text_bestBossLevel;
@@ -34,6 +37,8 @@ namespace Framework.UI
         public Dictionary<LeaderBoardType, ResponseProfileData> dic_profileData = new();
 
         public CharacterCard[] characterCards;
+        List<FriendData> friends = new List<FriendData>();
+        string userId;
 
         public override void ActivePopup()
         {
@@ -48,6 +53,40 @@ namespace Framework.UI
         public override void Initialize()
         {
             button_Close.onClick.AddListener(() => InActivePopup());
+
+
+            button_AddFriend.button.onClick.AddListener(async () =>
+            {
+                SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
+                if (friends.Count >= 30)
+                {
+                    SystemNoticePopup popupNotice = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popupNotice.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Max_Number"));
+                }
+                else
+                {
+                    await NetworkManager.Instance.SendFriendRequest(userId, () =>
+                    {
+                        SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Success"));
+                        button_AddFriend.gameObject.SetActive(false);
+                    }, (err) =>
+                    {
+                        SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Max_Number"));
+                    });
+                }
+            });
+
+            button_DeleteFriend.button.onClick.AddListener(async () =>
+            {
+                SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
+                await NetworkManager.Instance.DeleteFriend(userId, () =>
+                {
+                    button_DeleteFriend.gameObject.SetActive(false);
+                    button_AddFriend.gameObject.SetActive(true);
+                }, null);
+            });
         }
 
         public string RankInfo(int rank)
@@ -62,7 +101,7 @@ namespace Framework.UI
 
             text_userNickname.text = data.nickname;
 
-            string key = data.leaderBoardType == "WAVE_WEEKLY" ? "UI_WeeklyStat" : "UI_DailyStat";
+            string key = data.leaderBoardType == "WAVE_WEEKLY" ? "UI_WeeklyStat" : (data.leaderBoardType == "WAVE_DAILY" ? "UI_DailyStat" : "UI_LeagueStat");
 
             string stat = LanguageManager.Instance.GetStringData(key);
             text_rankType.text = stat;
@@ -98,6 +137,9 @@ namespace Framework.UI
                     break;
             }
 
+            if (data.ranking == null)
+                data.ranking = new Podium();
+
             if (data.ranking.first > 0)
             {
                 text_userNickname.text = $"{nickName}";
@@ -118,14 +160,36 @@ namespace Framework.UI
             text_bestBossLevel.text = data.bestBossLevel == 0 ? "-" : $"Lv.{data.bestBossLevel}";
             text_bestScore.text = RankInfo(data.bestScore);
 
-
+            if (data.bestCharacter == null) data.bestCharacter = new Network.CharacterInfo[0];
             for (int i = 0; i < data.bestCharacter.Length; i++)
             {
                 CharacterData characterData = DataManager.Instance.dic_CharacterData[(CharacterIndex)data.bestCharacter[i].characterId];
                 characterCards[i].Initialize(characterData);
                 characterCards[i].text_Level.text = $"Lv.{data.bestCharacter[i].classLevel}";
             }
+
             ActivePopup();
+        }
+
+        public async void FriendCheck(string userId)
+        {
+            if (UserInfoManager.Instance.userId == userId)
+            {
+                button_AddFriend.gameObject.SetActive(false);
+                button_DeleteFriend.gameObject.SetActive(false);
+                return;
+            }
+            this.userId = userId;
+            await NetworkManager.Instance.GetListFriends((data) => friends = data.friends, null);
+            await NetworkManager.Instance.SearchFriends(userId, (ReqSearchFriendsData data) =>
+                {
+                    button_AddFriend.gameObject.SetActive(!data.isFriend && !data.pendingFromFriend && friends.Count < 30);
+                    button_DeleteFriend.gameObject.SetActive(data.isFriend);
+                }, (string err) =>
+                {
+                    SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Invalid_UID"));
+                });
         }
 
         #region 여러가지 프로필 보여줘야하는 상황일 때 주석해제

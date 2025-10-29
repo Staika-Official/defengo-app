@@ -241,13 +241,26 @@ namespace Framework.UI
             button_AddFriend.button.onClick.AddListener(async () =>
             {
                 SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
-                await NetworkManager.Instance.SendFriendRequest(friendItem.friendData.userId, () =>
+                var popup = PopupManager.Instance.GetPopUp<FriendPopup>("friend");
+                if (popup.listFriendItems.Count >= 30)
                 {
-                    SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
-                    popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
-                    button_AddFriend.gameObject.SetActive(false);
-                    PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendFriendRequest(friendItem.friendData.userId);
-                }, null);
+                    SystemNoticePopup popupNotice = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popupNotice.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Max_Number"));
+                }
+                else
+                {
+                    await NetworkManager.Instance.SendFriendRequest(friendItem.friendData.userId, () =>
+                        {
+                            SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                            popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Success"));
+                            button_AddFriend.gameObject.SetActive(false);
+                            PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendFriendRequest(friendItem.friendData.userId);
+                        }, (err) =>
+                        {
+                            SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                            popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Max_Number"));
+                        });
+                }
             });
 
             button_DeleteFriend.button.onClick.AddListener(async () =>

@@ -42,7 +42,7 @@ namespace Framework.Game.Defense
             isBoss = true;
             transform.name = "Trush";
             speed = bossData.monsterSpeed;
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             SetBossMove();
         }
     }

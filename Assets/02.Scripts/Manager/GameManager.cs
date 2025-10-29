@@ -235,7 +235,7 @@ namespace Framework.Game.Defense
             buffManager.Initialize();
             renderSortManager.Initialized();
             string json = JsonUtility.ToJson(NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx]);
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestInitializeComplete(NetworkConnect.Instance.playerIdx, json);
+            NetworkConnect.Instance.networkGameManager.RpcInitializeComplete(NetworkConnect.Instance.playerIdx, json);
         }
 
         public void Initialize()
@@ -689,7 +689,7 @@ namespace Framework.Game.Defense
             if (!NetworkConnect.Instance.isFriendlyMatch)
                 CallEndBattle(payload);
 
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
+            NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx, false);
 
             // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
             // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
@@ -703,24 +703,22 @@ namespace Framework.Game.Defense
             gameState = GameState.GAME_OVER;
             SoundManager.Instance.PlaySound(SoundKey.SF_GAMEOVER);
 
-            EndBattlePayload payload = new EndBattlePayload()
+            SurrenderBattlePayload payload = new SurrenderBattlePayload()
             {
-                lastWave = waveIdx,
-                playId = NetworkConnect.Instance.playId,
-                requestGo = Go,
+                leavePlayId = NetworkConnect.Instance.playId,
                 sessionId = NetworkConnect.Instance.sessionId,
-                slotNumber = UserSlotManager.Instance.focusIdx,
-                userId = UserInfoManager.Instance.userId,
+                leaveUserId = UserInfoManager.Instance.userId,
             };
 
             if (!NetworkConnect.Instance.isFriendlyMatch)
-                CallEndBattle(payload);
+                CallSurrenderBattle(payload);
 
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestGameOver(NetworkConnect.Instance.playerIdx, waveIdx, true);
-
+            NetworkConnect.Instance.networkGameManager.Rpc_GameOver(NetworkConnect.Instance.playerIdx, waveIdx, true);
+            FieldBossDamage();
+            monsterSpawner.ClearMonster();
             // UIManager.Instance.battleResultPopup.SetResultInfo(data.Find(x => x.playerIdx == NetworkConnect.Instance.playerIdx).rank,
             // NetworkConnect.Instance.dic_PlayerData[NetworkConnect.Instance.playerIdx].waveCount, monsterSpawner.killedMonsterCount);
-            Debug.Log("Battle Game Over");
+            Debug.Log("Battle Game Surrender");
         }
 
         async void CallEndBattle(EndBattlePayload payload)
@@ -865,7 +863,7 @@ namespace Framework.Game.Defense
             Debug.Log($"SetPlayRecord Data in mode {gameMode}");
 
             int reqGo = rewardRule.rewardGo * monsterSpawner.killedMonsterCount;
-            int bossGo = killedBossLevel != 0 ? dic_RewardRules[$"BOSS_{killedBossLevel}"].rewardGo : 0;
+            int bossGo = killedBossLevel != 0 ? (dic_RewardRules.ContainsKey($"BOSS_{killedBossLevel}") ? dic_RewardRules[$"BOSS_{killedBossLevel}"].rewardGo : 0) : 0;
             int missionGo = 0;
 
 
@@ -932,6 +930,7 @@ namespace Framework.Game.Defense
                     waveNumber = waveIdx,
                     requestGo = reqGo + bossGo + missionGo,
                     killedMonster = monsterSpawner.killedMonsterCount,
+                    killedBossMonster = monsterSpawner.killedBossMonsterCount,
                     completedMissions = this.completedMission,
                     bossLevel = killedBossLevel,
                     playId = this.playId,
@@ -986,7 +985,7 @@ namespace Framework.Game.Defense
             int rewardGroupIndex = Calculator.GetIndependentTrial(rewardGroup);
             Debug.Log("rewardGroup Index : " + rewardGroupIndex);
             int randomIdx = UIManager.Instance.bossSelectPopup.RandomBoss();
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
+            NetworkConnect.Instance.networkGameManager.Rpc_ReachBossWave(waveIdx, UserInfoManager.Instance.nickname, rewardGroupIndex, randomIdx);
         }
         public float tempBossAddHealth;
         public float SetAddBossHealth(int roundId)

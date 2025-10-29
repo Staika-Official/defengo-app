@@ -197,43 +197,43 @@ namespace Framework.Game.Defense
             {
                 case FieldBossMonster.TRUSH:
                     NormalBossMonster normalBossMonster = GameManager.Instance.objectPoolManager.GetObject<NormalBossMonster>($"Boss_105");
-                    normalBossMonster.waveIndex = bossIdx + 1;
+                    normalBossMonster.waveIndex = waveIdx;
                     normalBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(normalBossMonster);
                     break;
                 case FieldBossMonster.SMOKER:
                     CarBossMonster carBossMonster = GameManager.Instance.objectPoolManager.GetObject<CarBossMonster>($"Boss_101");
-                    carBossMonster.waveIndex = bossIdx + 1;
+                    carBossMonster.waveIndex = waveIdx;
                     carBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(carBossMonster);
                     break;
                 case FieldBossMonster.SOTTY:
                     SottyBossMonster sottyBossMonster = GameManager.Instance.objectPoolManager.GetObject<SottyBossMonster>($"Boss_3");
-                    sottyBossMonster.waveIndex = bossIdx + 1;
+                    sottyBossMonster.waveIndex = waveIdx;
                     sottyBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(sottyBossMonster);
                     break;
                 case FieldBossMonster.LOCKY:
                     LockyBossMonster lockyBossMonster = GameManager.Instance.objectPoolManager.GetObject<LockyBossMonster>($"Boss_4");
-                    lockyBossMonster.waveIndex = bossIdx + 1;
+                    lockyBossMonster.waveIndex = waveIdx;
                     lockyBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(lockyBossMonster);
                     break;
                 case FieldBossMonster.PARASITE:
                     ParasiteBossMonster parasiteBossMonster = GameManager.Instance.objectPoolManager.GetObject<ParasiteBossMonster>($"Boss_5");
-                    parasiteBossMonster.waveIndex = bossIdx + 1;
+                    parasiteBossMonster.waveIndex = waveIdx;
                     parasiteBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(parasiteBossMonster);
                     break;
                 case FieldBossMonster.BOOMBER:
                     BoomberBossMonster boomberBossMonster = GameManager.Instance.objectPoolManager.GetObject<BoomberBossMonster>($"Boss_6");
-                    boomberBossMonster.waveIndex = bossIdx + 1;
+                    boomberBossMonster.waveIndex = waveIdx;
                     boomberBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(boomberBossMonster);
                     break;
                 case FieldBossMonster.EMBEREON:
                     EmberonBossMonster emberonBossMonster = GameManager.Instance.objectPoolManager.GetObject<EmberonBossMonster>($"Boss_7");
-                    emberonBossMonster.waveIndex = bossIdx + 1;
+                    emberonBossMonster.waveIndex = waveIdx;
                     emberonBossMonster.FieldBossInitialize(bossData);
                     monsters.Add(emberonBossMonster);
                     break;
@@ -249,9 +249,9 @@ namespace Framework.Game.Defense
                 return;
 
             if (bossIdx >= bossData.bossMonsters.Length - 1)
-                {
-                    bossIdx = bossData.bossMonsters.Length - 1;
-                }
+            {
+                bossIdx = bossData.bossMonsters.Length - 1;
+            }
 
             BossMonster data = bossData.bossMonsters[bossIdx];
             switch (data.monsterId)
@@ -285,7 +285,7 @@ namespace Framework.Game.Defense
 
             if (GameManager.Instance.gameMode == GameMode.BATTLE)
             {
-                NetworkConnect.Instance.networkGameManager.Rpc_RequestSpawnBoss(UserInfoManager.Instance.nickname, data.bossHealth);
+                NetworkConnect.Instance.networkGameManager.Rpc_SpawnBoss(UserInfoManager.Instance.nickname, data.bossHealth);
             }
         }
 
@@ -524,6 +524,7 @@ namespace Framework.Game.Defense
                         isWaveStart = false;
                         break;
                     case GameMode.BATTLE:
+                        NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx, totalKilledMonsterCount, totalKilledBossMonsterCount);
                         GameManager.Instance.SetPlayRecordData(killedBossLevel, currentWaveIdx);
                         killedMonsterCount = 0;
                         killedBossLevel = 0;
@@ -572,20 +573,12 @@ namespace Framework.Game.Defense
                             if (currentWaveIdx >= infiniteData.waveDatas.Length)
                             {
                                 UIManager.Instance.ChangeWaveValue(currentWaveIdx + 1);
-                                if (GameManager.Instance.gameMode == GameMode.BATTLE)
-                                {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx + 1, totalKilledMonsterCount, totalKilledBossMonsterCount);
-                                }
                                 GameManager.Instance.waveIdx = currentWaveIdx + 1;
                             }
                             else
                             {
                                 int idx = infiniteData.waveDatas[currentWaveIdx].wave;
                                 UIManager.Instance.ChangeWaveValue(idx);
-                                if (GameManager.Instance.gameMode == GameMode.BATTLE)
-                                {
-                                    NetworkConnect.Instance.networkGameManager.Rpc_RequestWaveComplete(NetworkConnect.Instance.playerIdx, idx, totalKilledMonsterCount, totalKilledBossMonsterCount);
-                                }
                                 GameManager.Instance.waveIdx = idx;
                             }
                             WaveEnd();

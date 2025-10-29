@@ -35,7 +35,17 @@ public class FriendItem : MonoBehaviour
         button_sendFriendRequest.onPointerUp += async () =>
         {
             SoundManager.Instance.PlaySound(SoundKey.SF_CLICK);
-            await NetworkManager.Instance.SendFriendRequest(friendData.userId, SuccesSendFriendRequest, FailedSendFriendRequest);
+
+            var popup = PopupManager.Instance.GetPopUp<FriendPopup>("friend");
+            if (popup.listFriendItems.Count >= 30)
+            {
+                SystemNoticePopup popupNotice = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                popupNotice.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Max_Number"));
+            }
+            else
+            {
+                await NetworkManager.Instance.SendFriendRequest(friendData.userId, SuccesSendFriendRequest, FailedSendFriendRequest);
+            }
         };
         button_checkProfile.onClick.AddListener(() =>
         {
@@ -62,11 +72,9 @@ public class FriendItem : MonoBehaviour
         pendingFromFriend = data.pendingFromFriend;
         pendingFromUser = data.pendingFromCaller;
 
-        button_sendEnergy.gameObject.SetActive(isFriend);
-        button_sendEnergy.SetInterectible(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
+        button_sendEnergy.gameObject.SetActive(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
         button_sendFriendRequest.gameObject.SetActive(!isFriend && !data.pendingFromCaller && !data.pendingFromFriend);
         button_inviteFriendlyBattle.gameObject.SetActive(false);
-        button_inviteFriendlyBattle.SetInterectible(button_inviteFriendlyBattle.gameObject.activeSelf);
     }
 
     public void SetFriendData(FriendData data, bool _isFriend, bool _isBattleInvite)
@@ -78,7 +86,7 @@ public class FriendItem : MonoBehaviour
         image_userProfile.sprite = userProfileData.sprite_image;
         text_userName.text = friendData.nickname;
 
-        button_sendEnergy.SetInterectible(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
+        button_sendEnergy.gameObject.SetActive(isFriend && DateTime.UtcNow > friendData.blockSendEnergyDate);
         button_sendFriendRequest.gameObject.SetActive(!isFriend);
         button_inviteFriendlyBattle.gameObject.SetActive(isFriend && isBattleInvite);
         button_inviteFriendlyBattle.SetInterectible(button_inviteFriendlyBattle.gameObject.activeSelf);
@@ -88,7 +96,7 @@ public class FriendItem : MonoBehaviour
     {
         SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
         popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
-        button_sendEnergy.SetInterectible(false);
+        button_sendEnergy.gameObject.SetActive(false);
         PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendEnergy(friendData.userId);
     }
     void FailedSendEnergy(string energy)
@@ -100,14 +108,14 @@ public class FriendItem : MonoBehaviour
     void SuccesSendFriendRequest()
     {
         SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
-        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Success"));
+        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Success"));
         gameObject.SetActive(false);
         PopupManager.Instance.GetPopUp<FriendPopup>("friend").OnSendFriendRequest(friendData.userId);
     }
     void FailedSendFriendRequest(string error)
     {
         SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
-        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Failed"));
+        popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Friend_Request_Max_Number"));
     }
 }
 

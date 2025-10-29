@@ -368,9 +368,11 @@ namespace Framework.Game.Defense
             else
             {
                 //튜도리얼이아니라면 랜덤캐릭터를 얻어와서 생성시켜줌
-                GameManager.Instance.characterSpawner.SummonSynthesisCharacter(glacierIdx, starGradeIndex);
+                GameManager.Instance.characterSpawner.SummonSynthesisCharacter(glacierIdx, starGradeIndex, IsInfected);
                 //GameManager.Instance.characterSpawner.SummonSynthesisWantCharacter<CharacterHiFive>(glacierIdx, starGradeIndex, "HiFive");
             }
+
+            ReleaseInfect();
 
             //본인이 버프를 주고있는 캐릭터가 0이상이다 0이하면 버프를 안주고있다는 뜻
             if (dic_speedBuffValue.Count > 0)
@@ -408,6 +410,10 @@ namespace Framework.Game.Defense
 
             //소환 해제로 변경해줌 어짜피 새롭게 인잇하면 isSummoned값 true로 변경
             isSummoned = false;
+
+            if (IsInfected)
+                mergeCharacter.IsInfected = true;
+            ReleaseInfect();
 
             //합쳐진 캐릭터를 업그레이드 시켜주는 함수 (합쳐지는 캐릭터도 반환하면서 새로운 캐릭터를 생성시키는거와 동일)
             mergeCharacter.UpgradeCharacter();
@@ -1184,7 +1190,7 @@ namespace Framework.Game.Defense
 
         public virtual void CharacterTypeCheckToMarge(Character character)
         {
-            if (character.starGradeIndex == this.starGradeIndex && character.characterIndex == this.characterIndex && starGradeIndex < 4)
+            if (character.starGradeIndex == this.starGradeIndex && character.characterIndex == this.characterIndex && starGradeIndex < 4 && !IsLockdown && !character.IsLockdown)
             {
                 MergeCharacter(character);
                 transform.localPosition = character.pivotPosition;
@@ -1235,14 +1241,25 @@ namespace Framework.Game.Defense
             Debug.Log($"{transform.name} Release Lockdown");
         }
 
-        public void Infect()
+        public ObjectParticle infectedFX = null;
+        public ObjectParticle Infect()
         {
             IsInfected = true;
+
+            infectedFX = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_Infected");
+            infectedFX.gameObject.name = "BossEf_Infected";
+            infectedFX.SimplePlay();
+            infectedFX.transform.SetParent(transform);
+            infectedFX.transform.localPosition = Vector2.zero;
+            return infectedFX;
         }
 
         public void ReleaseInfect()
         {
             IsInfected = false;
+            if (infectedFX != null)
+                GameManager.Instance.objectPoolManager.ReturnObject(infectedFX, infectedFX.particleName);
+            infectedFX = null;
         }
         #endregion
     }

@@ -15,8 +15,6 @@ namespace Framework.Game.Defense
 
         public ObscuredInt targetCount;
         public ObscuredFloat skillInterval;
-        public List<Character> infectedCharacters = new();
-        public List<ObjectParticle> objectParticles = new();
 
         public IEnumerator abilitySequence;
 
@@ -29,8 +27,8 @@ namespace Framework.Game.Defense
             speed = bossData.monsterSpeed;
             skillInterval = bossData.uniqueValue[0];
             targetCount = (int)bossData.uniqueValue[1] + (int)(waveIndex / bossData.uniqueValue[2]);
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
-            objectParticles = new();
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
+
             SetBossMove();
         }
 
@@ -44,7 +42,7 @@ namespace Framework.Game.Defense
                 IsMove = false;
                 yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
                 InfectCharacter();
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(0.4f);
                 Debug.Log("Parasite Attack End");
                 IsMove = true;
                 IsBossAttack = false;
@@ -59,8 +57,8 @@ namespace Framework.Game.Defense
                ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
             Debug.Log($"{gameObject.name} infect character target count {tempTargetCount}");
 
-            int[] targets = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
-            Debug.Log($"{gameObject.name} infect character ids {JsonConvert.SerializeObject(targets)}");
+            int listCount = GameManager.Instance.characterSpawner.summonedCharacters.Count;
+            int[] targets = Calculator.GetMultiIndex(listCount, listCount);
 
             int selectedCount = 0;
 
@@ -74,7 +72,6 @@ namespace Framework.Game.Defense
                 }
                 else
                 {
-                    infectedCharacters.Add(character);
                     InfectSequence(character);
                     selectedCount++;
 
@@ -90,11 +87,6 @@ namespace Framework.Game.Defense
         {
             Debug.Log($"{gameObject.name} infect character {character.name}");
             character.Infect();
-            ObjectParticle infect = GameManager.Instance.objectPoolManager.GetObject<ObjectParticle>("BossEf_Infected");
-            infect.SimplePlay();
-            infect.transform.SetParent(character.transform);
-            infect.transform.localPosition = Vector2.zero;
-            objectParticles.Add(infect);
         }
 
         public override void Abillity()
@@ -105,7 +97,7 @@ namespace Framework.Game.Defense
 
         public override void DeathSequence()
         {
-
+            StopCoroutine(abilitySequence);
         }
 
         public override void EndOfUse()
@@ -116,19 +108,10 @@ namespace Framework.Game.Defense
                 deadTimerCoroutine = null;
             }
 
-            for (int i = 0; i < infectedCharacters.Count; i++)
+            for (int i = 0; i < GameManager.Instance.characterSpawner.summonedCharacters.Count; i++)
             {
-                infectedCharacters[i].ReleaseInfect();
+                GameManager.Instance.characterSpawner.summonedCharacters[i].ReleaseInfect();
             }
-
-            for (int i = 0; i < objectParticles.Count; i++)
-            {
-                GameManager.Instance.objectPoolManager.ReturnObject(objectParticles[i], objectParticles[i].particleName);
-            }
-
-            objectParticles.Clear();
-
-            infectedCharacters.Clear();
 
             monsterInterface.transform.SetParent(transform);
             monsterInterface.ReturnObjectPool();

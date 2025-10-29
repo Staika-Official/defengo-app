@@ -203,15 +203,15 @@ namespace Framework.UI
 
             // Determine which ELO tier to use based on avgElo
             Dictionary<int, float> selectedTier;
-            if (avgElo < 800)
+            if (avgElo < 900)
                 selectedTier = eloTiers[800];
-            else if (avgElo < 900)
-                selectedTier = eloTiers[900];
             else if (avgElo < 1000)
-                selectedTier = eloTiers[1000];
+                selectedTier = eloTiers[900];
             else if (avgElo < 1300)
-                selectedTier = eloTiers[1300];
+                selectedTier = eloTiers[1000];
             else if (avgElo < 1500)
+                selectedTier = eloTiers[1300];
+            else if (avgElo < 1800)
                 selectedTier = eloTiers[1500];
             else
                 selectedTier = eloTiers[1800];

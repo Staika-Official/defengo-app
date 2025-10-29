@@ -26,7 +26,7 @@ namespace Framework.Game.Defense
             skillInterval = bossData.uniqueValue[0];
             targetCount = (int)bossData.uniqueValue[1] + (int)(waveIndex / bossData.uniqueValue[2]);
             speed = bossData.monsterSpeed;
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             skillActiveDelay = bossData.uniqueValue[3];
             // reinforceAttackChance = (bossData.uniqueValue[3] + waveIndex / 5 * bossData.uniqueValue[4]) * 100;
             objectParticles = new();
@@ -68,8 +68,9 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
            ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] summonCharacterIdxs = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
-
+            int listCount = GameManager.Instance.characterSpawner.summonedCharacters.Count;
+            int[] summonCharacterIdxs = Calculator.GetMultiIndex(listCount, listCount);
+            
             int selectedCount = 0;
 
             for (int i = 0; i < summonCharacterIdxs.Length; i++)
@@ -111,9 +112,9 @@ namespace Framework.Game.Defense
                 explosion.SimplePlay(character.transform);
                 objectParticles.Add(explosion);
 
-                character.DestroyedTile();
                 Glacier glacier = GridManager.Instance.glaciersTiles[character.glacierIdx];
                 glacier.Damage();
+                if (glacier.glacierState == GlacierState.BROKEN) glacier.Damage();
             });
         }
 

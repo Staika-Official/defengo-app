@@ -76,6 +76,7 @@ namespace Framework.Network
                 Instance = this;
                 Debug.Log("[NetworkConnect] Singleton Instance created.");
             }
+            Application.runInBackground = true;
         }
 
         /// <summary>
@@ -155,7 +156,11 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+                });
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -195,7 +200,11 @@ namespace Framework.Network
             else
             {
                 Debug.LogError($"[NetworkConnect] Failed to join session: {result.ShutdownReason}");
-                PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
+                });
             }
             StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(false));
         }
@@ -280,6 +289,7 @@ namespace Framework.Network
             var result = await runner.StartGame(new StartGameArgs()
             {
                 GameMode = Fusion.GameMode.AutoHostOrClient,
+                SessionName = UserInfoManager.Instance.userId,
                 PlayerCount = maxPlayerCount,
                 SessionProperties = customProps
             });
@@ -385,7 +395,8 @@ namespace Framework.Network
                     isInitialize = false,
                     userId = UserInfoManager.Instance.userId,
                     rankTier = DataManager.Instance.GetRankTierConfig(myCurrentRank.finalRank).description,
-                    elo = myCurrentRank.elo
+                    elo = myCurrentRank.elo,
+                    hasShownSummary = false,
                 };
 
                 this.playerIdx = data.playerIdx;
@@ -499,9 +510,10 @@ namespace Framework.Network
                         // In battle: mark as abnormal exit and keep data for summary
                         data.isAbnormalExit = true;
                         data.isInitialize = true;
+                        data.isGameOver = true;
                         if (networkGameManager != null)
                         {
-                            networkGameManager.Rpc_RequestGameOver(player.AsIndex, data.waveCount, true);
+                            networkGameManager.Rpc_GameOver(player.AsIndex, data.waveCount, true);
                         }
                         else
                         {
@@ -510,6 +522,8 @@ namespace Framework.Network
                     }
                     break;
             }
+
+            Instance.PushSnapShot();
         }
 
         public void OnSceneLoadDone(NetworkRunner runner)
@@ -552,7 +566,7 @@ namespace Framework.Network
                         continue;
                     session.Properties.TryGetValue("password", out var pw);
                     session.Properties.TryGetValue("isPlaying", out var isPlaying);
-                    if (session.Name == roomName && roomPassword == pw && !isPlaying)
+                    if (session.Name == roomName && roomPassword == pw && roomName == session.Name && !isPlaying)
                     {
                         Debug.Log($"[NetworkConnect] Joining available friendly session: {session.Name}");
                         JoinFriendlySession(session.Name);
@@ -577,7 +591,8 @@ namespace Framework.Network
                 foreach (var session in sessionList)
                 {
                     session.Properties.TryGetValue("isPlaying", out var isPlaying);
-                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount || isPlaying)
+                    session.Properties.TryGetValue("password", out var pw);
+                    if (!session.IsOpen || session.MaxPlayers == session.PlayerCount || isPlaying || pw != null)
                         continue;
 
                     Debug.Log($"[NetworkConnect] Joining available session: {session.Name}");
@@ -625,12 +640,10 @@ namespace Framework.Network
             if (networkBattleStatus == NetworkBattleStatus.INGAME && !GameManager.Instance.isGameOver)
             {
                 GameManager.Instance.GameOver();
-                if (runner != null)
-                    runner.Shutdown();
                 PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
                 delegate
                 {
-                    runner.Shutdown();
+                    ShutDown();
                     GameManager.Instance.objectPoolManager.AllClear();
                     SceneLoadManager.Instance.SwitchingScene(2);
                 });
@@ -644,6 +657,16 @@ namespace Framework.Network
                     PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
                 });
             }
+            else
+            {
+                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
+                delegate
+                {
+                    ShutDown();
+                    GameManager.Instance.objectPoolManager.AllClear();
+                    SceneLoadManager.Instance.SwitchingScene(2);
+                });
+            }
         }
 
         public void InitializeCheck(int idx, string json)
@@ -654,7 +677,7 @@ namespace Framework.Network
             dic_PlayerData[idx].sessionId = data.sessionId;
             dic_PlayerData[idx].playId = data.playId;
 
-            bool allReady = dic_PlayerData.Values.All(p => p.isInitialize);
+            bool allReady = dic_PlayerData.Values.All(p => p.isInitialize || p.isGameOver || p.isAbnormalExit);
             if (allReady)
             {
                 Debug.Log("[NetworkConnect] All players ready. Closing session and starting countdown.");
@@ -750,13 +773,21 @@ namespace Framework.Network
                     _countdownStarted = false;
 
                     // Restart matchmaking
-                    Debug.Log("[NetworkConnect] Restarting matchmaking after disconnect");
-                    ConnectToLobby(isFriendlyMatch, roomName, roomPassword);
+                    Debug.Log("[NetworkConnect] disconnect");
+                    OnAbnormalShutdown();
                     break;
 
                 case NetworkBattleStatus.INGAME:
-                    Debug.Log("[NetworkConnect] Disconnected during BATTLE - handling abnormal shutdown");
-                    OnAbnormalShutdown();
+                    if (reason == NetDisconnectReason.Timeout)
+                    {
+                        Debug.Log("[NetworkConnect] Disconnected during BATTLE - Time Out");
+                        OnAbnormalShutdown();
+                    }
+                    else
+                    {
+                        Debug.Log("[NetworkConnect] Disconnected during BATTLE - handling abnormal shutdown");
+                        OnAbnormalShutdown();
+                    }
                     break;
             }
         }
@@ -803,7 +834,7 @@ namespace Framework.Network
 
                 // Restart matchmaking from scratch - will create or join a new session
                 Debug.Log("[NetworkConnect] Restarting matchmaking - creating/joining new session");
-                ConnectToLobby(isFriendlyMatch, roomName, roomPassword);
+                ConnectToLobby(isFriendlyMatch);
                 var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
                 popup.UpdateUserInfo();
                 return;
@@ -847,10 +878,8 @@ namespace Framework.Network
             Debug.Log($"[NetworkConnect] Chosen new host: Player {chosenHost.AsIndex}");
             Debug.Log($"[NetworkConnect] Am I the chosen host? {isChosenHost}");
 
-            if (isChosenHost)
+            if (true)
             {
-                Debug.Log($"[NetworkConnect] I am the chosen host (Player {runner.LocalPlayer.AsIndex}), calling StartGame(token)");
-
                 // Store the migration token
                 _hostMigrationToken = hostMigrationToken;
 
@@ -881,14 +910,23 @@ namespace Framework.Network
                 Debug.Log("[NetworkConnect] Starting new runner with host migration token");
                 StartGameResult result = await newRunner.StartGame(new StartGameArgs()
                 {
+                    GameMode = isChosenHost ? Fusion.GameMode.Host : Fusion.GameMode.Client,
                     HostMigrationToken = hostMigrationToken,
-                    HostMigrationResume = OnHostMigrationResume,
+                    HostMigrationResume = isChosenHost ? OnHostMigrationResume : null,
                 });
 
                 if (result.Ok == false)
                 {
-                    Debug.LogError($"[NetworkConnect] Host migration failed: {result.ShutdownReason}");
-                    HandleMigrationFailure(currentStatus);
+                    Debug.LogError($"[NetworkConnect] Host migration failed 1");
+                    await Task.Delay(500);
+                    StartGameResult result1 = await newRunner.StartGame(new StartGameArgs()
+                    {
+                        GameMode = isChosenHost ? Fusion.GameMode.Host : Fusion.GameMode.Client,
+                        HostMigrationToken = hostMigrationToken,
+                        HostMigrationResume = isChosenHost ? OnHostMigrationResume : null,
+                    });
+                    if (result1.Ok == false)
+                        HandleMigrationFailure(currentStatus);
                 }
                 else
                 {
@@ -979,7 +1017,7 @@ namespace Framework.Network
                     Debug.Log($"[NetworkConnect] Calling GameOver for old host {oldHostIdx}");
                     dic_PlayerData[oldHostIdx].isAbnormalExit = true;
                     dic_PlayerData[oldHostIdx].isInitialize = true;
-                    networkGameManager.Rpc_RequestGameOver(oldHostIdx, dic_PlayerData[oldHostIdx].waveCount, true);
+                    networkGameManager.Rpc_GameOver(oldHostIdx, dic_PlayerData[oldHostIdx].waveCount, true);
                 }
 
                 // Update in-game UI after migration
@@ -1154,6 +1192,8 @@ namespace Framework.Network
                 var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
                 popup.UpdateUserInfo();
             }
+
+            Instance.PushSnapShot();
         }
 
         [Rpc]
@@ -1194,6 +1234,8 @@ namespace Framework.Network
                 var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
                 popup.UpdateUserInfo();
             }
+
+            Instance.PushSnapShot();
         }
 
         Coroutine ICountMatchingTimeOut;
@@ -1210,7 +1252,7 @@ namespace Framework.Network
                 totalElo += kvp.Value.elo;
             }
             avgElo = totalElo / dic_PlayerData.Count;
-            Debug.Log($"[NetworkConnect] ============================================");
+            Debug.Log($"[NetworkConnect] ============================================ Avg ELO {avgElo}");
             int cd = 30;
             while (cd > 0)
             {
@@ -1258,8 +1300,8 @@ namespace Framework.Network
 
             // Sort normal players by performance (alive first, then by wave/kills)
             normalPlayers = normalPlayers
-                .OrderBy(p => p.isGameOver)                   // Alive players first (false < true)
-                .ThenByDescending(p => p.waveCount)          // Higher wave better
+                // .OrderBy(p => p.isGameOver)                   // Alive players first (false < true)
+                .OrderByDescending(p => p.waveCount)          // Higher wave better
                 .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
                 .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
@@ -1324,8 +1366,37 @@ namespace Framework.Network
 
         public void ShutDown()
         {
-            runner.Shutdown();
+            dic_PlayerData.Clear();
+            if (runner != null)
+                runner.Shutdown();
             Destroy(gameObject);
+        }
+
+        void OnApplicationPause(bool paused)
+        {
+            if (paused && runner.IsServer)
+            {
+                PauseSequence();
+            }
+            else if (!paused)
+            {
+                OnAbnormalShutdown();
+            }
+        }
+        async void PauseSequence()
+        {
+            Debug.Log("[Fusion] Host paused — serialize HostMigrationToken before suspension");
+
+            await runner.PushHostMigrationSnapshot();
+            await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
+        }
+
+        public void PushSnapShot()
+        {
+            if (runner && runner.IsServer)
+            {
+                runner.PushHostMigrationSnapshot();
+            }
         }
     }
 }

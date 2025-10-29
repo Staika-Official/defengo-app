@@ -256,6 +256,13 @@ namespace Framework.Game.Defense
                     GameManager.Instance.monsterSpawner.killedBossMonsterCount++;
                     GameManager.Instance.monsterSpawner.totalKilledBossMonsterCount++;
                 }
+                else if (monsterType == MonsterType.FIELD_BOSS_MONSTER)
+                {
+                    GameManager.Instance.monsterSpawner.killedBossMonsterCount++;
+                    GameManager.Instance.monsterSpawner.totalKilledBossMonsterCount++;
+
+                    DeathSequence();
+                }
 
                 //몬스터가 안죽는 이슈가있는경우의 방어코드 5초뒤 강제로 죽임
                 deadTimerCoroutine = DeadTimeSequenceAsync();

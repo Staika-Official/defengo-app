@@ -1480,6 +1480,7 @@ namespace Framework.Network
         public int waveNumber;
         public int requestGo;
         public int killedMonster;
+        public int killedBossMonster;
         public string completedMissions;
         public int bossLevel;
         public string characterInfo = "";
@@ -1545,6 +1546,7 @@ namespace Framework.Network
         public int finalRank;
         public float lp = 0;
         public float elo = 0;
+        public float totalLp = 0;
         public int seasonId;
         public List<int> promotionConditionNumbers;
         public bool isPromotion;
@@ -1577,6 +1579,8 @@ namespace Framework.Network
         public float newElo;
         public float oldLp;
         public float newLp;
+        public float oldTotalLp;
+        public float newTotalLp;
         public List<BattleBonusDetail> bonusDetails;
         public List<UserItem> rewards;
     }

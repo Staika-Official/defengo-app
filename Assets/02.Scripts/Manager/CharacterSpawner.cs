@@ -815,8 +815,6 @@ namespace Framework.Game.Defense
 
         public void SummonFixedCharacter(CharacterIndex characterIndex, Glacier glacier, int starGrade)
         {
-            if (!GridManager.Instance.IsPossibleSummon()) return;
-            summonCount++;
             Debug.Log("Summon Fixed Monster Idx : " + characterIndex);
             Character character = GetFixedCharacter(characterIndex);
             // Glacier glacier = GridManager.Instance.PossibleSummonIdx();
@@ -847,7 +845,7 @@ namespace Framework.Game.Defense
             character.Initialize(glacier, 0, true);
         }
 
-        public void SummonSynthesisCharacter(int glacierIdx, int starGradeIndex)
+        public void SummonSynthesisCharacter(int glacierIdx, int starGradeIndex, bool isInfected = false)
         {
             Character character = GetRandomCharacter();
             
@@ -861,6 +859,9 @@ namespace Framework.Game.Defense
             GameManager.Instance.characterSpawner.SetQuestCharacterStarCount(starGradeIndex);
 
             character.Initialize(glacier, starGradeIndex);
+
+            if (isInfected)
+                character.Infect();
         }
 
         //Test용 합성 시 원하는 캐릭터 생성하기위함

@@ -5,6 +5,7 @@ using Spine.Unity;
 using System.Collections;
 using Spine;
 using Framework.Util;
+using System.Linq;
 
 namespace Framework.Game.Defense
 {
@@ -26,7 +27,7 @@ namespace Framework.Game.Defense
             speed = bossData.monsterSpeed;
             skillInterval = bossData.uniqueValue[0];
             coefficient = (int)bossData.uniqueValue[2];
-            health = bossData.health + GameManager.Instance.tempBossAddHealth;
+            health = bossData.health + GameManager.Instance.tempBossAddHealth + (waveIndex - 1) / 5 * bossData.healthFactor;
             targetCount = (int)bossData.uniqueValue[1] + (GameManager.Instance.waveIdx / coefficient);
             SetBossMove();
         }
@@ -41,7 +42,7 @@ namespace Framework.Game.Defense
                 IsMove = false;
                 yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
                 ConversionCharacter();
-                yield return new WaitForSpineAnimationComplete(entry);
+                yield return new WaitForSeconds(0.45f);
                 Debug.Log("Sotty Attack End");
                 IsMove = true;
                 IsBossAttack = false;
@@ -60,21 +61,21 @@ namespace Framework.Game.Defense
             int tempTargetCount = targetCount > GameManager.Instance.characterSpawner.summonedCharacters.Count
             ? GameManager.Instance.characterSpawner.summonedCharacters.Count : targetCount;
 
-            int[] tempCharacterIdxs = new int[GameManager.Instance.characterSpawner.summonedCharacters.Count];
+            int listCount = GameManager.Instance.characterSpawner.summonedCharacters.Count;
+            int[] targets = Calculator.GetMultiIndex(listCount, listCount);
 
-            int[] targets = Calculator.GetMultiIndex(GameManager.Instance.characterSpawner.summonedCharacters.Count, tempTargetCount);
+            int selectedCount = 0;
+
+            int[] tempSlot = new int[5];
+            for (int j = 0; j < tempSlot.Length; j++)
+            {
+                tempSlot[j] = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds[j];
+            }
 
             for (int i = 0; i < targets.Length; i++)
             {
-                targets[i] = tempCharacterIdxs[i];
                 Debug.Log($"Sotty Target : {GameManager.Instance.characterSpawner.summonedCharacters[targets[i]].transform.name}");
                 Character character = GameManager.Instance.characterSpawner.summonedCharacters[targets[i]];
-                int[] tempSlot = new int[5];
-
-                for (int j = 0; j < tempSlot.Length; j++)
-                {
-                    tempSlot[j] = UserSlotManager.Instance.GetSlotFocusIndexData().slotCharacterIds[j];
-                }
 
                 int characterIdx = (int)character.characterIndex;
 
@@ -93,15 +94,21 @@ namespace Framework.Game.Defense
                         Glacier glacier = GridManager.Instance.glaciersTiles[character.glacierIdx];
                         GameManager.Instance.characterSpawner
                             .SummonFixedCharacter((CharacterIndex)tempSlot[temp], glacier, character.starGradeIndex);
+                        selectedCount++;
                         break;
                     }
+                }
+
+                if (selectedCount >= tempTargetCount)
+                {
+                    break;
                 }
             }
         }
 
         public override void DeathSequence()
         {
-
+            StopCoroutine(abilitySequence);
         }
 
         public override void EndOfUse()

@@ -22,6 +22,8 @@ namespace Framework.UI
         [SerializeField] private TextMeshProUGUI text_PromoMax;
         [SerializeField] private GameObject go_Promotion;
         [SerializeField] private Slider slider_Ribbon;
+        [SerializeField] private GameObject go_MasternLegend;
+        [SerializeField] private TextMeshProUGUI text_MasternLegendLP;
         [SerializeField] private List<Transform> trans_PromotionCheckers;
         public SkeletonGraphic rankAnim;
 
@@ -45,6 +47,12 @@ namespace Framework.UI
             });
             button_Play.onPointerUp += () =>
             {
+                // Check if NetworkConnect already exists
+                if (NetworkConnect.Instance != null)
+                {
+                    Debug.LogWarning("[StartUpBattleModePopup] NetworkConnect already exists, destroying old instance");
+                    NetworkConnect.Instance.ShutDown();
+                }
                 NetworkConnect networkConnect = Instantiate(HomeScreen.Instance.networkPrefab).GetComponent<NetworkConnect>();
                 networkConnect.ConnectToLobby(false);
                 PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").ActivePopup();
@@ -52,6 +60,12 @@ namespace Framework.UI
             };
             button_PlayWithFriend.onPointerUp += () =>
             {
+                // Check if NetworkConnect already exists
+                if (NetworkConnect.Instance != null)
+                {
+                    Debug.LogWarning("[StartUpBattleModePopup] NetworkConnect already exists, destroying old instance");
+                    NetworkConnect.Instance.ShutDown();
+                }
                 NetworkConnect networkConnect = Instantiate(HomeScreen.Instance.networkPrefab).GetComponent<NetworkConnect>();
                 networkConnect.ConnectToLobby(true);
                 PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").ActivePopup();
@@ -63,6 +77,7 @@ namespace Framework.UI
         {
             button_Play.SetInterectible(UserInfoManager.Instance.gemValue >= ConfigData.BATTLE_MODE_PLAY_COST);
             text_BattleCost.text = $"x{ConfigData.BATTLE_MODE_PLAY_COST}";
+            text_BattleCost.gameObject.SetActive(ConfigData.BATTLE_MODE_PLAY_COST > 0);
             await NetworkManager.Instance.GetBattleLeaderboard((data) =>
             {
                 text_SeasonTime.text = $"{data.season.fromDate} ~ {data.season.toDate}";
@@ -78,7 +93,7 @@ namespace Framework.UI
                 text_League.text = rankConfig.description;
                 rankAnim.AnimationState.SetAnimation(0, $"{(int)rankConfig.tierType}_{GetRankName(rankConfig.tierType)}Idle", true);
                 go_Promotion.SetActive(rank.isPromotion);
-                
+
                 for (int i = 0; i < trans_PromotionCheckers.Count; i++)
                 {
                     if (i < rankConfig.promotionConditionMax)
@@ -101,8 +116,11 @@ namespace Framework.UI
                     }
                 }
 
-                slider_Ribbon.gameObject.SetActive(!rank.isPromotion);
-                text_Lp.text = $"{(int)rank.lp}";
+                slider_Ribbon.gameObject.SetActive(!rank.isPromotion && (int)rankConfig.tierType < (int)RankTierType.RANKTIER_5);
+                if ((int)rankConfig.tierType < (int)RankTierType.RANKTIER_5)
+                    text_Lp.text = $"{(int)rank.totalLp % 100}";
+                else
+                    text_Lp.text = $"{(int)rank.totalLp}";
                 slider_Ribbon.value = rank.lp / ConfigData.RANK_TIER_LP_CONDITION;
                 if (rank.isPromotion)
                 {
@@ -113,6 +131,8 @@ namespace Framework.UI
                     text_Promo.text = $"{rank.promotionConditionNumbers.FindAll(x => x == 1).Count}";
                     text_PromoMax.text = $"/ {rankConfig.promotionConditionMax}";
                 }
+                go_MasternLegend.SetActive((int)rankConfig.tierType >= (int)RankTierType.RANKTIER_5);
+                text_MasternLegendLP.text = $"{(int)rank.totalLp}";
             }, (defRank) =>
             {
                 var rankConfig = DataManager.Instance.GetRankTierConfig(1);

@@ -55,7 +55,7 @@ namespace Framework.UI
             (json) =>
             {
                 MyLeaderBoardRankData myRankData = JsonUtility.FromJson<MyLeaderBoardRankData>(json);
-                text_Rank.text = $"{myRankData.rank}";
+                text_Rank.text = $"{myRankData.bestWave}";
             }, null);
         }
     }

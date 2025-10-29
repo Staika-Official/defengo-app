@@ -22,7 +22,9 @@ namespace Framework.UI
         public Slider slider_Lp;
         public GameObject go_Promo;
         public GameObject go_Normal;
+        public GameObject go_MasternLegend;
         public TextMeshProUGUI text_LP;
+        public TextMeshProUGUI text_MasternLegendLP;
         public TextMeshProUGUI text_MaxPromo;
         public List<Transform> trans_PromotionCheckers;
         public TextMeshProUGUI text_promoProgress;
@@ -52,7 +54,7 @@ namespace Framework.UI
                 {
                     SoundManager.Instance.PlaySound(SoundKey.BGM_LOBBY);
                 };
-                if (NetworkConnect.Instance != null && NetworkConnect.Instance.runner != null)
+                if (NetworkConnect.Instance != null)
                     NetworkConnect.Instance.ShutDown();
 
                 GameManager.Instance.objectPoolManager.AllClear();
@@ -127,6 +129,7 @@ namespace Framework.UI
             text_Rank.text = $"{newCofig.description}";
             slider_Lp.value = newRank.lp / 100f;
             text_MaxPromo.text = $"/ {oldCofig.promotionConditionMax}";
+            text_MasternLegendLP.text = $"{(int)summaryData.newTotalLp}";
 
             float battle = summaryData.lpDelta;
             foreach (var itm in summaryData.bonusDetails)
@@ -183,7 +186,10 @@ namespace Framework.UI
             switch (leagueRankStatus)
             {
                 case LeagueRankStatus.Normal:
-                    animator.SetTrigger("resultNormal");
+                    if ((int)newCofig.tierType < (int)RankTierType.RANKTIER_5)
+                        animator.SetTrigger("resultNormal");
+                    else
+                        animator.SetTrigger("resultNormalMasternLegend");
                     break;
                 case LeagueRankStatus.TierUp:
                     animator.SetTrigger("resultNormal");

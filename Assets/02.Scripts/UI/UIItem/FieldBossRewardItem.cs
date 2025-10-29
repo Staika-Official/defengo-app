@@ -245,7 +245,7 @@ namespace Framework.UI
             selected = true;
             SelectAction?.Invoke();
             PopupSelectAction?.Invoke();
-            NetworkConnect.Instance.networkGameManager.Rpc_RequestSelectFieldBossReward(NetworkConnect.Instance.playerIdx);
+            NetworkConnect.Instance.networkGameManager.Rpc_SelectdFieldBossReward(NetworkConnect.Instance.playerIdx);
             clickAnimation.Play();
         }
 
@@ -253,7 +253,6 @@ namespace Framework.UI
         {
             Debug.Log("SelectComplete wave Idx :" + GameManager.Instance.waveIdx);
             UIManager.Instance.ChangeWaveValue(GameManager.Instance.waveIdx);
-            GameManager.Instance.monsterSpawner.WaveEnd();
             UIManager.Instance.fieldBossRewardPopup.PopUpSequence(false);
         }
     }

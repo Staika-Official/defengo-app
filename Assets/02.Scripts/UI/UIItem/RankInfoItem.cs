@@ -25,10 +25,12 @@ namespace Framework.UI
         public Image image_limitedProfile;
         public Image image_backGround;
         public TextMeshProUGUI text_Rank;
-        public TextMeshProUGUI text_Nickname;
+        public TextMeshProUGUI text_RankTier;
         public TextMeshProUGUI text_GoValue;
+        public TextMeshProUGUI text_Nickname;
         public GameObject taikaIcon;
         public GameObject goIcon;
+        public GameObject go_LP;
 
         public Button button_ViewDetail;
         
@@ -94,6 +96,8 @@ namespace Framework.UI
 
             bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
             text_GoValue.text = $"<sprite=12>{data.bestWave}";
+            text_RankTier.gameObject.SetActive(false);
+            go_LP.SetActive(false);
             SetCellColorInfo(rank, isMine);
         }
         public void Initialize(BattleLeaderboardInfo data, int rank)
@@ -111,7 +115,10 @@ namespace Framework.UI
             text_Nickname.text = temp[0];
 
             bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
-            text_GoValue.text = $"{(int)data.lp} lp";
+            text_GoValue.text = $"{(int)data.lp}";
+            text_RankTier.text = $"{DataManager.Instance.GetRankTierConfig(data.finalRank).description}";
+            go_LP.SetActive(true);
+            text_RankTier.gameObject.SetActive(true);
             SetCellColorInfo(rank, isMine);
         }
 
@@ -163,6 +170,7 @@ namespace Framework.UI
             text_GoValue.text = isPrevious ? $"<sprite=13>{valueInfo}" : $"<sprite=0>{valueInfo}";
 
             bool isMine = UserInfoManager.Instance.userId == data.userId.ToString();
+            go_LP.SetActive(false);
             SetCellColorInfo(rank, isMine);
         }
 

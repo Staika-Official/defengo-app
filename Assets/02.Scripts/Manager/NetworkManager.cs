@@ -131,6 +131,7 @@ namespace Framework.Network
         public static readonly string getTotalUserProfileData = "/game/api/user-profiles/clients/DEFENGO/users/{0}";
         public static readonly string setUserProfileIdx = "/game/api/user-profiles/clients/DEFENGO/users/{0}/profiles/{1}";
         public static readonly string getUserLeaderBoardDetail = "/game/api/leader-board-best-waves/leader-board-types/{0}/detail/{1}?userId={2}";
+        public static readonly string getBattleUserLeaderBoardDetail = "/game/api/battle-season/battle-user-leaderboard/detail?userId={0}";
 
         // public static readonly string getWeeklyRewardBoard = "/game/api/reward-leader-boards/leader-board-types/WAVE_WEEKLY";
         public static readonly string getTokenProductList = "/wallet-go/api/spending/tokens/swap?action={0}&markets=cmc";
@@ -2702,13 +2703,40 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
-                // Debug.Log(res.downloadHandler.text);
+                Debug.Log(res.downloadHandler.text);
                 ResponseProfileData data = GetT<ResponseProfileData>(res.downloadHandler.text);
                 Success?.Invoke(data);
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
+                Failed?.Invoke();
+                ErrorMessage(req.responseCode.ToString());
+                Debug.Log(req.downloadHandler.text);
+            }
+
+            req.Dispose();
+        }
+
+        public async UniTask GetBattleUserProfileDetail(string userId, UnityAction<ResponseProfileData> Success,
+            UnityAction Failed)
+        {
+            UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.getBattleUserLeaderBoardDetail, userId), "GET");
+
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader(contentType, contentTypeValue);
+            req.SetRequestHeader(authorization, bearer + accessToken);
+
+            try
+            {
+                var res = await req.SendWebRequest();
+                Debug.Log(res.downloadHandler.text);
+                ResponseProfileData data = GetT<ResponseProfileData>(res.downloadHandler.text);
+                Success?.Invoke(data);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.Message);
                 Failed?.Invoke();
                 ErrorMessage(req.responseCode.ToString());
                 Debug.Log(req.downloadHandler.text);
