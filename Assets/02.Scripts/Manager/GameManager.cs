@@ -1209,7 +1209,6 @@ namespace Framework.Game.Defense
 
         public void OnDestroy()
         {
-            ObjectPoolManager.OnCompleteAssetLoad = null;
             Instance = null;
         }
 
