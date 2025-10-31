@@ -67,7 +67,7 @@ namespace Framework.UI
                     NetworkConnect.Instance.ShutDown();
                 }
                 NetworkConnect networkConnect = Instantiate(HomeScreen.Instance.networkPrefab).GetComponent<NetworkConnect>();
-                networkConnect.ConnectToLobby(true);
+                networkConnect.ConnectToLobby(true, UserInfoManager.Instance.userId, UserInfoManager.Instance.userId);
                 PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").ActivePopup();
                 DontDestroyOnLoad(networkConnect);
             };
