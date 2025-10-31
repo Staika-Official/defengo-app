@@ -862,11 +862,12 @@ namespace Framework.Game.Defense
             Debug.Log($"SetPlayRecord Data in stage {gameState}");
             if (gameState == GameState.GAME_OVER) return;
             int waveValue = waveIdx > 71 ? 71 : waveIdx;
-            RewardRule rewardRule = dic_RewardRules[$"WAVE_{waveValue}"];
-
-            Debug.Log($"SetPlayRecord Data in mode {gameMode}");
-
-            int reqGo = rewardRule.rewardGo * monsterSpawner.killedMonsterCount;
+            int reqGo = 0;
+            if (dic_RewardRules.ContainsKey($"WAVE_{waveValue}"))
+            {
+                RewardRule rewardRule = dic_RewardRules[$"WAVE_{waveValue}"];
+                reqGo = rewardRule.rewardGo * monsterSpawner.killedMonsterCount;
+            }
             int bossGo = killedBossLevel != 0 ? (dic_RewardRules.ContainsKey($"BOSS_{killedBossLevel}") ? dic_RewardRules[$"BOSS_{killedBossLevel}"].rewardGo : 0) : 0;
             int missionGo = 0;
 
