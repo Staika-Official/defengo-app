@@ -219,7 +219,7 @@ namespace Framework.Game.Defense
             {
                 SurrenderBattlePayload payload = new SurrenderBattlePayload()
                 {
-                    sessionId = NetworkConnect.Instance.dic_PlayerData[playerId].sessionId,
+                    sessionId = NetworkConnect.Instance.sessionId,
                     leavePlayId = NetworkConnect.Instance.dic_PlayerData[playerId].playId,
                     leaveUserId = NetworkConnect.Instance.dic_PlayerData[playerId].userId
                 };
