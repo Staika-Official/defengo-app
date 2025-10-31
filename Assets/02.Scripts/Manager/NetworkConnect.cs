@@ -285,7 +285,7 @@ namespace Framework.Network
             var result = await runner.StartGame(new StartGameArgs()
             {
                 GameMode = Fusion.GameMode.AutoHostOrClient,
-                SessionName = UserInfoManager.Instance.userId,
+                SessionName = roomName,
                 PlayerCount = maxPlayerCount,
                 SessionProperties = customProps
             });
@@ -294,8 +294,6 @@ namespace Framework.Network
             {
                 Debug.Log("[NetworkConnect] Friendly Session created successfully.");
                 roomUuid = runner.SessionInfo.Name;
-                roomName = runner.SessionInfo.Name;
-                roomPassword = UserInfoManager.Instance.userId;
                 networkBattleStatus = NetworkBattleStatus.LOBBY;
                 PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").UpdateUserInfo();
             }
