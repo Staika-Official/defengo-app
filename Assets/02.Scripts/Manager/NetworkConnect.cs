@@ -634,15 +634,15 @@ namespace Framework.Network
 
         void OnAbnormalShutdown()
         {
-            if (networkBattleStatus == NetworkBattleStatus.INGAME && !GameManager.Instance.isGameOver)
+            if (networkBattleStatus == NetworkBattleStatus.INGAME)
             {
                 GameManager.Instance.GameOver();
                 PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
                 delegate
                 {
-                    ShutDown();
                     GameManager.Instance.objectPoolManager.AllClear();
                     SceneLoadManager.Instance.SwitchingScene(2);
+                    ShutDown();
                 });
             }
             else if (networkBattleStatus == NetworkBattleStatus.LOBBY)
@@ -652,16 +652,6 @@ namespace Framework.Network
                 delegate
                 {
                     PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking").Shutdown();
-                });
-            }
-            else
-            {
-                PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
-                delegate
-                {
-                    ShutDown();
-                    GameManager.Instance.objectPoolManager.AllClear();
-                    SceneLoadManager.Instance.SwitchingScene(2);
                 });
             }
         }
@@ -1385,7 +1375,7 @@ namespace Framework.Network
 
         void OnApplicationPause(bool paused)
         {
-            if (paused && runner.IsServer)
+            if (paused)
             {
                 PauseSequence();
             }
@@ -1394,12 +1384,12 @@ namespace Framework.Network
                 OnAbnormalShutdown();
             }
         }
-        async void PauseSequence()
+        void PauseSequence()
         {
             Debug.Log("[Fusion] Host paused — serialize HostMigrationToken before suspension");
 
-            await runner.PushHostMigrationSnapshot();
-            await runner.Shutdown(shutdownReason: ShutdownReason.HostMigration);
+            runner.PushHostMigrationSnapshot();
+            runner.Shutdown(shutdownReason: runner.IsServer ? ShutdownReason.HostMigration : ShutdownReason.Ok);
         }
 
         public void PushSnapShot()

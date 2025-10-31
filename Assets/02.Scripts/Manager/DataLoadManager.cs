@@ -11,10 +11,10 @@ namespace Framework.Util
     public class DataLoadManager : MonoBehaviour
     {
         public static DataLoadManager Instance;
-                
+
         void Start()
         {
-            if(Instance is null)
+            if (Instance is null)
             {
                 Instance = this;
             }
@@ -40,7 +40,7 @@ namespace Framework.Util
         }
 
         public async Task<T> GetDataAsyncBinary<T>(string dataKey)
-        {   
+        {
 
 #if UNITY_EDITOR
             TextAsset asset = (TextAsset)UnityEditor.AssetDatabase.LoadAssetAtPath("Assets/07.TextAsset/01.Table/" + dataKey + ".json", typeof(TextAsset));
