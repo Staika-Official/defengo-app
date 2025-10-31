@@ -122,15 +122,11 @@ namespace Framework.Game.Defense
             anim_Transition.gameObject.SetActive(true);
             anim_CloudSequence.gameObject.SetActive(true);
             isPlayingIntro = true;
-
             onCompleteWave = null;
-
-            ObjectPoolManager.OnCompleteAssetLoad = () =>
-            {
-                TutorialManager.Instance.Initiailize(!UserInfoManager.Instance.userState.finishedTutorial);
-                StartCoroutine(GameStartSequence());
-            };
-
+            ObjectPoolManager.Instance.OnCompleteAssetLoad -= HandleLoadAssetComplete;
+            ObjectPoolManager.Instance.OnCompleteAssetLoad += HandleLoadAssetComplete;
+            ObjectPoolManager.Instance.SetObjectPool();
+            
 #if UNITY_EDITOR
             this.UpdateAsObservable()
                 .Where(_ => Input.GetKeyDown(KeyCode.C))
@@ -1247,5 +1243,15 @@ namespace Framework.Game.Defense
                 UIManager.Instance.pausePopup.ActivePopup();
             }
         }
+
+        #region Private Methods
+
+        private void HandleLoadAssetComplete()
+        {
+            Debug.Log("Load Asset Complete");
+            TutorialManager.Instance.Initiailize(!UserInfoManager.Instance.userState.finishedTutorial);
+            StartCoroutine(GameStartSequence());
+        }
+        #endregion
     }
 }

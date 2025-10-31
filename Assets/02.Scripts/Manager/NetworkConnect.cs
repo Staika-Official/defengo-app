@@ -636,7 +636,7 @@ namespace Framework.Network
         {
             if (networkBattleStatus == NetworkBattleStatus.INGAME)
             {
-                GameManager.Instance.GameOver();
+                //GameManager.Instance.GameOver();
                 PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
                 delegate
                 {
@@ -1387,7 +1387,6 @@ namespace Framework.Network
         void PauseSequence()
         {
             Debug.Log("[Fusion] Host paused — serialize HostMigrationToken before suspension");
-
             runner.PushHostMigrationSnapshot();
             runner.Shutdown(shutdownReason: runner.IsServer ? ShutdownReason.HostMigration : ShutdownReason.Ok);
         }

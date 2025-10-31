@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,8 +19,26 @@ namespace Framework.Util
 
     public class ObjectPoolManager : MonoBehaviour
     {
+        #region Singleton Instance
+        private static ObjectPoolManager _instance;
+
+        public static ObjectPoolManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new GameObject("ObjectPoolManager").AddComponent<ObjectPoolManager>();
+                }
+                return _instance;
+            }
+        }
+        
+        public bool Exist => _instance != null;
+        #endregion
+        
         public delegate void AssetLoad();
-        public static AssetLoad OnCompleteAssetLoad;
+        public AssetLoad OnCompleteAssetLoad;
         public Transform poolContainer;
         public Transform inactivePoolContainer;
         public Dictionary<string, Queue> objectQueueDic = new();
@@ -29,19 +48,29 @@ namespace Framework.Util
 
         public List<string> poolObjectList;
 
-        void Start()
+
+        #region Variables
+        private bool initialized = false;
+        #endregion
+        
+        
+        #region Unity Methods
+
+        private void Awake()
         {
-            SetObjectPool();
+            _instance = this;
         }
+        #endregion
+        
 
         public async void SetObjectPool()
         {
+            if(initialized) return;
+            initialized = true;
             TextAsset asset = await DataLoadManager.Instance.GetDataAsync<TextAsset>("AssetListData");
-
             AssetList assetList = JsonUtility.FromJson<AssetList>(asset.text);
 
             poolObjectList = assetList.assetName.ToList();
-
 
             if (!UserInfoManager.Instance.userState.finishedTutorial)
             {
@@ -82,6 +111,7 @@ namespace Framework.Util
                 objectQueueDic.Add(poolingObject.objectName, queue);
             }
 
+            initialized = true;
             OnCompleteAssetLoad?.Invoke();
         }
 
