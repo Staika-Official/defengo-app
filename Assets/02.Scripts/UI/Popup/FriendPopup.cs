@@ -21,6 +21,7 @@ namespace Framework.UI
         public TMP_InputField input_UID;
         public Button button_Search;
         public FriendItem searchFriendItem;
+        public GameObject goSearchFriendResult;
 
         public GameObject goListFriend;
         public ScrollRect scrollFriends;
@@ -62,7 +63,10 @@ namespace Framework.UI
             {
                 button_Search.interactable = !string.IsNullOrEmpty(txt);
                 if (string.IsNullOrEmpty(txt))
-                    searchFriendItem.transform.parent.gameObject.SetActive(false);
+                {
+                    goSearchFriendResult.SetActive(false);
+                    goRecommendedFriend.transform.parent.gameObject.SetActive(true);
+                }
             });
 
             button_Close.onClick.AddListener(() =>
@@ -111,7 +115,8 @@ namespace Framework.UI
             {
                 await NetworkManager.Instance.SearchFriends(input_UID.text, (ReqSearchFriendsData data) =>
                 {
-                    searchFriendItem.transform.parent.gameObject.SetActive(true);
+                    goSearchFriendResult.SetActive(true);
+                    goRecommendedFriend.transform.parent.gameObject.SetActive(false);
                     searchFriendItem.gameObject.SetActive(true);
                     searchFriendItem.SetFriendData(data);
                 }, (string err) =>
@@ -125,9 +130,15 @@ namespace Framework.UI
                 var friend = friendDatas.Find(x => x.userId == input_UID.text);
                 if (friend != null)
                 {
-                    searchFriendItem.transform.parent.gameObject.SetActive(true);
+                    goSearchFriendResult.SetActive(true);
+                    goRecommendedFriend.transform.parent.gameObject.SetActive(false);
                     searchFriendItem.gameObject.SetActive(true);
                     searchFriendItem.SetFriendData(friend, true, isBattleInvite);
+                }
+                else
+                {
+                    SystemNoticePopup popup = PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice");
+                    popup.SetNoticeText(LanguageManager.Instance.GetStringData("UI_Invalid_UID"));
                 }
             }
         }
@@ -190,7 +201,7 @@ namespace Framework.UI
         {
             var itm = listFriendItems.Find(x => x.friendData.userId == userId);
             if (itm != null)
-                itm.button_sendEnergy.SetInterectible(false);
+                itm.button_sendEnergy.gameObject.SetActive(false);
         }
         public void OnSendFriendRequest(string userId)
         {
@@ -204,12 +215,17 @@ namespace Framework.UI
         public void OnDeleteFriend(string userId)
         {
             var itm = listFriendItems.Find(x => x.friendData.userId == userId);
+            var dat = friendDatas.Find(x => x.userId == userId);
+
             if (itm != null)
             {
                 listFriendItems.Remove(itm);
                 Destroy(itm.gameObject);
             }
+            if (dat != null)
+                friendDatas.Remove(dat);
             text_FriendCount.text = $"{listFriendItems.Count}/30";
+            input_UID.text = "";
         }
     }
 }
