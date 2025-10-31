@@ -26,7 +26,7 @@ namespace Framework.Util
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(dataKey);
             await handle.Task;
             T data = handle.Result;
-            Addressables.Release(handle);
+            //Addressables.Release(handle);
             return data;
         }
 
