@@ -211,6 +211,8 @@ namespace Framework.Game.Defense
                 // Example: 2 others alive + 1 surrendering = rank 3
                 NetworkConnect.Instance.dic_PlayerData[playerId].rank = aliveCount + 1;
                 Debug.Log($"[NetworkGameManager] Player {playerId} surrendered, assigned rank {aliveCount + 1} (lowest among {aliveCount + 1} alive players before surrender)");
+
+                NetworkConnect.Instance.InitializeCheck(playerId, JsonUtility.ToJson(NetworkConnect.Instance.dic_PlayerData[playerId]));
             }
 
             if (NetworkConnect.Instance.IsCurrentHost() && isAbnormal)

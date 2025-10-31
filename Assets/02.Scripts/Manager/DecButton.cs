@@ -55,6 +55,8 @@ namespace Framework.Game.Defense
 
         public void Initialize(CharacterData data)
         {
+            Debug.Log("Initializing DecButton for Character: " + data);
+            Debug.Log("Json Data: " + data.ToJsonData());
             characterName = data.name;
             characterGrade = data.characterGrade;
             characterIndex = data.characterIndex;

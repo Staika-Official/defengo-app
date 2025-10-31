@@ -26,8 +26,8 @@ namespace Framework.Network
         public static NetworkConnect Instance;
 
         [Header("Network State")]
-        public bool isHost;
         public int metaScore;
+        public bool isHost => runner != null && runner.IsServer;
         public NetworkRunner runner;
         public Dictionary<int, NetworkBattleData> dic_PlayerData = new(); // player index -> battle data
         public NetworkBattleStatus networkBattleStatus;
@@ -43,6 +43,8 @@ namespace Framework.Network
         public int sessionId;
         public string userId;
         public float avgElo = 0;
+        bool isHostLoadedSceneBattle = false;
+        bool firstTimeInitializeCheck = false;
 
         [Header("References")]
         public GameObject networkObjectPrefab;
@@ -121,7 +123,6 @@ namespace Framework.Network
         /// </summary>
         public async void JoinSession(string sessionName)
         {
-            isHost = false;
             Debug.Log($"[NetworkConnect] Joining session: {sessionName}");
 
             if (runner == null)
@@ -143,7 +144,6 @@ namespace Framework.Network
             if (result.Ok)
             {
                 // AutoHostOrClient may make us host even if we tried to join
-                isHost = runner.IsServer;
                 Debug.Log($"[NetworkConnect] Successfully joined session. isHost: {isHost}");
                 roomUuid = runner.SessionInfo.Name;
                 networkBattleStatus = NetworkBattleStatus.LOBBY;
@@ -170,7 +170,6 @@ namespace Framework.Network
         /// </summary>
         public async void JoinFriendlySession(string sessionName)
         {
-            isHost = false;
             Debug.Log($"[NetworkConnect] Joining friendly session: {sessionName}");
 
             if (runner == null)
@@ -192,7 +191,6 @@ namespace Framework.Network
             if (result.Ok)
             {
                 // AutoHostOrClient may make us host even if we tried to join
-                isHost = runner.IsServer;
                 Debug.Log($"[NetworkConnect] Successfully joined friendly session. isHost: {isHost}");
                 roomUuid = runner.SessionInfo.Name;
                 networkBattleStatus = NetworkBattleStatus.LOBBY;
@@ -214,7 +212,6 @@ namespace Framework.Network
         /// </summary>
         public async void CreateSession()
         {
-            isHost = true;
             Debug.Log("[NetworkConnect] Creating new session as host...");
 
             var customProps = new Dictionary<string, SessionProperty>
@@ -265,7 +262,6 @@ namespace Framework.Network
         /// </summary>
         public async void CreateFriendlySession()
         {
-            isHost = true;
             Debug.Log("[NetworkConnect] Creating new session as host...");
 
             var customProps = new Dictionary<string, SessionProperty>
@@ -327,15 +323,16 @@ namespace Framework.Network
                 }, null);
             }
 
-            Instance.StartCoroutine(HomeScreen.Instance.StartGameSequence(Instance.GameStartSequence));
+            Instance.StartCoroutine(HomeScreen.Instance.ShowTransitionOnly(true, Instance.GameStartSequence));
         }
 
         public void GameStartSequence()
         {
             Debug.Log("[NetworkConnect] Running GameStartSequence...");
 
-            if (isHost)
+            if (isHost && !isHostLoadedSceneBattle)
             {
+                isHostLoadedSceneBattle = true;
                 Debug.Log("[NetworkConnect] Host is loading battle scene.");
                 StopAllCoroutines();
                 runner.LoadScene(SceneRef.FromIndex(3), LoadSceneMode.Single);
@@ -671,20 +668,38 @@ namespace Framework.Network
 
         public void InitializeCheck(int idx, string json)
         {
+            if (firstTimeInitializeCheck)
+                return;
             Debug.Log($"[NetworkConnect] InitializeCheck called for player {idx}.");
             NetworkBattleData data = JsonUtility.FromJson<NetworkBattleData>(json);
-            dic_PlayerData[idx].isInitialize = true;
-            dic_PlayerData[idx].sessionId = data.sessionId;
-            dic_PlayerData[idx].playId = data.playId;
+            if (data != null)
+            {
+                dic_PlayerData[idx].isInitialize = true;
+                dic_PlayerData[idx].sessionId = data.sessionId;
+                dic_PlayerData[idx].playId = data.playId;
+            }
 
             bool allReady = dic_PlayerData.Values.All(p => p.isInitialize || p.isGameOver || p.isAbnormalExit);
             if (allReady)
             {
                 Debug.Log("[NetworkConnect] All players ready. Closing session and starting countdown.");
+                firstTimeInitializeCheck = true;
                 runner.SessionInfo.IsOpen = false;
 
-                GameManager.Instance.CountStart();
+                StartCoroutine(InitializeCheckDone());
             }
+        }
+
+        IEnumerator InitializeCheckDone()
+        {
+            GameManager.Instance.anim_Transition.SetTrigger("TransitionOut");
+
+            yield return new WaitForSeconds(1f);
+
+            GameManager.Instance.anim_CloudSequence.Rewind();
+            GameManager.Instance.anim_CloudSequence.Play();
+
+            GameManager.Instance.CountStart();
         }
 
         public void FieldBossRewardCheck(int idx)
@@ -769,7 +784,6 @@ namespace Framework.Network
 
                     // Reset state
                     dic_PlayerData.Clear();
-                    isHost = false;
                     _countdownStarted = false;
 
                     // Restart matchmaking
@@ -827,7 +841,6 @@ namespace Framework.Network
 
                 // Reset all state variables
                 dic_PlayerData.Clear();
-                isHost = false;
                 _countdownStarted = false;
                 _isHostMigrating = false;
                 playerIdx = 0;
@@ -954,7 +967,6 @@ namespace Framework.Network
             this.runner = runner;
 
             // Update host status based on the new runner
-            isHost = runner.IsServer;
             Debug.Log($"[NetworkConnect] I am now the new host: {isHost}");
 
             // Reset countdown flag on migration to allow fresh start
@@ -1079,7 +1091,6 @@ namespace Framework.Network
             }
 
             // Reset state
-            isHost = false;
             dic_PlayerData.Clear();
             networkBattleStatus = NetworkBattleStatus.LOBBY;
 
@@ -1304,7 +1315,7 @@ namespace Framework.Network
                 .OrderByDescending(p => p.waveCount)          // Higher wave better
                 .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
-                .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
+                                                              // .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
                 .ToList();
 
             // Sort abnormal exits by their LOCKED rank (assigned at surrender time)

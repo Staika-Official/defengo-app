@@ -382,7 +382,6 @@ namespace Framework.Game.Defense
                 };
 
                 currentDecData.Add(dec);
-
                 UIManager.Instance.buttons_Upgrade[i].Initialize(data);
                 if (data.isHiddenMission)
                 {

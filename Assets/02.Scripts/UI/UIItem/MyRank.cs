@@ -122,8 +122,8 @@ namespace Framework.UI
                         image_limitedProfile.sprite = userProfileData.sprite_image;
                         break;
                 }
-                var find = RankingScreen.Instance.activeRankinfoItems.Find(x => x.userId == myRankData.userId);
-                text_Rank.text = find != null ? find.text_Rank.text : "99+";
+                var find = RankingScreen.Instance.battleLeaderboards.Find(x => x.userId == myRankData.userId);
+                text_Rank.text = find != null ? $"{RankingScreen.Instance.battleLeaderboards.IndexOf(find) + 1}" : "99+";
                 text_NickName.text = UserInfoManager.Instance.nickname;
 
                 string value = $"{(int)myRankData.totalLp}";

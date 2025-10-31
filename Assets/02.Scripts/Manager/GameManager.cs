@@ -153,15 +153,17 @@ namespace Framework.Game.Defense
             {
                 gameMode = GameMode.TUTORIAL;
             }
+            else if (NetworkConnect.Instance != null)
+            {
+                gameMode = GameMode.BATTLE;
+            }
 
             monsterSpawner.InitializeStart();
 
-            anim_Transition.SetTrigger("TransitionOut");
+            if (gameMode != GameMode.BATTLE)
+                anim_Transition.SetTrigger("TransitionOut");
 
             yield return new WaitForSeconds(2);
-
-            anim_CloudSequence.Rewind();
-            anim_CloudSequence.Play();
 
             float temp = Camera.main.orthographicSize;
             Camera.main.orthographicSize = temp * 1.3f;
@@ -174,6 +176,9 @@ namespace Framework.Game.Defense
             switch (gameMode)
             {
                 case GameMode.SINGLE:
+
+                    anim_CloudSequence.Rewind();
+                    anim_CloudSequence.Play();
                     Initialize();
                     yield return new WaitForSeconds(1f);
                     CountStart();
@@ -182,6 +187,9 @@ namespace Framework.Game.Defense
                     BattleInitialize();
                     break;
                 case GameMode.TUTORIAL:
+
+                    anim_CloudSequence.Rewind();
+                    anim_CloudSequence.Play();
                     TutorialManager.Instance.Initialize();
                     TutorialInitialize();
                     break;
@@ -1201,6 +1209,7 @@ namespace Framework.Game.Defense
 
         public void OnDestroy()
         {
+            ObjectPoolManager.OnCompleteAssetLoad = null;
             Instance = null;
         }
 

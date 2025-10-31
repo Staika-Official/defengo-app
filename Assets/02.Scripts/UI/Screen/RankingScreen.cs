@@ -59,6 +59,7 @@ namespace Framework.UI
 
         [SerializeField] public List<RankInfoItem> activeRankinfoItems = new();
         [SerializeField] private Queue<RankInfoItem> rankInfoItems = new();
+        public List<BattleLeaderboardInfo> battleLeaderboards = new();
 
         private void Start()
         {
@@ -415,7 +416,7 @@ namespace Framework.UI
             text_LeagueNum.text = $"Season {data.season.id}";
 
             bool isNoRank = data.leaders.Count == 0;
-
+            battleLeaderboards = data.leaders;
             if (data.season.activated)
             {
                 noRank.SetActive(isNoRank);
