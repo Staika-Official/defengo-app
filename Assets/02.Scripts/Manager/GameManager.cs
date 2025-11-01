@@ -280,7 +280,7 @@ namespace Framework.Game.Defense
                     playId = UserInfoManager.Instance.playId;
                     break;
                 case GameMode.BATTLE:
-                    RewardRuleList rewardRuleList = await DataLoadManager.Instance.GetDataAsyncBinary<RewardRuleList>("testWaveData");
+                    RewardRuleList rewardRuleList = UserInfoManager.Instance.rewardRuleList;
 
                     for (int i = 0; i < rewardRuleList.rewardRules.Length; i++)
                     {
@@ -598,7 +598,7 @@ namespace Framework.Game.Defense
         {
             SoundManager.Instance.PlaySound(SoundKey.SF_MISSION_COMPLETE);
 
-            int go = dic_RewardRules[$"MISSION_{missionIndex}"].rewardGo;
+            int go = dic_RewardRules.ContainsKey($"MISSION_{missionIndex}") ? dic_RewardRules[$"MISSION_{missionIndex}"].rewardGo : 0;
             int goValue = (int)(go * missionRewardBuffValue);
 
             ++missionManager.currentMissionClear;

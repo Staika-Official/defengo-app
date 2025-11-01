@@ -17,7 +17,7 @@ namespace Framework.Game.Defense
         //유니크 벨류 1,4 : 빙판 세우는 주기 (최소, 최대)
         public ObscuredFloat iceBarrierMinCycle;
         public ObscuredFloat iceBarrierMaxCycle;
-        
+
         //유니크 벨류 2 : 빙판 지속시간
         public ObscuredFloat iceBarrierDuration;
         //유니크 벨류 3 : 빙판 판정 (거리로 판정내림)
@@ -96,12 +96,12 @@ namespace Framework.Game.Defense
             iceBarrierMinCycle = characterData.characterUniqueValue[0]
                 - (characterData.characterClassLevel - 1)
                 * characterData.classUpFactor[0];
-            
+
             iceBarrierMaxCycle = characterData.characterUniqueValue[3]
                                  - (characterData.characterClassLevel - 1)
                                  * characterData.classUpFactor[1];
-            
-            iceBarrierDuration = characterData.characterUniqueValue[1] 
+
+            iceBarrierDuration = characterData.characterUniqueValue[1]
                 + starGradeIndex * characterData.starFactor[0];
 
             iceBarrierBlockDistance = characterData.characterUniqueValue[2];
@@ -141,20 +141,23 @@ namespace Framework.Game.Defense
                 Debug.Log($"Guardian : {iceBarrierRandomCycle}");
                 yield return new WaitForSeconds(iceBarrierRandomCycle);
 
-                //캐릭터의 쳐다보는 위치와 위치마다 애니메이션이 다르기에 값을 설정해주는 함수
-                TrackEntry entry = GuardianLookAnimation();
+                if (!IsLockdown)
+                {
+                    //캐릭터의 쳐다보는 위치와 위치마다 애니메이션이 다르기에 값을 설정해주는 함수
+                    TrackEntry entry = GuardianLookAnimation();
 
-                //애니메이션 이벤트 Attack이 발생되면 넘어감
-                yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
+                    //애니메이션 이벤트 Attack이 발생되면 넘어감
+                    yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
 
-                //베리어 이펙트를 생성
-                BarrierAction();
+                    //베리어 이펙트를 생성
+                    BarrierAction();
 
-                //애니메이션이 끝날때까지 대기
-                yield return new WaitForSpineAnimationComplete(entry);
+                    //애니메이션이 끝날때까지 대기
+                    yield return new WaitForSpineAnimationComplete(entry);
 
-                //애니메이션이 끝난다면 아이들 상태
-                anim.AnimationState.SetAnimation(0, "Idle", true);
+                    //애니메이션이 끝난다면 아이들 상태
+                    anim.AnimationState.SetAnimation(0, "Idle", true);
+                }
             }
         }
 
