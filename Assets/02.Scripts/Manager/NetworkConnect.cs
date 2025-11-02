@@ -1307,7 +1307,7 @@ namespace Framework.Network
             normalPlayers = normalPlayers
                 // .OrderBy(p => p.isGameOver)                   // Alive players first (false < true)
                 .OrderByDescending(p => p.waveCount)          // Higher wave better
-                .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
+                // .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
                                                               // .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
                 .ToList();

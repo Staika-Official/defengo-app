@@ -863,7 +863,7 @@ namespace Framework.Game.Defense
 
         public void SetPlayRecordData(int killedBossLevel, int waveIdx)
         {
-            Debug.Log($"SetPlayRecord Data in stage {gameState}");
+            Debug.Log($"SetPlayRecord Data in stage {gameState} ~ wave {waveIdx}");
             if (gameState == GameState.GAME_OVER) return;
             int waveValue = waveIdx > 71 ? 71 : waveIdx;
             int reqGo = 0;
@@ -1046,6 +1046,15 @@ namespace Framework.Game.Defense
             UIManager.Instance.BossWaveItem.gameObject.SetActive(true);
             Debug.Log("BossWave Sequence wave Idx : " + roundId);
             float addhealth = SetAddBossHealth(roundId);
+
+            for (int i = waveIdx; i < roundId; i++)
+            {
+                if (i == waveIdx)
+                    SetPlayRecordData(monsterSpawner.killedBossLevel, i);
+                else
+                    SetPlayRecordData(0, i);
+            }
+
             waveIdx = roundId;
             monsterSpawner.currentWaveIdx = roundId - 1;
             monsterSpawner.waveIdx = roundId;
