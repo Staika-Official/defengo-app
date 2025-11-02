@@ -524,8 +524,8 @@ namespace Framework.Game.Defense
                         isWaveStart = false;
                         break;
                     case GameMode.BATTLE:
-                        NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx, totalKilledMonsterCount, totalKilledBossMonsterCount);
                         GameManager.Instance.SetPlayRecordData(killedBossLevel, currentWaveIdx);
+                        NetworkConnect.Instance.networkGameManager.Rpc_WaveComplete(NetworkConnect.Instance.playerIdx, currentWaveIdx, totalKilledMonsterCount, totalKilledBossMonsterCount);
                         killedMonsterCount = 0;
                         killedBossLevel = 0;
                         GameManager.Instance.WaveEnd();
