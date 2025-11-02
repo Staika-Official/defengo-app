@@ -1291,6 +1291,7 @@ namespace Framework.Network
             try
             {
                 var res = await req.SendWebRequest();
+                Debug.Log(req.downloadHandler.text);
                 RewardRuleList data = GetT<RewardRuleList>(res.downloadHandler.text);
                 UserInfoManager.Instance.SuccessRewardRuleList(data);
             }
@@ -4172,7 +4173,7 @@ namespace Framework.Network
         public async UniTask SurrenderBattle(SurrenderBattlePayload payload, UnityAction onSuccess, UnityAction onFail)
         {
             UnityWebRequest req = new(Domain.baseUrl + string.Format(Url.postSurrenderBattle, UserInfoManager.Instance.userId,
-                                NetworkConnect.Instance.sessionId, NetworkConnect.Instance.playId), "POST");
+                                NetworkConnect.Instance.sessionId, payload.leavePlayId), "POST");
 
             req.downloadHandler = new DownloadHandlerBuffer();
             var json = JsonUtility.ToJson(payload);

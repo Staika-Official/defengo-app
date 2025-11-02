@@ -126,7 +126,7 @@ namespace Framework.Game.Defense
             ObjectPoolManager.Instance.OnCompleteAssetLoad -= HandleLoadAssetComplete;
             ObjectPoolManager.Instance.OnCompleteAssetLoad += HandleLoadAssetComplete;
             ObjectPoolManager.Instance.SetObjectPool();
-            
+
 #if UNITY_EDITOR
             this.UpdateAsObservable()
                 .Where(_ => Input.GetKeyDown(KeyCode.C))
@@ -281,6 +281,10 @@ namespace Framework.Game.Defense
                     break;
                 case GameMode.BATTLE:
                     RewardRuleList rewardRuleList = UserInfoManager.Instance.rewardRuleList;
+                    if (rewardRuleList == null || rewardRuleList.rewardRules == null || rewardRuleList.rewardRules.Length <= 0)
+                    {
+                        rewardRuleList = await DataLoadManager.Instance.GetDataAsyncBinary<RewardRuleList>("testWaveData");
+                    }
 
                     for (int i = 0; i < rewardRuleList.rewardRules.Length; i++)
                     {
@@ -878,7 +882,11 @@ namespace Framework.Game.Defense
 
                 for (int i = 0; i < temp.Length; i++)
                 {
-                    int reward = dic_RewardRules[$"MISSION_{temp[i]}"].rewardGo;
+                    int reward = 0;
+                    if (dic_RewardRules.ContainsKey($"MISSION_{temp[i]}"))
+                    {
+                        reward = dic_RewardRules[$"MISSION_{temp[i]}"].rewardGo;
+                    }
                     missionGo += reward;
                 }
             }
@@ -938,7 +946,7 @@ namespace Framework.Game.Defense
                     killedBossMonster = monsterSpawner.killedBossMonsterCount,
                     completedMissions = this.completedMission,
                     bossLevel = killedBossLevel,
-                    playId = this.playId,
+                    playId = NetworkConnect.Instance.playId,
                     characterInfo = "",
                     monsterInfo = null,
                     sessionId = NetworkConnect.Instance.sessionId,

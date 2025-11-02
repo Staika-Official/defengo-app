@@ -624,8 +624,13 @@ namespace Framework.Network
                     OnAbnormalShutdown();
                     break;
 
+                case ShutdownReason.HostMigration:
+                    Debug.LogError("[NetworkConnect] Disconnected due to host migration.");
+                    break;
+
                 default:
                     Debug.LogError("[NetworkConnect] Shutdown: " + shutdownReason);
+                    OnAbnormalShutdown();
                     break;
             }
         }
@@ -658,7 +663,7 @@ namespace Framework.Network
         {
             if (firstTimeInitializeCheck)
                 return;
-            Debug.Log($"[NetworkConnect] InitializeCheck called for player {idx}.");
+            Debug.Log($"[NetworkConnect] InitializeCheck called for player {idx} ~ JSON: {json}");
             NetworkBattleData data = JsonUtility.FromJson<NetworkBattleData>(json);
             if (data != null)
             {
@@ -835,9 +840,10 @@ namespace Framework.Network
 
                 // Restart matchmaking from scratch - will create or join a new session
                 Debug.Log("[NetworkConnect] Restarting matchmaking - creating/joining new session");
-                ConnectToLobby(isFriendlyMatch);
                 var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
                 popup.UpdateUserInfo();
+                popup.button_Close.gameObject.SetActive(false);
+                ConnectToLobby(isFriendlyMatch);
                 return;
             }
 

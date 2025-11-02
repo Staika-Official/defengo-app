@@ -64,7 +64,7 @@ namespace Framework.UI
 
         public async void Show()
         {
-            await NetworkManager.Instance.GetBattleSummary(GameManager.Instance.playId, async (response) =>
+            await NetworkManager.Instance.GetBattleSummary(NetworkConnect.Instance.playId, async (response) =>
             {
                 await NetworkManager.Instance.GetMyBattleLeaderboard((newRank) =>
                 {

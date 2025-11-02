@@ -36,6 +36,7 @@ namespace Framework.UI
         public override void InActivePopup()
         {
             PopUpSequence(false);
+            _ = NetworkManager.Instance.GetRewardRule();
         }
 
         public override void Initialize()
