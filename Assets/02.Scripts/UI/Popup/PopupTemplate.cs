@@ -21,6 +21,8 @@ namespace Framework.UI
         public Button button_Close;
         public UnityAction PauseAction;
 
+        public bool IsActived => canvasGroup.alpha == 1 && canvasGroup.blocksRaycasts && canvasGroup.interactable; 
+
         public void PopUpSequence(bool isActive)
         {
             Debug.Log($"{gameObject.name} sequence: {isActive}");

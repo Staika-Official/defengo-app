@@ -268,7 +268,7 @@ namespace Framework.Network
             {
                 ["averageScore"] = metaScore,
                 ["averageRate"] = 40,
-                ["password"] = UserInfoManager.Instance.userId,
+                ["password"] = roomPassword,
                 ["isPlaying"] = false,
             };
 
@@ -640,6 +640,8 @@ namespace Framework.Network
             if (networkBattleStatus == NetworkBattleStatus.INGAME)
             {
                 //GameManager.Instance.GameOver();
+                if (UIManager.Instance.battleResultPopup.IsActived || UIManager.Instance.battleResultTablePopup.IsActived || UIManager.Instance.battleResultPromotePopup.IsActived)
+                    return;
                 PopupManager.Instance.GetPopUp<SystemNoticePopup>("systemNotice").SetNoticeText(LanguageManager.Instance.GetStringData("UI_Unknown_Error"),
                 delegate
                 {
@@ -1307,7 +1309,7 @@ namespace Framework.Network
             normalPlayers = normalPlayers
                 // .OrderBy(p => p.isGameOver)                   // Alive players first (false < true)
                 .OrderByDescending(p => p.waveCount)          // Higher wave better
-                // .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
+                                                              // .ThenByDescending(p => p.monsterBossKilled)   // Then boss kills
                 .ThenByDescending(p => p.monsterKilled)       // Then normal kills
                                                               // .ThenBy(p => p.playerIdx)                     // Final tie-breaker: lower playerIdx wins
                 .ToList();
