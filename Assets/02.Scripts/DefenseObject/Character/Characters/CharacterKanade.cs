@@ -31,7 +31,7 @@ namespace Framework.Game.Defense
         
         public override IEnumerator ActionSequence()
         {
-            while (isSummoned)
+            while (isSummoned && !IsLockdown)
             {
                 int randomIndex = Random.Range(0, 3);
 

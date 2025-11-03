@@ -24,7 +24,7 @@ namespace Framework.Game.Defense
 
         public override IEnumerator ActionSequence()
         {
-            while (isSummoned)
+            while (isSummoned && !IsLockdown)
             {
                 if (targetedMonster.Count > 0 && characterState == CharacterState.DETECT)
                 {

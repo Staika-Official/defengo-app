@@ -19,7 +19,7 @@ namespace Framework.Game.Defense
 
         public override IEnumerator ActionSequence()
         {
-            while (isSummoned)
+            while (isSummoned && !IsLockdown)
             {
                 TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_FrontSide", false);
 

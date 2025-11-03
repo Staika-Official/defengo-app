@@ -47,7 +47,7 @@ namespace Framework.Game.Defense
 
         public override IEnumerator ActionSequence()
         {
-            while (isSummoned)
+            while (isSummoned && !IsLockdown)
             {
                 //첫 소환부터 캐릭터가 스킬을 쓰면 안되기에 빙판세우는 주기만큼 대기
                 yield return new WaitForSeconds(bubbleShieldTime);

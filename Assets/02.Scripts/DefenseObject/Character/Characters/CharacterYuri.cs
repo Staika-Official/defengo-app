@@ -27,9 +27,9 @@ namespace Framework.Game.Defense
 
         public override IEnumerator ActionSequence()
         {
-            while (isSummoned)
+            while (isSummoned && !IsLockdown)
             {
-                if (targetedMonster.Count > 0 && characterState == CharacterState.DETECT)
+                if (targetedMonster.Count > 0 && characterState == CharacterState.DETECT && !IsLockdown)
                 {
                     characterState = CharacterState.ATTACK;
                     List<Monster> targetCache = targetedMonster;

@@ -120,7 +120,7 @@ namespace Framework.Game.Defense
 
             CharacterAction = () =>
             {
-                if (isSummoned && targetedMonster.Count > 0 && !isStun)
+                if (isSummoned && targetedMonster.Count > 0 && !isStun && !IsLockdown)
                 {
                     actionSequence = ActionSequence();
                     StartCoroutine(actionSequence);

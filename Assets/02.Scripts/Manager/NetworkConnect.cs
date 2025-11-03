@@ -93,7 +93,7 @@ namespace Framework.Network
             // reset countdown flag on a fresh lobby connection
             _countdownStarted = false;
 
-            Debug.Log($"[NetworkConnect] Connecting to lobby... ~ Is Friendly Match: {isFriendlyMatch}");
+            Debug.Log($"[NetworkConnect] Connecting to lobby... ~ Is Friendly Match: {isFriendlyMatch} ~ RoomName: {roomName} ~ RoomPassword: {roomPassword}");
 
             if (runner == null)
             {
@@ -845,7 +845,7 @@ namespace Framework.Network
                 var popup = PopupManager.Instance.GetPopUp<MatchMakingPopup>("matchMaking");
                 popup.UpdateUserInfo();
                 popup.button_Close.gameObject.SetActive(false);
-                ConnectToLobby(isFriendlyMatch);
+                ConnectToLobby(isFriendlyMatch, UserInfoManager.Instance.userId, UserInfoManager.Instance.userId);
                 return;
             }
 

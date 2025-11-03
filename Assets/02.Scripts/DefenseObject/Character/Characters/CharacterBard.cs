@@ -92,7 +92,7 @@ namespace Framework.Game.Defense
 
         public void SetSpeedBuffCharacter()
         {
-            if (!isSummoned) return;
+            if (!isSummoned || IsLockdown) return;
             Vector2 pos = Calculator.TransformationVector(constructibleIdx);
 
             //현재 소환된 캐릭터 순회

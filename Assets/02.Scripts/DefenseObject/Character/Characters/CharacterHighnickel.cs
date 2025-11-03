@@ -19,27 +19,30 @@ namespace Framework.Game.Defense
 
         public override IEnumerator ActionSequence()
         {
-            TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_FrontSide", false);
-
-            yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
-
-            List<Monster> targetCache = GameManager.Instance.monsterSpawner.monsters;
-
-            for (int i = 0; i < targetCache.Count; i++)
+            if (!IsLockdown)
             {
-                if (!targetCache[i].IsAlive) continue;
+                TrackEntry entry = anim.AnimationState.SetAnimation(0, "Attack_FrontSide", false);
 
-                HighnickelProjectile projectile = GameManager.Instance.objectPoolManager.GetObject<HighnickelProjectile>(characterData.projectileName);
-                projectile.transform.localPosition = transform.localPosition;
-                projectile.attackValue = totalDamage;
-                projectile.criticalDamageRate = criticalDamageRate;
-                projectile.isMove = true;
-                projectile.provokedIndex = glacierIdx;
+                yield return new WaitForSpineEvent(anim.AnimationState, "Attack");
 
-                projectile.Initialize(this, targetCache[i], false, projectileSpeed, "ElectroHit", stunDration);
+                List<Monster> targetCache = GameManager.Instance.monsterSpawner.monsters;
+
+                for (int i = 0; i < targetCache.Count; i++)
+                {
+                    if (!targetCache[i].IsAlive) continue;
+
+                    HighnickelProjectile projectile = GameManager.Instance.objectPoolManager.GetObject<HighnickelProjectile>(characterData.projectileName);
+                    projectile.transform.localPosition = transform.localPosition;
+                    projectile.attackValue = totalDamage;
+                    projectile.criticalDamageRate = criticalDamageRate;
+                    projectile.isMove = true;
+                    projectile.provokedIndex = glacierIdx;
+
+                    projectile.Initialize(this, targetCache[i], false, projectileSpeed, "ElectroHit", stunDration);
+                }
+
+                yield return new WaitForSpineAnimationComplete(entry);
             }
-
-            yield return new WaitForSpineAnimationComplete(entry);
 
             anim.AnimationState.SetAnimation(0, "Idle", true);
         }
