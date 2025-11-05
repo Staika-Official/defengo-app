@@ -233,7 +233,7 @@ namespace Framework.Network
 
             var result = await runner.StartGame(new StartGameArgs()
             {
-                GameMode = Fusion.GameMode.AutoHostOrClient,
+                GameMode = Fusion.GameMode.Host,
                 PlayerCount = maxPlayerCount,
                 SessionProperties = customProps
             });
@@ -284,7 +284,7 @@ namespace Framework.Network
 
             var result = await runner.StartGame(new StartGameArgs()
             {
-                GameMode = Fusion.GameMode.AutoHostOrClient,
+                GameMode = Fusion.GameMode.Host,
                 SessionName = roomName,
                 PlayerCount = maxPlayerCount,
                 SessionProperties = customProps
